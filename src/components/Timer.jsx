@@ -44,13 +44,13 @@ const Timer = ({ minutes, onTimeUp }) => {
   const getColor = () => {
     if (isCritical) return 'text-red-400';
     if (isWarning) return 'text-yellow-400';
-    return 'text-white';
+    return 'text-gray-900 dark:text-white';
   };
 
   const getBgColor = () => {
-    if (isCritical) return 'bg-red-500/20 border-red-500/50';
-    if (isWarning) return 'bg-yellow-500/20 border-yellow-500/50';
-    return 'bg-white/10 border-white/20';
+    if (isCritical) return 'bg-red-500/20 dark:bg-red-500/20 border-red-500/50 dark:border-red-500/50';
+    if (isWarning) return 'bg-yellow-500/20 dark:bg-yellow-500/20 border-yellow-500/50 dark:border-yellow-500/50';
+    return 'bg-black/5 dark:bg-white/10 border-gray-300 dark:border-white/20';
   };
 
   const getAriaLabel = () => {

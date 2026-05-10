@@ -66,7 +66,7 @@ const QuestionCard = ({
           )}
         </div>
         <div className="flex items-center gap-3">
-          <span className="px-3 py-1 rounded-lg bg-white/10 text-sm" aria-label={`${marks} ${marks === 1 ? 'mark' : 'marks'} available`}>
+          <span className="px-3 py-1 rounded-lg bg-black/5 dark:bg-white/10 text-sm" aria-label={`${marks} ${marks === 1 ? 'mark' : 'marks'} available`}>
             +{marks} {marks === 1 ? 'mark' : 'marks'}
           </span>
           {isAnswered && (
@@ -106,14 +106,14 @@ const QuestionCard = ({
           const isSelected = isOptionSelected(index);
           
           return (
-            <div
-              key={index}
-              id={optionId}
-              className={`p-3 sm:p-4 rounded-xl border cursor-pointer transition-all flex-shrink-0 ${
-                isSelected 
-                  ? 'border-primary bg-primary/10' 
-                  : 'border-white/10 bg-white/5 hover:bg-white/10'
-              }`}
+                <div
+                  key={index}
+                  id={optionId}
+                  className={`p-3 sm:p-4 rounded-xl border cursor-pointer transition-all flex-shrink-0 ${
+                    isSelected 
+                      ? 'border-primary bg-primary/10' 
+                      : 'border-gray-200 dark:border-white/10 bg-black/5 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10'
+                  }`}
               onClick={() => handleOptionClick(index)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -130,7 +130,7 @@ const QuestionCard = ({
               <div className="flex items-center gap-3">
                 <div 
                   className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                    isSelected ? 'border-primary bg-primary' : 'border-gray-500'
+                    isSelected ? 'border-primary bg-primary' : 'border-gray-400 dark:border-gray-500'
                   }`}
                   aria-hidden="true"
                 >
@@ -152,7 +152,7 @@ const QuestionCard = ({
       </div>
 
       {isMultiple && (
-        <p id={`multiple-hint-${questionNumber}`} className="text-sm text-gray-400 mt-4 flex-shrink-0">
+        <p id={`multiple-hint-${questionNumber}`} className="text-sm text-gray-500 dark:text-gray-400 mt-4 flex-shrink-0">
           Select all answers that apply{selectedCount > 0 ? ` (${selectedCount} selected)` : ''}
         </p>
       )}
@@ -160,7 +160,7 @@ const QuestionCard = ({
       {explanation && (
         <aside className="mt-3 p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20 flex-shrink-0" aria-label="Explanation">
           <strong className="text-sm"><span aria-hidden="true">💡</span> Explanation:</strong>
-          <p className="mt-1 text-xs text-gray-300">{explanation}</p>
+          <p className="mt-1 text-xs text-gray-600 dark:text-gray-300">{explanation}</p>
         </aside>
       )}
     </article>

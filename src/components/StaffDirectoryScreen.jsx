@@ -14,9 +14,9 @@ const SectionWithConnector = ({ title, icon, count, children, delay = 0 }) => (
   >
     <div className="flex items-center gap-3 mb-4">
       <div className="h-px w-12 bg-gradient-to-r from-transparent to-primary/40" />
-      <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10">
+      <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10">
         <span className="text-sm">{icon}</span>
-        <span className="text-sm font-semibold text-gray-200">{title}</span>
+        <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">{title}</span>
         <span className="text-xs bg-primary/20 px-2 py-0.5 rounded-full text-primary">{count}</span>
       </div>
       <div className="h-px w-12 bg-gradient-to-l from-transparent to-primary/40" />
@@ -46,7 +46,7 @@ const StaffDirectoryScreen = () => {
       onClick={() => handlePersonClick(person)}
     >
       <Avatar person={person} size={size} />
-      <h3 className="mt-3 font-bold text-white text-sm text-center line-clamp-2 break-words" style={{ maxWidth: '180px' }}>
+      <h3 className="mt-3 font-bold text-gray-900 dark:text-white text-sm text-center line-clamp-2 break-words" style={{ maxWidth: '180px' }}>
         {person.salutation === 'Mr' ? 'Mr.' : 'Mrs.'} {capitalize(person.name)}
       </h3>
       <p className="text-xs text-primary/80">{person.designation}</p>
@@ -65,10 +65,10 @@ const StaffDirectoryScreen = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent text-center mb-1">
+        <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent text-center mb-1">
           People of SKKSV
         </h1>
-        <p className="text-gray-400 text-sm text-center">Our School Family</p>
+        <p className="text-gray-500 dark:text-gray-400 text-sm text-center">Our School Family</p>
       </motion.div>
 
       <div className="px-4 space-y-8">

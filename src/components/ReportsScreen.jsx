@@ -114,8 +114,8 @@ const ReportsScreen = ({ config: propConfig, onBack: propOnBack }) => {
         <div className="glass-card w-full max-w-md animate-slideUp">
           <div className="text-center mb-8">
             <div className="text-5xl mb-4">📊</div>
-            <h2 className="text-2xl font-bold mb-2">Reports</h2>
-            <p className="text-gray-400">Teacher secret key not configured</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Reports</h2>
+            <p className="text-gray-500 dark:text-gray-400">Teacher secret key not configured</p>
           </div>
           <div className="text-center">
             <button className="px-6 py-3 rounded-xl font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90" onClick={onBack}>
@@ -133,14 +133,14 @@ const ReportsScreen = ({ config: propConfig, onBack: propOnBack }) => {
         <div className="glass-card w-full max-w-md animate-slideUp">
           <div className="text-center mb-8">
             <div className="text-5xl mb-4">📊</div>
-            <h2 className="text-2xl font-bold mb-2">Teacher Reports</h2>
-            <p className="text-gray-400">Enter teacher secret key to view reports</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Teacher Reports</h2>
+            <p className="text-gray-500 dark:text-gray-400">Enter teacher secret key to view reports</p>
           </div>
 
           <form onSubmit={handleKeySubmit} className="space-y-4">
             <input
               type="password"
-              className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white placeholder-gray-500 outline-none ${keyError ? 'border-red-500' : 'border-white/10 focus:border-primary/50'}`}
+              className={`w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 outline-none ${keyError ? 'border-red-500' : 'border-gray-200 dark:border-white/10 focus:border-primary/50'}`}
               placeholder="Enter teacher secret key"
               value={secretKey}
               onChange={handleKeyChange}
@@ -152,7 +152,7 @@ const ReportsScreen = ({ config: propConfig, onBack: propOnBack }) => {
             <button type="submit" className="w-full px-6 py-3 rounded-xl font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90">
               View Reports 🔓
             </button>
-            <button type="button" className="w-full px-6 py-3 rounded-xl font-medium bg-white/10 border border-white/20 text-white hover:bg-white/20" onClick={onBack}>
+            <button type="button" className="w-full px-6 py-3 rounded-xl font-medium bg-black/5 dark:bg-white/10 border border-gray-300 dark:border-white/20 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20" onClick={onBack}>
               ← Back
             </button>
           </form>
@@ -167,17 +167,17 @@ const ReportsScreen = ({ config: propConfig, onBack: propOnBack }) => {
         <div className="glass-card animate-slideUp">
           <div className="text-center mb-8">
             <div className="text-5xl mb-4">📊</div>
-            <h2 className="text-2xl font-bold mb-2">{config.examType} - Class {config.classNum}</h2>
-            <p className="text-gray-400">{config.subject} | {config.teacher}</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{config.examType} - Class {config.classNum}</h2>
+            <p className="text-gray-500 dark:text-gray-400">{config.subject} | {config.teacher}</p>
           </div>
 
           {loading ? (
             <div className="text-center py-12">
-              <p className="text-gray-400">Loading reports...</p>
+              <p className="text-gray-500 dark:text-gray-400">Loading reports...</p>
             </div>
           ) : sortedData.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-400">No reports found for this assessment.</p>
+              <p className="text-gray-500 dark:text-gray-400">No reports found for this assessment.</p>
             </div>
           ) : (
             <>
@@ -197,7 +197,7 @@ const ReportsScreen = ({ config: propConfig, onBack: propOnBack }) => {
                     <span>📥</span> Export Excel
                   </button>
                   <button 
-                    className="px-4 py-2 rounded-xl font-medium bg-white/10 border border-white/20 text-white hover:bg-white/20 flex items-center gap-2" 
+                    className="px-4 py-2 rounded-xl font-medium bg-black/5 dark:bg-white/10 border border-gray-300 dark:border-white/20 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20 flex items-center gap-2" 
                     onClick={fetchReportData}
                   >
                     <span>🔄</span> Refresh
@@ -205,39 +205,39 @@ const ReportsScreen = ({ config: propConfig, onBack: propOnBack }) => {
                 </div>
               </div>
 
-              <div className="overflow-x-auto rounded-xl bg-black/20">
+              <div className="overflow-x-auto rounded-xl bg-gray-100 dark:bg-black/20">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-white/10">
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-300 cursor-pointer hover:text-white" onClick={() => handleSort('name')}>
+                    <tr className="border-b border-gray-200 dark:border-white/10">
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300 cursor-pointer hover:text-gray-900 dark:hover:text-white" onClick={() => handleSort('name')}>
                         Name <SortIcon columnKey="name" />
                       </th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-300 cursor-pointer hover:text-white w-24" onClick={() => handleSort('rollNumber')}>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300 cursor-pointer hover:text-gray-900 dark:hover:text-white w-24" onClick={() => handleSort('rollNumber')}>
                         Roll No <SortIcon columnKey="rollNumber" />
                       </th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-300 cursor-pointer hover:text-white w-20" onClick={() => handleSort('correct')}>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300 cursor-pointer hover:text-gray-900 dark:hover:text-white w-20" onClick={() => handleSort('correct')}>
                         Correct <SortIcon columnKey="correct" />
                       </th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-300 cursor-pointer hover:text-white w-20" onClick={() => handleSort('wrong')}>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300 cursor-pointer hover:text-gray-900 dark:hover:text-white w-20" onClick={() => handleSort('wrong')}>
                         Wrong <SortIcon columnKey="wrong" />
                       </th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-300 cursor-pointer hover:text-white w-20" onClick={() => handleSort('skipped')}>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300 cursor-pointer hover:text-gray-900 dark:hover:text-white w-20" onClick={() => handleSort('skipped')}>
                         Skipped <SortIcon columnKey="skipped" />
                       </th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-300 cursor-pointer hover:text-white w-20" onClick={() => handleSort('marks')}>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300 cursor-pointer hover:text-gray-900 dark:hover:text-white w-20" onClick={() => handleSort('marks')}>
                         Marks <SortIcon columnKey="marks" />
                       </th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-300 cursor-pointer hover:text-white w-20" onClick={() => handleSort('percentage')}>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300 cursor-pointer hover:text-gray-900 dark:hover:text-white w-20" onClick={() => handleSort('percentage')}>
                         % <SortIcon columnKey="percentage" />
                       </th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-300 cursor-pointer hover:text-white w-20" onClick={() => handleSort('grade')}>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300 cursor-pointer hover:text-gray-900 dark:hover:text-white w-20" onClick={() => handleSort('grade')}>
                         Grade <SortIcon columnKey="grade" />
                       </th>
                     </tr>
                   </thead>
                   <tbody>
                     {sortedData.map((row) => (
-                      <tr key={row.id} className="border-b border-white/5 hover:bg-white/5">
+                      <tr key={row.id} className="border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5">
                         <td className="px-4 py-3 text-sm">{row.name}</td>
                         <td className="px-4 py-3 text-sm">{row.rollNumber}</td>
                         <td className="px-4 py-3 text-sm text-green-400">{row.correct}</td>

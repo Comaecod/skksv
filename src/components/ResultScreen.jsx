@@ -165,27 +165,27 @@ const ResultScreen = ({
     <div className="w-full max-w-3xl animate-slideUp" role="region" aria-labelledby="result-heading">
       <article className="glass-card">
         <header className="text-center mb-6 sm:mb-8">
-          <h2 id="result-heading" className="text-xl sm:text-2xl font-bold mb-2">
+          <h2 id="result-heading" className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">
             <span aria-hidden="true">{performance.emoji}</span> {config.examTitle} Complete <span aria-hidden="true">{performance.emoji}</span>
           </h2>
-          <p className="text-gray-400">
+          <p className="text-gray-500 dark:text-gray-400">
             Please remain seated. Do not look around. <span aria-hidden="true">👀</span>
           </p>
         </header>
 
         {studentInfo && (
-          <div className="p-4 sm:p-6 rounded-2xl bg-white/5 border border-white/10 mb-4 sm:mb-6">
-            <h3 className="text-lg sm:text-xl font-semibold mb-1">
+          <div className="p-4 sm:p-6 rounded-2xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 mb-4 sm:mb-6">
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-1">
               {formatName(studentInfo.firstName)} {formatName(studentInfo.lastName)}
             </h3>
-            <p className="text-gray-400">Roll Number: {studentInfo.rollNumber}</p>
+            <p className="text-gray-500 dark:text-gray-400">Roll Number: {studentInfo.rollNumber}</p>
           </div>
         )}
 
         <div className="text-center mb-4" role="status" aria-live="polite" aria-label="Your score">
           <div className="text-5xl sm:text-6xl font-bold">
             {results.totalEarned.toFixed(1)}
-            <span className="text-2xl sm:text-3xl text-gray-400">/{results.totalMarks}</span>
+            <span className="text-2xl sm:text-3xl text-gray-500 dark:text-gray-400">/{results.totalMarks}</span>
           </div>
         </div>
 
@@ -199,28 +199,28 @@ const ResultScreen = ({
           </span>
         </div>
 
-        <p className="text-center text-gray-400 mb-4 sm:mb-6">{performance.message}</p>
+        <p className="text-center text-gray-500 dark:text-gray-400 mb-4 sm:mb-6">{performance.message}</p>
 
         <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6 sm:mb-8" role="list" aria-label="Question statistics">
           <div className="p-3 sm:p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-center" role="listitem">
             <div className="text-2xl sm:text-3xl font-bold text-green-400" aria-label={`${results.correctCount} correct answers`}>{results.correctCount}</div>
-            <div className="text-xs sm:text-sm text-gray-400"><span aria-hidden="true">✅</span> Correct</div>
+            <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400"><span aria-hidden="true">✅</span> Correct</div>
           </div>
           <div className="p-3 sm:p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-center" role="listitem">
             <div className="text-2xl sm:text-3xl font-bold text-red-400" aria-label={`${results.wrongCount} wrong answers`}>{results.wrongCount}</div>
-            <div className="text-xs sm:text-sm text-gray-400"><span aria-hidden="true">❌</span> Wrong</div>
+            <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400"><span aria-hidden="true">❌</span> Wrong</div>
           </div>
           <div className="p-3 sm:p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/20 text-center" role="listitem">
             <div className="text-2xl sm:text-3xl font-bold text-yellow-400" aria-label={`${results.skippedCount} skipped questions`}>{results.skippedCount}</div>
-            <div className="text-xs sm:text-sm text-gray-400"><span aria-hidden="true">⏭️</span> Skipped</div>
+            <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400"><span aria-hidden="true">⏭️</span> Skipped</div>
           </div>
         </div>
 
         {hasSecretKey && !isUnlocked ? (
           <div className="text-center py-6 sm:py-8">
             <div className="text-4xl sm:text-5xl mb-4" aria-hidden="true">🔒</div>
-            <h3 className="text-lg sm:text-xl font-semibold mb-2">Answers Hidden</h3>
-            <p className="text-gray-400 mb-6">Enter the secret key to view question analysis</p>
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-2">Answers Hidden</h3>
+            <p className="text-gray-500 dark:text-gray-400 mb-6">Enter the secret key to view question analysis</p>
             
             <form onSubmit={handleKeySubmit} className="max-w-sm mx-auto space-y-4">
               <div>
@@ -229,7 +229,7 @@ const ResultScreen = ({
                   ref={keyInputRef}
                   id="secret-key"
                   type="password"
-                  className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white placeholder-gray-500 outline-none ${keyError ? 'border-red-500' : 'border-white/10 focus:border-primary/50'}`}
+                  className={`w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 outline-none ${keyError ? 'border-red-500' : 'border-gray-200 dark:border-white/10 focus:border-primary/50'}`}
                   placeholder="Enter secret key"
                   value={secretKey}
                   onChange={handleKeyChange}
@@ -249,16 +249,16 @@ const ResultScreen = ({
           </div>
         ) : (
           <div className="mb-4 sm:mb-6">
-            <h3 className="text-base sm:text-lg font-semibold mb-4"><span aria-hidden="true">📊</span> Question Analysis</h3>
-            <div className="overflow-x-auto rounded-xl bg-black/20">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-4"><span aria-hidden="true">📊</span> Question Analysis</h3>
+            <div className="overflow-x-auto rounded-xl bg-gray-100 dark:bg-black/20">
               <table className="w-full min-w-[500px]">
                 <thead>
-                  <tr className="border-b border-white/10">
-                    <th className="px-3 sm:px-4 py-3 text-left text-sm font-semibold text-gray-300 w-12" scope="col">#</th>
-                    <th className="px-3 sm:px-4 py-3 text-left text-sm font-semibold text-gray-300" scope="col">Question</th>
-                    <th className="px-3 sm:px-4 py-3 text-left text-sm font-semibold text-gray-300 w-32" scope="col">Correct</th>
-                    <th className="px-3 sm:px-4 py-3 text-left text-sm font-semibold text-gray-300 w-32" scope="col">Your Answer</th>
-                    <th className="px-3 sm:px-4 py-3 text-center text-sm font-semibold text-gray-300 w-12" scope="col">Status</th>
+                    <tr className="border-b border-gray-200 dark:border-white/10">
+                    <th className="px-3 sm:px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300 w-12" scope="col">#</th>
+                    <th className="px-3 sm:px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300" scope="col">Question</th>
+                    <th className="px-3 sm:px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300 w-32" scope="col">Correct</th>
+                    <th className="px-3 sm:px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300 w-32" scope="col">Your Answer</th>
+                    <th className="px-3 sm:px-4 py-3 text-center text-sm font-semibold text-gray-600 dark:text-gray-300 w-12" scope="col">Status</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -286,7 +286,7 @@ const ResultScreen = ({
                     const truncated = question.text.length > 40 ? question.text.substring(0, 40) + '...' : question.text;
 
                     return (
-                      <tr key={question.id} className="border-b border-white/5 hover:bg-white/5">
+                      <tr key={question.id} className="border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5">
                         <td className="px-3 sm:px-4 py-3 text-sm">Q{question.questionNumber}</td>
                         <td className="px-3 sm:px-4 py-3 text-sm" title={question.text}>{truncated}</td>
                         <td className="px-3 sm:px-4 py-3 text-sm text-green-400">{correctText}</td>
@@ -323,7 +323,7 @@ const ResultScreen = ({
         </div>
 
         <aside className="text-center p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 mb-4 sm:mb-6" aria-label="Study tip">
-          <p className="text-sm text-gray-300"><span aria-hidden="true">💡</span> Review answers above to understand correct solutions. Practice makes perfect!</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300"><span aria-hidden="true">💡</span> Review answers above to understand correct solutions. Practice makes perfect!</p>
         </aside>
 
         <div className="text-center">

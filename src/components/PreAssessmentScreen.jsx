@@ -28,14 +28,14 @@ const PreAssessmentScreen = ({ config, onSuccess, onBack }) => {
     <div className="glass-card w-full max-w-md animate-slideUp">
       <div className="text-center mb-8">
         <div className="text-5xl mb-4">🔐</div>
-        <h2 className="text-2xl font-bold text-white mb-2">Enter Assessment Key</h2>
-        <p className="text-gray-400">Get the key from your teacher to begin</p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Enter Assessment Key</h2>
+        <p className="text-gray-500 dark:text-gray-400">Get the key from your teacher to begin</p>
       </div>
 
-      <div className="mb-6 p-4 rounded-xl bg-white/5 border border-white/10">
+      <div className="mb-6 p-4 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10">
         <div className="text-center">
-          <div className="text-sm text-gray-400 mb-1">{config.examType}</div>
-          <div className="text-lg font-semibold text-white">Class {config.classNum} - {config.subject}</div>
+          <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">{config.examType}</div>
+          <div className="text-lg font-semibold text-gray-900 dark:text-white">Class {config.classNum} - {config.subject}</div>
         </div>
       </div>
 
@@ -43,8 +43,8 @@ const PreAssessmentScreen = ({ config, onSuccess, onBack }) => {
         <div>
           <input
             type="password"
-            className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white placeholder-gray-500 outline-none transition-all ${
-              error ? 'border-red-500' : 'border-white/10 focus:border-primary/50'
+            className={`w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 outline-none transition-all ${
+              error ? 'border-red-500' : 'border-gray-200 dark:border-white/10 focus:border-primary/50'
             }`}
             placeholder="Enter assessment key"
             value={secretKey}
@@ -69,7 +69,7 @@ const PreAssessmentScreen = ({ config, onSuccess, onBack }) => {
           <button
             type="button"
             onClick={onBack}
-            className="px-6 py-3 rounded-xl font-medium bg-white/10 border border-white/20 text-white hover:bg-white/20 transition-all"
+            className="px-6 py-3 rounded-xl font-medium bg-black/5 dark:bg-white/10 border border-gray-300 dark:border-white/20 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20 transition-all"
           >
             ← Back
           </button>

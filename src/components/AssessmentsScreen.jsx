@@ -166,7 +166,7 @@ const AssessmentsScreen = () => {
       <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4">
         <div className="glass-card p-8 text-center w-full max-w-md">
           <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading...</p>
+          <p className="text-gray-500 dark:text-gray-400">Loading...</p>
         </div>
       </div>
     );
@@ -216,7 +216,7 @@ const AssessmentsScreen = () => {
         <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4">
           <div className="glass-card p-8 text-center w-full max-w-md">
             <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-400">Loading assessment...</p>
+            <p className="text-gray-500 dark:text-gray-400">Loading assessment...</p>
           </div>
         </div>
       ) : examConfig ? (
@@ -285,7 +285,7 @@ const AssessmentsScreen = () => {
             answers={answers} 
             studentInfo={studentInfo} 
             config={examConfig} 
-            onRestart={() => navigate('/assessments')} 
+            onRestart={() => navigate('/')} 
           />
         </div>
       );

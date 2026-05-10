@@ -151,7 +151,7 @@ const QuizScreen = ({
 
   return (
     <div 
-      className="w-full max-w-6xl flex flex-col lg:flex-row gap-4 lg:gap-6 animate-fadeIn min-h-[calc(100vh-140px)]"
+      className="w-full max-w-6xl mx-auto flex flex-col lg:flex-row gap-4 lg:gap-6 animate-fadeIn min-h-[calc(100vh-140px)]"
       ref={mainRef}
       tabIndex={-1}
       onKeyDown={handleKeyDown}
@@ -171,9 +171,9 @@ const QuizScreen = ({
           <div className="text-sm text-center sm:text-left">
             {!hasAnswered ? (
               wrongAnswerPenaltyFraction > 0 ? (
-                <span className="text-yellow-400">📝 Unattempted (wrong answers have -{wrongAnswerPenaltyFraction * 100}% penalty)</span>
+                <span className="text-yellow-400 dark:text-yellow-400">📝 Unattempted (wrong answers have -{wrongAnswerPenaltyFraction * 100}% penalty)</span>
               ) : (
-                <span className="text-gray-400">📝 Unattempted question</span>
+                <span className="text-gray-500 dark:text-gray-400">📝 Unattempted question</span>
               )
             ) : (
               <span className="text-green-400">✅ Answered</span>
@@ -206,17 +206,17 @@ const QuizScreen = ({
         className="w-full lg:w-80 flex-shrink-0 flex flex-col gap-4 order-1 lg:order-2"
         aria-label="Quiz navigation"
       >
-        <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
+        <div className="p-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             <div>
-              <div className="text-base font-semibold text-white">{studentInfo.firstName} {studentInfo.lastName}</div>
-              <div className="text-gray-400 text-sm">Roll: {studentInfo.rollNumber}</div>
+              <div className="text-base font-semibold text-gray-900 dark:text-white">{studentInfo.firstName} {studentInfo.lastName}</div>
+              <div className="text-gray-500 dark:text-gray-400 text-sm">Roll: {studentInfo.rollNumber}</div>
             </div>
             <Timer minutes={timeLimitMinutes} onTimeUp={handleTimeUp} />
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
+        <div className="p-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10">
           <div className="flex gap-3 mb-4 flex-wrap justify-center text-xs" role="list" aria-label="Question status legend">
             <div className="flex items-center gap-1" role="listitem">
               <span className="w-3 h-3 rounded bg-primary" aria-hidden="true"></span>
@@ -231,7 +231,7 @@ const QuizScreen = ({
               <span>Skipped</span>
             </div>
             <div className="flex items-center gap-1" role="listitem">
-              <span className="w-3 h-3 rounded bg-gray-600" aria-hidden="true"></span>
+              <span className="w-3 h-3 rounded bg-gray-300 dark:bg-gray-600" aria-hidden="true"></span>
               <span>Unvisited</span>
             </div>
           </div>
@@ -242,13 +242,13 @@ const QuizScreen = ({
                 const status = getQuestionStatus(q, idx);
                 const bgColor = status === 'current' ? 'bg-primary' : 
                                status === 'answered' ? 'bg-green-500' : 
-                               status === 'skipped' ? 'bg-yellow-500' : 'bg-gray-600';
+                               status === 'skipped' ? 'bg-yellow-500' : 'bg-gray-300 dark:bg-gray-600';
                 const isCurrent = status === 'current';
                 
                 return (
                   <button
                     key={q.id}
-                    className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg font-medium text-sm ${bgColor} hover:opacity-80 transition-all focus:outline-none focus:ring-2 focus:ring-white/50 ${isCurrent ? 'ring-2 ring-white' : ''}`}
+                    className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg font-medium text-sm text-white ${bgColor} hover:opacity-80 transition-all focus:outline-none focus:ring-2 focus:ring-gray-900/50 dark:focus:ring-white/50 ${isCurrent ? 'ring-2 ring-gray-900 dark:ring-white' : ''}`}
                     onClick={() => handleQuestionClick(idx)}
                     aria-label={`Question ${idx + 1}${status === 'current' ? ', current' : ''}${status === 'answered' ? ', answered' : ''}${status === 'skipped' ? ', skipped' : ''}`}
                     aria-current={isCurrent ? 'true' : undefined}
@@ -262,22 +262,22 @@ const QuizScreen = ({
 
           <div className="space-y-2 text-sm" role="status" aria-live="polite" aria-atomic="true">
             <div className="flex justify-between">
-              <span className="text-gray-400">Answered:</span>
+              <span className="text-gray-500 dark:text-gray-400">Answered:</span>
               <span className="text-green-400 font-medium">{answeredCount}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-400">Skipped:</span>
+              <span className="text-gray-500 dark:text-gray-400">Skipped:</span>
               <span className="text-yellow-400 font-medium">{skippedCount}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-400">Unvisited:</span>
-              <span className="text-gray-400 font-medium">{remainingCount}</span>
+              <span className="text-gray-500 dark:text-gray-400">Unvisited:</span>
+              <span className="text-gray-500 dark:text-gray-400 font-medium">{remainingCount}</span>
             </div>
           </div>
         </div>
 
-        <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-          <p className="text-xs text-gray-400 text-center">Keyboard: A/B/C/D = Select, 1/2/3/4 = Alt, Enter = Next</p>
+        <div className="p-3 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10">
+          <p className="text-xs text-gray-500 dark:text-gray-400 text-center">Keyboard: A/B/C/D = Select, 1/2/3/4 = Alt, Enter = Next</p>
         </div>
       </aside>
     </div>

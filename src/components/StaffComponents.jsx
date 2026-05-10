@@ -53,7 +53,7 @@ export const Avatar = ({ person, size = 'md' }) => {
 
   if (photoSrc) {
     return (
-      <div className={`${sizeClasses[size]} rounded-full overflow-hidden border-2 border-white/20 shadow-lg flex-shrink-0`}>
+      <div className={`${sizeClasses[size]} rounded-full overflow-hidden border-2 border-gray-200 dark:border-white/20 shadow-lg flex-shrink-0`}>
         <img src={photoSrc} alt={person.name} className="w-full h-full object-cover" />
       </div>
     );
@@ -79,12 +79,12 @@ export const PersonCard = ({ person, onClick }) => {
       <div className="flex items-center gap-3">
         <Avatar person={person} size="md" />
         <div className="flex-1 min-w-0">
-          <h4 className="font-semibold text-white text-sm leading-tight line-clamp-2 break-words" title={displayName}>
+          <h4 className="font-semibold text-gray-900 dark:text-white text-sm leading-tight line-clamp-2 break-words" title={displayName}>
             {salutation} {displayName}
           </h4>
           <p className="text-xs text-primary/80 mt-1">{person.designation}</p>
           {person.subject && (
-            <p className="text-xs text-gray-400 mt-1">{person.subject}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{person.subject}</p>
           )}
         </div>
       </div>

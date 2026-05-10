@@ -4,13 +4,39 @@
 
 @layer base {
   :root {
-    --bg-dark: #0f172a;
+    --bg-primary: #f8fafc;
+    --bg-secondary: #f1f5f9;
+    --bg-card: rgba(255, 255, 255, 0.9);
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(0, 0, 0, 0.12);
+    --text-primary: #1e293b;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    --accent: #667eea;
+    --accent-light: #818cf8;
+    --overlay: rgba(0, 0, 0, 0.05);
+    --overlay-hover: rgba(0, 0, 0, 0.1);
+    --border-color: rgba(0, 0, 0, 0.1);
+    --body-bg-start: #e2e8f0;
+    --body-bg-end: #f1f5f9;
+  }
+
+  :root.dark {
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-card: rgba(15, 23, 42, 0.9);
     --glass-bg: rgba(255, 255, 255, 0.08);
     --glass-border: rgba(255, 255, 255, 0.18);
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
+    --text-muted: #64748b;
     --accent: #667eea;
     --accent-light: #818cf8;
+    --overlay: rgba(255, 255, 255, 0.05);
+    --overlay-hover: rgba(255, 255, 255, 0.1);
+    --border-color: rgba(255, 255, 255, 0.1);
+    --body-bg-start: #0f172a;
+    --body-bg-end: #1e293b;
   }
 
   html {
@@ -26,7 +52,7 @@
 
   body {
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, var(--bg-dark) 0%, #1e293b 100%);
+    background: linear-gradient(135deg, var(--body-bg-start) 0%, var(--body-bg-end) 100%);
     color: var(--text-primary);
     min-height: 100vh;
     line-height: 1.6;
@@ -112,15 +138,15 @@
     padding: 0.75rem 1.5rem;
     font-weight: 500;
     border-radius: 0.75rem;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
+    background: var(--overlay);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
     transition: all 0.2s ease;
     cursor: pointer;
   }
 
   .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--overlay-hover);
   }
 
   .btn:focus-visible {
@@ -219,6 +245,9 @@
 
 @media (prefers-contrast: high) {
   :root {
+    --glass-border: rgba(0, 0, 0, 0.4);
+  }
+  :root.dark {
     --glass-border: rgba(255, 255, 255, 0.4);
   }
 }

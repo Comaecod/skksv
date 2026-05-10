@@ -12,7 +12,6 @@ import ContactScreen from './components/ContactScreen';
 import FeedbackScreen from './components/FeedbackScreen';
 import FeedbackReportsScreen from './components/FeedbackReportsScreen';
 import ReportsScreen from './components/ReportsScreen';
-import './index.css';
 
 function App() {
   const [pageViewCount, setPageViewCount] = useState(null);

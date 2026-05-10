@@ -73,17 +73,17 @@ const RollNumberScreen = ({ onStartQuiz, questionsCount, onBack }) => {
     <div className="glass-card w-full max-w-md animate-slideUp" role="region" aria-labelledby="student-details-heading">
       <div className="text-center mb-6 sm:mb-8">
         <div className="text-4xl sm:text-5xl mb-4" aria-hidden="true">✍️</div>
-        <h2 id="student-details-heading" className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+        <h2 id="student-details-heading" className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
           Student Details
         </h2>
-        <p className="text-gray-400 text-base sm:text-lg mt-2">
+        <p className="text-gray-500 dark:text-gray-400 text-base sm:text-lg mt-2">
           Fill in your details to begin
         </p>
       </div>
 
       <form onSubmit={handleSubmit} noValidate>
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-300 mb-2" htmlFor="firstName">
+          <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2" htmlFor="firstName">
             <span aria-hidden="true">👤</span> First Name
           </label>
           <input
@@ -91,7 +91,7 @@ const RollNumberScreen = ({ onStartQuiz, questionsCount, onBack }) => {
             type="text"
             id="firstName"
             name="firstName"
-            className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white placeholder-gray-500 outline-none transition-all ${errors.firstName ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-primary/50 focus:ring-2 focus:ring-primary/20'}`}
+            className={`w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 outline-none transition-all ${errors.firstName ? 'border-red-500 focus:border-red-500' : 'border-gray-200 dark:border-white/10 focus:border-primary/50 focus:ring-2 focus:ring-primary/20'}`}
             placeholder="Enter your first name"
             value={formData.firstName}
             onChange={handleChange}
@@ -109,14 +109,14 @@ const RollNumberScreen = ({ onStartQuiz, questionsCount, onBack }) => {
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-300 mb-2" htmlFor="lastName">
+          <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2" htmlFor="lastName">
             <span aria-hidden="true">👤</span> Last Name
           </label>
           <input
             type="text"
             id="lastName"
             name="lastName"
-            className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white placeholder-gray-500 outline-none transition-all ${errors.lastName ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-primary/50 focus:ring-2 focus:ring-primary/20'}`}
+            className={`w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 outline-none transition-all ${errors.lastName ? 'border-red-500 focus:border-red-500' : 'border-gray-200 dark:border-white/10 focus:border-primary/50 focus:ring-2 focus:ring-primary/20'}`}
             placeholder="Enter your last name"
             value={formData.lastName}
             onChange={handleChange}
@@ -134,14 +134,14 @@ const RollNumberScreen = ({ onStartQuiz, questionsCount, onBack }) => {
         </div>
 
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-300 mb-2" htmlFor="rollNumber">
+          <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2" htmlFor="rollNumber">
             <span aria-hidden="true">🔢</span> Roll Number
           </label>
           <input
             type="text"
             id="rollNumber"
             name="rollNumber"
-            className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white placeholder-gray-500 outline-none transition-all ${errors.rollNumber ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-primary/50 focus:ring-2 focus:ring-primary/20'}`}
+            className={`w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 outline-none transition-all ${errors.rollNumber ? 'border-red-500 focus:border-red-500' : 'border-gray-200 dark:border-white/10 focus:border-primary/50 focus:ring-2 focus:ring-primary/20'}`}
             placeholder="Enter your roll number"
             value={formData.rollNumber}
             onChange={handleChange}
@@ -159,7 +159,7 @@ const RollNumberScreen = ({ onStartQuiz, questionsCount, onBack }) => {
         </div>
 
         <div className="text-center mb-6">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/20 text-sm" role="status" aria-live="polite">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/20 dark:bg-primary/20 text-sm" role="status" aria-live="polite">
             <span aria-hidden="true">📝</span>
             <span>{questionsCount} questions will be selected randomly</span>
           </div>
@@ -176,7 +176,7 @@ const RollNumberScreen = ({ onStartQuiz, questionsCount, onBack }) => {
         <div className="text-center">
           <button 
             type="button" 
-            className="px-6 py-3 rounded-xl font-medium bg-white/10 border border-white/20 text-white hover:bg-white/20 transition-all" 
+            className="px-6 py-3 rounded-xl font-medium bg-black/5 dark:bg-white/10 border border-gray-300 dark:border-white/20 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20 transition-all" 
             onClick={onBack}
             aria-label="Go back to previous screen"
           >

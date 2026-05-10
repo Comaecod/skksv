@@ -17,11 +17,11 @@ import skksv13 from '../assets/carousel/skksv13.jpg';
 import skksv14 from '../assets/carousel/skksv14.jpg';
 
 const StatItem = ({ icon, value, label }) => (
-  <div className="flex items-center gap-2 bg-white/5 rounded-lg px-3 py-2">
+    <div className="flex items-center gap-2 bg-black/5 dark:bg-white/5 rounded-lg px-3 py-2">
     <span className="text-lg">{icon}</span>
     <div>
-      <div className="text-white font-semibold text-sm">{value}</div>
-      <div className="text-gray-500 text-xs">{label}</div>
+      <div className="text-gray-900 dark:text-white font-semibold text-sm">{value}</div>
+      <div className="text-gray-500 dark:text-gray-400 text-xs">{label}</div>
     </div>
   </div>
 );
@@ -33,8 +33,8 @@ const FeatureCard = ({ icon, title, description }) => (
   >
     <div className="text-2xl sm:text-3xl shrink-0">{icon}</div>
     <div>
-      <h3 className="font-semibold text-white mb-1 text-sm sm:text-base">{title}</h3>
-      <p className="text-gray-400 text-xs sm:text-sm">{description}</p>
+      <h3 className="font-semibold text-gray-900 dark:text-white mb-1 text-sm sm:text-base">{title}</h3>
+      <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm">{description}</p>
     </div>
   </motion.div>
 );
@@ -69,7 +69,7 @@ const ImageCarousel = ({ images }) => {
   if (images.length === 0) {
     return (
       <div className="w-full h-64 sm:h-80 lg:h-96 bg-gradient-to-br from-primary/30 to-purple-600/30 rounded-2xl flex items-center justify-center">
-        <span className="text-gray-500 text-sm">Gallery coming soon</span>
+        <span className="text-gray-500 dark:text-gray-400 text-sm">Gallery coming soon</span>
       </div>
     );
   }
@@ -157,13 +157,13 @@ const HomeScreen = () => {
           transition={{ duration: 0.6 }}
           className="text-center mb-8 sm:mb-10 mt-8"
         >
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-white mb-2">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-2">
             Sri Kanchi Kamakoti
           </h1>
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent mb-3">
             Sankara Vidyalaya
           </h2>
-          <p className="text-gray-400 text-sm sm:text-base italic mb-4">
+          <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base italic mb-4">
             Sanatana Dharma Seva Gramam
           </p>
 
@@ -178,7 +178,7 @@ const HomeScreen = () => {
             ))}
           </div>
 
-          <p className="text-gray-300 text-sm sm:text-lg max-w-2xl mx-auto leading-relaxed">
+          <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-lg max-w-2xl mx-auto leading-relaxed">
             Step into a vibrant space where tradition meets innovation. With top-class infrastructure,
             healthy meals, and a caring hostel, we nurture your child's academic, emotional, and cultural growth.
             Here, every child thrives!
@@ -203,11 +203,11 @@ const HomeScreen = () => {
           transition={{ delay: 0.6 }}
           className="glass-card p-4 sm:p-8 mb-10 sm:mb-14 text-center"
         >
-          <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-3">
             Where Tradition Meets Tomorrow
           </h2>
           <p className="text-primary font-medium text-sm sm:text-base mb-2">A Home for Scholars</p>
-          <p className="text-gray-400 text-sm sm:text-base">
+          <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base">
             Nestled in the serene surroundings of Sanatana Dharma Seva Gramam, we provide an environment
             where young minds blossom into confident, compassionate individuals rooted in Indian values
             yet prepared for the global stage.
@@ -220,7 +220,7 @@ const HomeScreen = () => {
           transition={{ delay: 0.8 }}
           className="mb-10 sm:mb-14"
         >
-          <h2 className="text-xl sm:text-2xl font-bold text-white text-center mb-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white text-center mb-6">
             Why Choose Us
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
@@ -241,16 +241,16 @@ const HomeScreen = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
-          className="flex flex-wrap justify-center items-center gap-4 py-6 border-t border-white/10"
+          className="flex flex-wrap justify-center items-center gap-4 py-6 border-t border-gray-200 dark:border-white/10"
         >
-          <p className="text-gray-500 text-sm">
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
             Sri Kanchi Kamakoti Sankara Vidyalaya, Sanatana Dharma Seva Gramam, Podili - AP
           </p>
           <a
             href="https://maps.app.goo.gl/tJxDJYtwDYMbrGzv9"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm transition-all"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-black/5 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-gray-900 dark:text-white text-sm transition-all"
           >
             📍 View on Maps
           </a>

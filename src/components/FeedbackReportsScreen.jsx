@@ -104,7 +104,7 @@ const FeedbackReportsScreen = () => {
       <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4">
         <div className="glass-card p-8 text-center w-full max-w-md">
           <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading feedbacks...</p>
+          <p className="text-gray-500 dark:text-gray-400">Loading feedbacks...</p>
         </div>
       </div>
     );
@@ -115,14 +115,14 @@ const FeedbackReportsScreen = () => {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
           <div className="text-5xl mb-4">📋</div>
-          <h2 className="text-2xl font-bold text-white mb-2">Feedback Reports</h2>
-          <p className="text-gray-400">{feedbacks.length} pending feedback(s)</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Feedback Reports</h2>
+          <p className="text-gray-500 dark:text-gray-400">{feedbacks.length} pending feedback(s)</p>
         </div>
 
         {feedbacks.length === 0 ? (
           <div className="glass-card p-8 text-center">
             <div className="text-4xl mb-4">🎉</div>
-            <p className="text-gray-400">No pending feedbacks</p>
+            <p className="text-gray-500 dark:text-gray-400">No pending feedbacks</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -143,29 +143,29 @@ const FeedbackReportsScreen = () => {
                           <span>{severity.icon}</span>
                           <span>{severity.label}</span>
                         </span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
                           {formatDate(feedback.createdAt)}
                         </span>
                       </div>
 
                       <div className="grid grid-cols-2 gap-4 mb-4">
                         <div>
-                          <p className="text-xs text-gray-500">Name</p>
-                          <p className="text-white font-medium">{feedback.name}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Name</p>
+                          <p className="text-gray-900 dark:text-white font-medium">{feedback.name}</p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-500">Phone</p>
-                          <p className="text-white font-medium">{feedback.phone}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Phone</p>
+                          <p className="text-gray-900 dark:text-white font-medium">{feedback.phone}</p>
                         </div>
                         <div className="col-span-2">
-                          <p className="text-xs text-gray-500">Email</p>
-                          <p className="text-white font-medium">{feedback.email}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Email</p>
+                          <p className="text-gray-900 dark:text-white font-medium">{feedback.email}</p>
                         </div>
                       </div>
 
                       <div>
-                        <p className="text-xs text-gray-500 mb-1">Message</p>
-                        <p className="text-gray-300 text-sm bg-white/5 rounded-lg p-3">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Message</p>
+                        <p className="text-gray-600 dark:text-gray-300 text-sm bg-black/5 dark:bg-white/5 rounded-lg p-3">
                           {feedback.message}
                         </p>
                       </div>
@@ -191,7 +191,7 @@ const FeedbackReportsScreen = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-sm"
             onClick={() => setShowPasswordModal(false)}
           >
             <motion.div
@@ -203,8 +203,8 @@ const FeedbackReportsScreen = () => {
             >
               <div className="text-center mb-6">
                 <div className="text-4xl mb-3">🔒</div>
-                <h3 className="text-xl font-bold text-white">Confirm Resolution</h3>
-                <p className="text-gray-400 text-sm mt-1">Enter admin password to resolve this feedback</p>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">Confirm Resolution</h3>
+                <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Enter admin password to resolve this feedback</p>
               </div>
 
               <input
@@ -215,7 +215,7 @@ const FeedbackReportsScreen = () => {
                   setPasswordError('');
                 }}
                 placeholder="Enter password"
-                className={`w-full px-4 py-3 rounded-xl bg-white/5 border ${passwordError ? 'border-red-500' : 'border-white/10'} text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all mb-4`}
+                className={`w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border ${passwordError ? 'border-red-500' : 'border-gray-200 dark:border-white/10'} text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all mb-4`}
                 autoFocus
               />
 
@@ -226,7 +226,7 @@ const FeedbackReportsScreen = () => {
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowPasswordModal(false)}
-                  className="flex-1 py-2.5 rounded-xl bg-white/10 border border-white/20 text-white hover:bg-white/20 transition-all"
+                  className="flex-1 py-2.5 rounded-xl bg-black/5 dark:bg-white/10 border border-gray-300 dark:border-white/20 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20 transition-all"
                 >
                   Cancel
                 </button>

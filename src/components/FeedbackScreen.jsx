@@ -84,8 +84,8 @@ const FeedbackScreen = () => {
           className="glass-card p-8 text-center w-full max-w-md"
         >
           <div className="text-6xl mb-4">✅</div>
-          <h2 className="text-2xl font-bold text-white mb-2">Thank You!</h2>
-          <p className="text-gray-400 mb-6">Your feedback has been submitted successfully. We appreciate your input!</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Thank You!</h2>
+          <p className="text-gray-500 dark:text-gray-400 mb-6">Your feedback has been submitted successfully. We appreciate your input!</p>
           <button
             onClick={() => {
               setSubmitted(false);
@@ -109,13 +109,13 @@ const FeedbackScreen = () => {
       >
         <div className="text-center mb-8">
           <div className="text-5xl mb-4">💬</div>
-          <h2 className="text-2xl font-bold text-white mb-2">Share Your Feedback</h2>
-          <p className="text-gray-400">Help us improve the app by sharing your thoughts</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Share Your Feedback</h2>
+          <p className="text-gray-500 dark:text-gray-400">Help us improve the app by sharing your thoughts</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
               Name <span className="text-red-400">*</span>
             </label>
             <input
@@ -124,13 +124,13 @@ const FeedbackScreen = () => {
               value={formData.name}
               onChange={handleChange}
               placeholder="Enter your name"
-              className={`w-full px-4 py-3 rounded-xl bg-white/5 border ${errors.name ? 'border-red-500' : 'border-white/10'} text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all`}
+              className={`w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border ${errors.name ? 'border-red-500' : 'border-gray-200 dark:border-white/10'} text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all`}
             />
             {errors.name && <p className="text-red-400 text-sm mt-1">{errors.name}</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
               Phone Number <span className="text-red-400">*</span>
             </label>
             <input
@@ -140,13 +140,13 @@ const FeedbackScreen = () => {
               onChange={handleChange}
               placeholder="Enter your phone number"
               maxLength={10}
-              className={`w-full px-4 py-3 rounded-xl bg-white/5 border ${errors.phone ? 'border-red-500' : 'border-white/10'} text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all`}
+              className={`w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border ${errors.phone ? 'border-red-500' : 'border-gray-200 dark:border-white/10'} text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all`}
             />
             {errors.phone && <p className="text-red-400 text-sm mt-1">{errors.phone}</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
               Email Address <span className="text-red-400">*</span>
             </label>
             <input
@@ -155,30 +155,30 @@ const FeedbackScreen = () => {
               value={formData.email}
               onChange={handleChange}
               placeholder="Enter your email address"
-              className={`w-full px-4 py-3 rounded-xl bg-white/5 border ${errors.email ? 'border-red-500' : 'border-white/10'} text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all`}
+              className={`w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border ${errors.email ? 'border-red-500' : 'border-gray-200 dark:border-white/10'} text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all`}
             />
             {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
               Severity Level <span className="text-red-400">*</span>
             </label>
             <select
               name="severity"
               value={formData.severity}
               onChange={handleChange}
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-primary/50 transition-all"
+              className="w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white focus:outline-none focus:border-primary/50 transition-all"
             >
-              <option value="critical" className="bg-slate-800">🔴 Critical - App not working</option>
-              <option value="severe" className="bg-slate-800">🟠 Severe - Major issue</option>
-              <option value="normal" className="bg-slate-800">🟡 Normal - Minor inconvenience</option>
-              <option value="minor" className="bg-slate-800">🟢 Minor - Suggestion/Enhancement</option>
+              <option value="critical" className="bg-white dark:bg-slate-800">🔴 Critical - App not working</option>
+              <option value="severe" className="bg-white dark:bg-slate-800">🟠 Severe - Major issue</option>
+              <option value="normal" className="bg-white dark:bg-slate-800">🟡 Normal - Minor inconvenience</option>
+              <option value="minor" className="bg-white dark:bg-slate-800">🟢 Minor - Suggestion/Enhancement</option>
             </select>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
               Your Message <span className="text-red-400">*</span>
             </label>
             <textarea
@@ -187,7 +187,7 @@ const FeedbackScreen = () => {
               onChange={handleChange}
               placeholder="Describe your feedback, suggestions, or issues..."
               rows={5}
-              className={`w-full px-4 py-3 rounded-xl bg-white/5 border ${errors.message ? 'border-red-500' : 'border-white/10'} text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all resize-none`}
+              className={`w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border ${errors.message ? 'border-red-500' : 'border-gray-200 dark:border-white/10'} text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all resize-none`}
             />
             {errors.message && <p className="text-red-400 text-sm mt-1">{errors.message}</p>}
           </div>

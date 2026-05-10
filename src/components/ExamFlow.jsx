@@ -312,7 +312,7 @@ export const useExamFlow = () => {
 
       case 'result':
         return (
-          <ResultScreen questions={quizQuestions} answers={answers} studentInfo={studentInfo} config={examConfig} onRestart={() => updateParams({})} />
+          <ResultScreen questions={quizQuestions} answers={answers} studentInfo={studentInfo} config={examConfig} onRestart={() => navigate('/')} />
         );
 
       case 'reports':

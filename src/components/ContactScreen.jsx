@@ -31,8 +31,8 @@ const ContactScreen = () => {
           className="text-center mb-8"
         >
           <div className="text-5xl mb-4">📋</div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">Contact Us</h2>
-          <p className="text-gray-400">Get in touch with the school office</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">Contact Us</h2>
+          <p className="text-gray-500 dark:text-gray-400">Get in touch with the school office</p>
         </motion.div>
 
         <div className="space-y-4">
@@ -47,7 +47,7 @@ const ContactScreen = () => {
               <div className="flex items-start gap-4">
                 <div className="text-3xl">{contact.icon}</div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-white mb-2">{contact.title}</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{contact.title}</h3>
                   
                   {contact.numbers && (
                     <div className="space-y-1">
@@ -64,7 +64,7 @@ const ContactScreen = () => {
                   )}
                   
                   {contact.address && (
-                    <p className="text-gray-300 whitespace-pre-line text-sm">
+                    <p className="text-gray-600 dark:text-gray-300 whitespace-pre-line text-sm">
                       {contact.address}
                     </p>
                   )}
@@ -80,7 +80,7 @@ const ContactScreen = () => {
                     </a>
                   )}
                   
-                  <p className="text-gray-500 text-xs mt-2">{contact.description}</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-xs mt-2">{contact.description}</p>
                 </div>
               </div>
             </motion.div>
@@ -93,7 +93,7 @@ const ContactScreen = () => {
           transition={{ delay: 0.4 }}
           className="mt-8 text-center"
         >
-          <p className="text-gray-500 text-sm">
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
             For admissions, fee payments, or general queries, please call during office hours.
           </p>
         </motion.div>
