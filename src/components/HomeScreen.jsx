@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SCHOOL_CONFIG } from '../config/schoolConfig';
+import NotificationBell from './NotificationBell';
+import NotificationDrawer from './NotificationDrawer';
 import skksv1 from '../assets/carousel/skksv1.jpg';
 import skksv2 from '../assets/carousel/skksv2.jpg';
 import skksv3 from '../assets/carousel/skksv3.jpg';
@@ -125,6 +127,7 @@ const ImageCarousel = ({ images }) => {
 };
 
 const HomeScreen = () => {
+  const [notificationOpen, setNotificationOpen] = useState(false);
   const images = [
     skksv1, skksv2, skksv3, skksv4, skksv5, skksv6,
     skksv7, skksv8, skksv9, skksv10, skksv11, skksv12,
@@ -256,6 +259,8 @@ const HomeScreen = () => {
           </a>
         </motion.div>
       </div>
+      <NotificationBell onClick={() => setNotificationOpen(true)} />
+      <NotificationDrawer isOpen={notificationOpen} onClose={() => setNotificationOpen(false)} />
     </div>
   );
 };
