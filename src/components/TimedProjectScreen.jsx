@@ -36,11 +36,16 @@ const TimedProjectScreen = ({ assessment, onComplete, onBack }) => {
     e.preventDefault();
     if (!validateForm() || isUploading) return;
     setSubmitError('');
+    setUploadProgress(0);
     setIsUploading(!!file);
+
     try {
-      await onComplete({ topic: topic.trim(), description: description.trim() }, file);
+      await onComplete({ topic: topic.trim(), description: description.trim() }, file, setUploadProgress);
+      setUploadProgress(100);
+      await new Promise(r => setTimeout(r, 400));
       setSubmitted(true);
     } catch (err) {
+      setUploadProgress(0);
       setSubmitError(err.message || 'Failed to submit project. Please check your network connection and try again.');
     }
     setIsUploading(false);
@@ -101,7 +106,7 @@ const TimedProjectScreen = ({ assessment, onComplete, onBack }) => {
           {allowFileUpload && (
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Upload File</label>
-              <div className={`border-2 border-dashed rounded-xl p-6 text-center transition-all ${file ? 'border-green-500/50 bg-green-500/5' : 'border-gray-300 dark:border-white/20 hover:border-primary/50'}`}>
+              <div className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-all ${file ? 'border-green-500/50 bg-green-500/5' : 'border-gray-300 dark:border-white/20 hover:border-primary/50'}`}>
                 {file ? (
                   <div>
                     <div className="text-3xl mb-2">📄</div>
@@ -140,9 +145,11 @@ const TimedProjectScreen = ({ assessment, onComplete, onBack }) => {
               </div>
               {errors.file && <p className="text-red-400 text-sm mt-1">⚠️ {errors.file}</p>}
               {isUploading && (
-                <div className="mt-2 text-center">
-                  <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-2" />
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Uploading file to server...</p>
+                <div className="mt-3">
+                  <div className="bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden">
+                    <div className="bg-gradient-to-r from-primary to-secondary h-2.5 rounded-full transition-all duration-300 ease-out" style={{ width: `${Math.min(uploadProgress, 100)}%` }} />
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1.5 text-center">{Math.round(uploadProgress)}% uploaded</p>
                 </div>
               )}
             </div>

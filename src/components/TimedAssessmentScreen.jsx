@@ -1,9 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { getClassesWithActive, getSubjectsForClassWithActive, getAssessmentsForClassSubject, getAssessmentById, getSubmissionsForAssessment } from '../services/timedAssessmentService';
+import { getClassesWithActive, getSubjectsForClassWithActive, getAssessmentsForClassSubject, getAssessmentById, getSubmissionsForAssessment, submitMcqAttempt, submitProject, toDate } from '../services/timedAssessmentService';
 import { getQuizQuestions } from '../utils/shuffle';
 import { calculateTotalScore } from '../utils/scoring';
-import { submitMcqAttempt, submitProject } from '../services/timedAssessmentService';
 import TimedAssessmentClassesScreen from './TimedAssessmentClassesScreen';
 import TimedAssessmentSubjectsScreen from './TimedAssessmentSubjectsScreen';
 import TimedAssessmentCardsScreen from './TimedAssessmentCardsScreen';
@@ -77,10 +76,7 @@ const TimedAssessmentScreen = () => {
       setLoadingAssessments(true);
       const now = new Date();
       const asm = await getAssessmentsForClassSubject(selectedClass, selectedSubject);
-      setAssessments(asm.filter(a => {
-        const end = a.endDateTime?.toDate?.() || new Date(a.endDateTime);
-        return end > now;
-      }));
+      setAssessments(asm.filter(a => toDate(a.endDateTime) > now));
       setLoadingAssessments(false);
     };
     load();
@@ -139,8 +135,8 @@ const TimedAssessmentScreen = () => {
     updateParams({ screen: 'result' });
   }, [quizQuestions, assessment, selectedAssessmentId, studentInfo, updateParams]);
 
-  const handleProjectComplete = useCallback(async (projectData, file) => {
-    const result = await submitProject(selectedAssessmentId, studentInfo, projectData, file);
+  const handleProjectComplete = useCallback(async (projectData, file, onProgress) => {
+    const result = await submitProject(selectedAssessmentId, studentInfo, projectData, file, onProgress);
     setProjectResult(result);
   }, [selectedAssessmentId, studentInfo]);
 

@@ -6,6 +6,14 @@ const ASSESSMENTS_COL = 'timedAssessments';
 const SUBMISSIONS_COL = 'timedSubmissions';
 const NOW = () => new Date();
 
+export const toDate = (ts) => {
+  if (!ts) return new Date(0);
+  if (typeof ts.toDate === 'function') return ts.toDate();
+  if (ts.seconds != null) return new Date(ts.seconds * 1000);
+  if (ts instanceof Date) return ts;
+  return new Date(ts);
+};
+
 export const getActiveAssessments = async () => {
   try {
     const q = query(
@@ -16,10 +24,7 @@ export const getActiveAssessments = async () => {
     const now = new Date();
     return snapshot.docs
       .map(d => ({ id: d.id, ...d.data() }))
-      .filter(a => {
-        const end = a.endDateTime?.toDate?.() || new Date(a.endDateTime);
-        return end > now;
-      });
+      .filter(a => toDate(a.endDateTime) > now);
   } catch (err) {
     console.error('Error fetching active assessments:', err.message);
     return [];
@@ -50,10 +55,7 @@ export const getAssessmentsForClassSubject = async (classNum, subject) => {
     const now = new Date();
     return snapshot.docs
       .map(d => ({ id: d.id, ...d.data() }))
-      .filter(a => {
-        const end = a.endDateTime?.toDate?.() || new Date(a.endDateTime);
-        return end > now;
-      });
+      .filter(a => toDate(a.endDateTime) > now);
   } catch (err) {
     console.error('Error fetching assessments:', err.message);
     return [];
@@ -92,7 +94,7 @@ export const submitMcqAttempt = async (assessmentId, studentInfo, answers, resul
   try {
     const assessment = await getAssessmentById(assessmentId);
     if (!assessment) throw new Error('Assessment not found');
-    if (new Date() > new Date(assessment.endDateTime?.toDate?.() || assessment.endDateTime)) {
+    if (new Date() > toDate(assessment.endDateTime)) {
       throw new Error('Assessment has expired');
     }
     const docRef = await addDoc(collection(db, SUBMISSIONS_COL), {
@@ -119,17 +121,17 @@ export const submitMcqAttempt = async (assessmentId, studentInfo, answers, resul
   }
 };
 
-export const submitProject = async (assessmentId, studentInfo, projectData, file) => {
+export const submitProject = async (assessmentId, studentInfo, projectData, file, onProgress) => {
   try {
     const assessment = await getAssessmentById(assessmentId);
     if (!assessment) throw new Error('Assessment not found');
-    if (new Date() > new Date(assessment.endDateTime?.toDate?.() || assessment.endDateTime)) {
+    if (new Date() > toDate(assessment.endDateTime)) {
       throw new Error('Assessment has expired');
     }
     let fileUrl = '';
     let fileName = '';
     if (file && assessment.allowFileUpload) {
-      const uploadResult = await uploadFile(file, assessmentId, studentInfo.rollNumber);
+      const uploadResult = await uploadFile(file, assessmentId, studentInfo.rollNumber, onProgress);
       fileUrl = uploadResult.url;
       fileName = uploadResult.name;
     }
@@ -158,13 +160,17 @@ export const submitProject = async (assessmentId, studentInfo, projectData, file
   }
 };
 
-export const uploadFile = async (file, assessmentId, rollNumber) => {
+export const uploadFile = async (file, assessmentId, rollNumber, onProgress) => {
   const timestamp = Date.now();
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
   const fileName = `${rollNumber}_${timestamp}_${safeName}`;
   const dirPath = `timed-assessments/${assessmentId}`;
 
-  const result = await puter.fs.upload([file], dirPath, { createMissingParents: true, dedupeName: true });
+  const result = await puter.fs.upload([file], dirPath, {
+    createMissingParents: true,
+    dedupeName: true,
+    onProgress: (p) => onProgress?.(Math.round(p * 100))
+  });
   const fsItem = Array.isArray(result) ? result[0] : result;
 
   const url = await puter.fs.getReadURL(fsItem.path, 365 * 24 * 60 * 60 * 1000);
@@ -181,7 +187,7 @@ export const getSubmissionsForAssessment = async (assessmentId) => {
     const snapshot = await getDocs(q);
     return snapshot.docs.map(d => {
       const data = d.data();
-      const submittedAt = data.submittedAt?.toDate?.() || null;
+      const submittedAt = data.submittedAt?.toDate?.() || (data.submittedAt?.seconds ? new Date(data.submittedAt.seconds * 1000) : null);
       return {
         id: d.id,
         name: `${data.studentInfo?.firstName || ''} ${data.studentInfo?.lastName || ''}`.trim(),

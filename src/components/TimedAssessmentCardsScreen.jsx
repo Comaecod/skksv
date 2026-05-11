@@ -1,12 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { toDate } from '../services/timedAssessmentService';
 
 const CountdownTimer = ({ endDateTime }) => {
-  const getEndTime = () => {
-    if (!endDateTime) return new Date();
-    if (typeof endDateTime?.toDate === 'function') return endDateTime.toDate();
-    return new Date(endDateTime);
-  };
+  const getEndTime = () => toDate(endDateTime);
 
   const calcTimeLeft = () => {
     const diff = getEndTime() - new Date();
@@ -53,8 +50,8 @@ const CountdownTimer = ({ endDateTime }) => {
 
 const StatusBadge = ({ startDateTime, endDateTime }) => {
   const now = new Date();
-  const start = startDateTime?.toDate?.() || new Date(startDateTime);
-  const end = endDateTime?.toDate?.() || new Date(endDateTime);
+  const start = toDate(startDateTime);
+  const end = toDate(endDateTime);
 
   if (now < start) return <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30">Upcoming</span>;
   if (now > end) return <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-500/20 text-red-400 border border-red-500/30">Expired</span>;

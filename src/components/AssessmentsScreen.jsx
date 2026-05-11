@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getExamTypes, getClassesForType, getSubjectsForClass, getExamConfig } from '../utils/examLoader';
+import { getClassesWithActive } from '../services/timedAssessmentService';
 import { getQuizQuestions } from '../utils/shuffle';
 import ExamTypeScreen from './ExamTypeScreen';
 import ClassSelectionScreen from './ClassSelectionScreen';
@@ -36,7 +37,8 @@ const AssessmentsScreen = () => {
       setLoading(true);
       try {
         const types = await getExamTypes();
-        setExamTypes(types);
+        const activeTimedClasses = await getClassesWithActive();
+        setExamTypes(activeTimedClasses.length > 0 ? types : types.filter(t => t !== 'Timed Assessment'));
       } catch (err) {
         console.error('Error loading exam types:', err);
       } finally {
