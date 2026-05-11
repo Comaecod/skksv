@@ -191,7 +191,7 @@ const ReportsScreen = ({ config: propConfig, onBack: propOnBack }) => {
                 </div>
                 <div className="flex gap-3">
                   <button 
-                    className="px-4 py-2 rounded-xl font-medium bg-green-600/30 border border-green-600/50 text-green-400 hover:bg-green-600/40 flex items-center gap-2" 
+                    className="px-4 py-2 rounded-xl font-medium bg-green-100 dark:bg-green-600/30 border border-green-300 dark:border-green-600/50 text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-600/40 flex items-center gap-2"
                     onClick={handleExportExcel}
                   >
                     <span>📥</span> Export Excel

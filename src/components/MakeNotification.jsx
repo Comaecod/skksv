@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { addNotification } from '../services/notificationService';
-
-const ADMIN_PASSWORD = 'AdminKey123';
+import { isMasterKey } from '../utils/auth';
 
 const MakeNotification = () => {
   const navigate = useNavigate();
@@ -27,7 +26,7 @@ const MakeNotification = () => {
   };
 
   const handleConfirm = async () => {
-    if (password !== ADMIN_PASSWORD) {
+    if (!isMasterKey(password)) {
       setPasswordError('Incorrect password');
       return;
     }

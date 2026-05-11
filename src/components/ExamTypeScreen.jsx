@@ -10,6 +10,7 @@ const ExamTypeScreen = ({ examTypes, onSelect, onBack }) => {
       'Unit Test 2': '📖',
       'Term 2': '📚',
       'Holiday Homework': '🏖️',
+      'Timed Assessment': '⏱️',
       'Assessment': '📋'
     };
     return icons[type] || '📋';
@@ -24,6 +25,7 @@ const ExamTypeScreen = ({ examTypes, onSelect, onBack }) => {
       'Unit Test 2': 'Second unit evaluation',
       'Term 2': 'Second term examination',
       'Holiday Homework': 'View holiday homework projects',
+      'Timed Assessment': 'MCQ tests, projects & timed evaluations',
       'Assessment': 'Take tests and quizzes'
     };
     return descriptions[type] || 'Assessment';

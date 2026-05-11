@@ -104,6 +104,10 @@ const AssessmentsScreen = () => {
   }, [subject, classNum, selectedExamType]);
 
   const handleSelectExamType = (type) => {
+    if (type === 'Timed Assessment') {
+      navigate('/timed-assessments');
+      return;
+    }
     setSelectedExamType(type);
     setClassNum(null);
     setSubject(null);

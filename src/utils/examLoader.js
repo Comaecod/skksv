@@ -40,7 +40,7 @@ export const getExamTypes = async () => {
   
   if (examTypesCache.data && (now - examTypesCache.timestamp) < CACHE_TTL) {
     const types = Object.keys(examTypesCache.data);
-    return [...types, 'Holiday Homework'].filter(Boolean);
+    return [...types, 'Holiday Homework', 'Timed Assessment'].filter(Boolean);
   }
   
   try {
@@ -63,11 +63,11 @@ export const getExamTypes = async () => {
     examTypesCache.data = types;
     examTypesCache.timestamp = now;
     
-    return [...Object.keys(types), 'Holiday Homework'];
+    return [...Object.keys(types), 'Holiday Homework', 'Timed Assessment'];
   } catch (error) {
     console.error('Error fetching exam types:', error.message);
     const cached = examTypesCache.data ? Object.keys(examTypesCache.data) : [];
-    return [...cached, 'Holiday Homework'];
+    return [...cached, 'Holiday Homework', 'Timed Assessment'];
   }
 };
 

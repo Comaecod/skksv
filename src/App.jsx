@@ -14,6 +14,9 @@ import FeedbackScreen from './components/FeedbackScreen';
 import FeedbackReportsScreen from './components/FeedbackReportsScreen';
 import ReportsScreen from './components/ReportsScreen';
 import MakeNotification from './components/MakeNotification';
+import TimedAssessmentScreen from './components/TimedAssessmentScreen';
+import MakeAssessment from './components/MakeAssessment';
+import ShowAssessments from './components/ShowAssessments';
 
 function App() {
   const [pageViewCount, setPageViewCount] = useState(null);
@@ -92,6 +95,27 @@ function App() {
             <>
               <Header />
               <MakeNotification />
+              <Footer />
+            </>
+          } />
+          <Route path="/timed-assessments" element={
+            <>
+              <Header />
+              <TimedAssessmentScreen />
+              <Footer />
+            </>
+          } />
+          <Route path="/make-assessment" element={
+            <>
+              <Header />
+              <MakeAssessment />
+              <Footer />
+            </>
+          } />
+          <Route path="/show-assessments" element={
+            <>
+              <Header />
+              <ShowAssessments />
               <Footer />
             </>
           } />

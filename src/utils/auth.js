@@ -3,7 +3,7 @@
  * Handles key validation with master key support
  */
 
-export const MASTER_KEY = 'AdminKey123';
+export const MASTER_KEY = import.meta.env.VITE_ADMIN_KEY || 'AdminKey123';
 
 export const isMasterKey = (key) => key === MASTER_KEY;
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db } from '../firebase';
 import { collection, query, where, getDocs, updateDoc, doc, orderBy } from 'firebase/firestore';
+import { isMasterKey } from '../utils/auth';
 
 const SEVERITY_ORDER = {
   critical: 0,
@@ -25,8 +26,6 @@ const FeedbackReportsScreen = () => {
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [isResolving, setIsResolving] = useState(false);
-
-  const ADMIN_PASSWORD = 'AdminKey123';
 
   useEffect(() => {
     const loadFeedbacks = async () => {
@@ -66,7 +65,7 @@ const FeedbackReportsScreen = () => {
   };
 
   const handlePasswordSubmit = async () => {
-    if (password !== ADMIN_PASSWORD) {
+    if (!isMasterKey(password)) {
       setPasswordError('Invalid password');
       return;
     }
