@@ -149,7 +149,7 @@ const HomeScreen = () => {
 
   return (
     <div className="w-full min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 pt-20 sm:pt-16 pb-20 sm:pb-16">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mt-6 sm:mt-8">
           <ImageCarousel images={images} />
         </div>

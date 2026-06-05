@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import staffData from '../data/staffDirectory.json';
 import { Avatar, PersonCard, capitalize } from './StaffComponents';
 import PersonModal from './PersonModal';
-import Footer from './Footer';
 
 const SectionWithConnector = ({ title, icon, count, children, delay = 0 }) => (
   <motion.div
@@ -55,7 +54,7 @@ const StaffDirectoryScreen = () => {
 
   return (
     <motion.div
-      className="w-full min-h-screen pb-12 overflow-y-auto pt-20 sm:pt-16"
+      className="w-full pb-12 overflow-y-auto"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
@@ -159,8 +158,6 @@ const StaffDirectoryScreen = () => {
           <PersonModal person={selectedPerson} onClose={closeModal} />
         )}
       </AnimatePresence>
-
-      <Footer />
     </motion.div>
   );
 };

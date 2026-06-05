@@ -40,12 +40,12 @@ const DEFAULT_QUESTIONS = `[
   }
 ]`;
 
-const MakeAssessment = () => {
+const MakeAssessment = ({ skipInitialAuth } = {}) => {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
 
   const [password, setPassword] = useState('');
-  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(skipInitialAuth || false);
   const [passwordError, setPasswordError] = useState(false);
   const [status, setStatus] = useState('');
   const [creating, setCreating] = useState(false);
@@ -300,7 +300,7 @@ const MakeAssessment = () => {
 
   if (!isAuthorized) {
     return (
-      <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4">
+      <div className="w-full flex items-center justify-center px-4 py-8">
         <div className="glass-card w-full max-w-md animate-slideUp">
           <div className="text-center mb-8">
             <div className="text-5xl mb-4">🔐</div>
@@ -311,7 +311,7 @@ const MakeAssessment = () => {
             <input type="password" className={`w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border text-gray-900 dark:text-white placeholder-gray-400 outline-none ${passwordError ? 'border-red-500' : 'border-gray-200 dark:border-white/10 focus:border-primary/50'}`} placeholder="Enter admin password" value={password} onChange={e => { setPassword(e.target.value); if (passwordError) setPasswordError(false); }} autoFocus />
             {passwordError && <p className="text-red-400 text-sm">⚠️ Incorrect password</p>}
             <button type="submit" className="w-full px-6 py-3 rounded-xl font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90">Authorize 🔓</button>
-            <button type="button" className="w-full px-6 py-3 rounded-xl font-medium bg-black/5 dark:bg-white/10 border border-gray-300 dark:border-white/20 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20" onClick={() => navigate('/')}>← Back to Home</button>
+<button type="button" className="w-full px-6 py-3 rounded-xl font-medium bg-black/5 dark:bg-white/10 border border-gray-300 dark:border-white/20 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20" onClick={() => navigate(skipInitialAuth ? '/admin' : '/')}>← Back to Home</button>
           </form>
         </div>
       </div>
@@ -319,7 +319,7 @@ const MakeAssessment = () => {
   }
 
   return (
-    <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-start justify-center px-4 py-8">
+    <div className="w-full flex items-start justify-center px-4 py-8">
       <div className="glass-card w-full max-w-4xl animate-slideUp">
         <div className="text-center mb-8">
           <div className="text-5xl mb-4">📝</div>
@@ -548,7 +548,7 @@ const MakeAssessment = () => {
           <button className={`px-6 py-3 rounded-xl font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 disabled:opacity-50`} onClick={handleCreate} disabled={creating}>
             {creating ? 'Creating...' : 'Create Assessment'}
           </button>
-          <button className="px-6 py-3 rounded-xl font-medium bg-black/5 dark:bg-white/10 border border-gray-300 dark:border-white/20 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20" onClick={() => navigate('/')}>← Back to Home</button>
+          <button className="px-6 py-3 rounded-xl font-medium bg-black/5 dark:bg-white/10 border border-gray-300 dark:border-white/20 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20" onClick={() => navigate(skipInitialAuth ? '/admin' : '/')}>← Back to Home</button>
         </div>
 
         {status && (

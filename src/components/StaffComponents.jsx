@@ -26,8 +26,8 @@ const getAvatarText = (person) => {
 };
 
 const staffPhotoMap = {
-  'staff-11': apPhoto,
-  'staff-14': vvPhoto,
+  'staff-10': apPhoto,
+  'staff-13': vvPhoto,
 };
 
 export const Avatar = ({ person, size = 'md' }) => {
@@ -69,12 +69,13 @@ export const Avatar = ({ person, size = 'md' }) => {
 export const PersonCard = ({ person, onClick }) => {
   const displayName = capitalize(person.name);
   const salutation = person.salutation === 'Mr' ? 'Mr.' : person.salutation === 'Mrs' ? 'Mrs.' : '';
+  const isOnLeave = person.onLeave;
 
   return (
     <motion.div
-      className="glass-card p-4 w-64 h-32 flex flex-col justify-center cursor-pointer"
-      whileHover={{ scale: 1.02, boxShadow: '0 8px 30px rgba(102, 126, 234, 0.3)' }}
-      onClick={() => onClick(person)}
+      className={`glass-card p-4 w-64 h-32 flex flex-col justify-center cursor-pointer ${isOnLeave ? 'opacity-50 grayscale' : ''}`}
+      whileHover={isOnLeave ? {} : { scale: 1.02, boxShadow: '0 8px 30px rgba(102, 126, 234, 0.3)' }}
+      onClick={() => !isOnLeave && onClick(person)}
     >
       <div className="flex items-center gap-3">
         <Avatar person={person} size="md" />
@@ -85,6 +86,11 @@ export const PersonCard = ({ person, onClick }) => {
           <p className="text-xs text-primary/80 mt-1">{person.designation}</p>
           {person.subject && (
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{person.subject}</p>
+          )}
+          {isOnLeave && (
+            <span className="inline-block mt-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/20 text-amber-500 border border-amber-500/30">
+              On Leave
+            </span>
           )}
         </div>
       </div>

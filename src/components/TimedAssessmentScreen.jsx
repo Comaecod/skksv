@@ -150,7 +150,7 @@ const TimedAssessmentScreen = () => {
     navigate('/');
   }, [screen, updateParams, navigate]);
 
-  const containerClass = 'w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4';
+  const containerClass = 'w-full flex items-center justify-center px-4 py-8';
 
   if (loadingClasses) {
     return (
@@ -208,7 +208,7 @@ const TimedAssessmentScreen = () => {
 
     case 'mcq':
       return (
-        <div className="pt-20 sm:pt-16">
+        <div className="">
           <TimedMcqScreen
             questions={quizQuestions}
             studentInfo={studentInfo}

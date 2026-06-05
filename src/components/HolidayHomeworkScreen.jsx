@@ -130,7 +130,7 @@ const HolidayHomeworkScreen = () => {
 
   if (loading && !holidayTypes.length) {
     return (
-      <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4">
+      <div className="w-full flex items-center justify-center px-4 py-8">
         <div className="glass-card p-8 text-center w-full max-w-md">
           <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-500 dark:text-gray-400">Loading...</p>
@@ -142,39 +142,39 @@ const HolidayHomeworkScreen = () => {
   switch (screen) {
     case 'holiday-type':
       return (
-        <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4">
+        <div className="w-full flex items-center justify-center px-4 py-8">
           <HolidayTypeScreen holidayTypes={holidayTypes} onSelect={handleSelectHolidayType} onBack={() => navigate('/')} />
         </div>
       );
 
     case 'class':
       return (
-        <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4">
+        <div className="w-full flex items-center justify-center px-4 py-8">
           <ClassSelectionScreen examType="Holiday Homework" classes={classes} onSelect={handleSelectClass} onBack={goBack} isLoading={loading} />
         </div>
       );
 
     case 'subject':
       return (
-        <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4">
+        <div className="w-full flex items-center justify-center px-4 py-8">
           <SubjectSelectionScreen examType="Holiday Homework" classNum={classNum} subjects={subjects} isLoading={subjectsLoading} onSelect={handleSelectSubject} onBack={goBack} />
         </div>
       );
 
     case 'content':
       return examConfig && examConfig.isHolidayHomework ? (
-        <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4">
+        <div className="w-full flex items-center justify-center px-4 py-8">
           <HolidayHomeworkContent config={examConfig} onBack={goBack} />
         </div>
       ) : (
-        <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4">
+        <div className="w-full flex items-center justify-center px-4 py-8">
           <EmptyState />
         </div>
       );
 
     default:
       return (
-        <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4">
+        <div className="w-full flex items-center justify-center px-4 py-8">
           <HolidayTypeScreen holidayTypes={holidayTypes} onSelect={handleSelectHolidayType} onBack={() => navigate('/')} />
         </div>
       );

@@ -46,7 +46,7 @@ const Header = () => {
   );
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b border-gray-200 dark:border-white/10">
+    <header className="sticky top-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b border-gray-200 dark:border-white/10">
       <div className="flex items-center justify-between px-4 py-3 max-w-7xl mx-auto">
         <div className="flex items-center gap-3">
           <Link to="/" className="flex items-center gap-3">
@@ -128,6 +128,14 @@ const Header = () => {
               );
             })}
           </div>
+
+          <Link
+            to="/admin"
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-gray-600 dark:text-gray-300 text-sm hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-all"
+            title="Admin Panel"
+          >
+            <span>🔐</span>
+          </Link>
 
           <button 
             className="sm:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10"

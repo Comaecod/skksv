@@ -100,7 +100,7 @@ const FeedbackReportsScreen = () => {
 
   if (loading) {
     return (
-      <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4">
+      <div className="w-full flex items-center justify-center px-4 py-8">
         <div className="glass-card p-8 text-center w-full max-w-md">
           <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-500 dark:text-gray-400">Loading feedbacks...</p>
@@ -110,7 +110,7 @@ const FeedbackReportsScreen = () => {
   }
 
   return (
-    <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 px-4 py-8">
+    <div className="w-full px-4 py-8">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
           <div className="text-5xl mb-4">📋</div>

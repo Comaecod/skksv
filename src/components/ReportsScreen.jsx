@@ -110,7 +110,7 @@ const ReportsScreen = ({ config: propConfig, onBack: propOnBack }) => {
 
   if (!hasSecretKey) {
     return (
-      <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4">
+      <div className="w-full flex items-center justify-center px-4 py-8">
         <div className="glass-card w-full max-w-md animate-slideUp">
           <div className="text-center mb-8">
             <div className="text-5xl mb-4">📊</div>
@@ -129,7 +129,7 @@ const ReportsScreen = ({ config: propConfig, onBack: propOnBack }) => {
 
   if (!isUnlocked) {
     return (
-      <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4">
+      <div className="w-full flex items-center justify-center px-4 py-8">
         <div className="glass-card w-full max-w-md animate-slideUp">
           <div className="text-center mb-8">
             <div className="text-5xl mb-4">📊</div>
@@ -162,7 +162,7 @@ const ReportsScreen = ({ config: propConfig, onBack: propOnBack }) => {
   }
 
   return (
-    <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4">
+    <div className="w-full flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-4xl">
         <div className="glass-card animate-slideUp">
           <div className="text-center mb-8">

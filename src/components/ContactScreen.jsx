@@ -23,7 +23,7 @@ const ContactScreen = () => {
   ];
 
   return (
-    <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4 py-8">
+    <div className="w-full flex items-center justify-center px-4 py-8">
       <div className="max-w-2xl w-full">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

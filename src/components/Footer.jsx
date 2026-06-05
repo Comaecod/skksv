@@ -47,7 +47,7 @@ const Footer = ({ pageViewCount }) => {
   const tooltip = theme === 'light' ? 'Light mode' : theme === 'dark' ? 'Dark mode' : 'System';
   
   return (
-    <footer className="fixed bottom-0 left-0 right-0 py-3 sm:py-4 z-20 backdrop-blur-md border-t" style={{ background: 'var(--bg-card)', borderColor: 'var(--border-color)' }} role="contentinfo">
+    <footer className="py-3 sm:py-4 backdrop-blur-md border-t" style={{ background: 'var(--bg-card)', borderColor: 'var(--border-color)' }} role="contentinfo">
       <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
         <button
           onClick={toggleTheme}

@@ -24,11 +24,11 @@ const TYPE_COLORS = {
   'Holiday Homework': 'border-rose-500/30 bg-rose-500/5'
 };
 
-const ShowAssessments = () => {
+const ShowAssessments = ({ skipInitialAuth } = {}) => {
   const navigate = useNavigate();
 
   const [password, setPassword] = useState('');
-  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(skipInitialAuth || false);
   const [passwordError, setPasswordError] = useState(false);
 
   const [traditionalExams, setTraditionalExams] = useState([]);
@@ -82,6 +82,12 @@ const ShowAssessments = () => {
     }
     setLoading(false);
   }, []);
+
+  useEffect(() => {
+    if (skipInitialAuth) {
+      fetchAll();
+    }
+  }, [skipInitialAuth, fetchAll]);
 
   const grouped = getAllGrouped();
 
@@ -151,7 +157,7 @@ const ShowAssessments = () => {
 
   if (!isAuthorized) {
     return (
-      <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4">
+      <div className="w-full flex items-center justify-center px-4 py-8">
         <div className="glass-card w-full max-w-md animate-slideUp">
           <div className="text-center mb-8">
             <div className="text-5xl mb-4">🔐</div>
@@ -171,7 +177,7 @@ const ShowAssessments = () => {
 
   if (loading) {
     return (
-      <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4">
+      <div className="w-full flex items-center justify-center px-4 py-8">
         <div className="glass-card p-8 text-center w-full max-w-md">
           <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4" />
           <p className="text-gray-500 dark:text-gray-400">Loading assessments...</p>
@@ -183,7 +189,7 @@ const ShowAssessments = () => {
   const totalCount = categories.reduce((sum, c) => sum + grouped[c].length, 0);
 
   return (
-    <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 px-4">
+    <div className="w-full px-4 py-8">
       <div className="max-w-5xl mx-auto">
         <div className="glass-card p-6 sm:p-8 animate-slideUp">
           <div className="text-center mb-8">
@@ -214,7 +220,7 @@ const ShowAssessments = () => {
                   {CATEGORY_ICONS[cat] || '📋'} {cat} ({grouped[cat].length})
                 </button>
               ))}
-              <button className="px-3 py-2 rounded-xl text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-green-500/30" onClick={() => navigate('/make-assessment')}>+ New</button>
+              <button className="px-3 py-2 rounded-xl text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-green-500/30" onClick={() => navigate('/admin/assessments/new')}>+ New</button>
               <button className="px-3 py-2 rounded-xl text-xs font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:bg-blue-500/30" onClick={fetchAll}>🔄 Refresh</button>
             </div>
           </div>
@@ -317,7 +323,7 @@ const ShowAssessments = () => {
           )}
 
           <div className="text-center mt-8">
-            <button className="px-6 py-3 rounded-xl font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90" onClick={() => navigate('/')}>← Back to Home</button>
+            <button className="px-6 py-3 rounded-xl font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90" onClick={() => navigate(skipInitialAuth ? '/admin' : '/')}>← Back to Home</button>
           </div>
         </div>
       </div>

@@ -169,7 +169,7 @@ const AssessmentsScreen = () => {
 
   if (loading && !examTypes.length) {
     return (
-      <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4">
+      <div className="w-full flex items-center justify-center px-4 py-8">
         <div className="glass-card p-8 text-center w-full max-w-md">
           <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-500 dark:text-gray-400">Loading...</p>
@@ -181,7 +181,7 @@ const AssessmentsScreen = () => {
   switch (screen) {
     case 'exam-type':
       return (
-        <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4">
+        <div className="w-full flex items-center justify-center px-4 py-8">
           <ExamTypeScreen 
             examTypes={examTypes} 
             onSelect={handleSelectExamType} 
@@ -192,7 +192,7 @@ const AssessmentsScreen = () => {
 
     case 'class':
       return (
-        <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4">
+        <div className="w-full flex items-center justify-center px-4 py-8">
           <ClassSelectionScreen 
             examType={selectedExamType} 
             classes={classes} 
@@ -205,7 +205,7 @@ const AssessmentsScreen = () => {
 
     case 'subject':
       return (
-        <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4">
+        <div className="w-full flex items-center justify-center px-4 py-8">
           <SubjectSelectionScreen 
             examType={selectedExamType} 
             classNum={classNum} 
@@ -219,14 +219,14 @@ const AssessmentsScreen = () => {
 
     case 'intro':
       return configLoading ? (
-        <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4">
+        <div className="w-full flex items-center justify-center px-4 py-8">
           <div className="glass-card p-8 text-center w-full max-w-md">
             <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
             <p className="text-gray-500 dark:text-gray-400">Loading assessment...</p>
           </div>
         </div>
       ) : examConfig ? (
-        <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4">
+        <div className="w-full flex items-center justify-center px-4 py-8">
           <IntroScreen 
             config={examConfig} 
             onStart={() => setScreen('preassessment')} 
@@ -235,14 +235,14 @@ const AssessmentsScreen = () => {
           />
         </div>
       ) : (
-        <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4">
+        <div className="w-full flex items-center justify-center px-4 py-8">
           <EmptyState />
         </div>
       );
 
     case 'preassessment':
       return examConfig ? (
-        <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4">
+        <div className="w-full flex items-center justify-center px-4 py-8">
           <PreAssessmentScreen 
             config={examConfig} 
             onSuccess={() => setScreen('student')} 
@@ -250,14 +250,14 @@ const AssessmentsScreen = () => {
           />
         </div>
       ) : (
-        <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4">
+        <div className="w-full flex items-center justify-center px-4 py-8">
           <EmptyState />
         </div>
       );
 
     case 'student':
       return examConfig ? (
-        <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4">
+        <div className="w-full flex items-center justify-center px-4 py-8">
           <RollNumberScreen 
             onStartQuiz={handleStartQuiz} 
             questionsCount={examConfig.totalQuestions || 0} 
@@ -265,14 +265,14 @@ const AssessmentsScreen = () => {
           />
         </div>
       ) : (
-        <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4">
+        <div className="w-full flex items-center justify-center px-4 py-8">
           <EmptyState />
         </div>
       );
 
     case 'quiz':
       return (
-        <div className="pt-20 sm:pt-16">
+        <div className="">
           <QuizScreen 
             questions={quizQuestions} 
             studentInfo={studentInfo} 
@@ -285,7 +285,7 @@ const AssessmentsScreen = () => {
 
     case 'result':
       return (
-        <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4">
+        <div className="w-full flex items-center justify-center px-4 py-8">
           <ResultScreen 
             questions={quizQuestions} 
             answers={answers} 
@@ -298,7 +298,7 @@ const AssessmentsScreen = () => {
 
     default:
       return (
-        <div className="w-full min-h-screen pt-20 sm:pt-16 pb-20 sm:pb-16 flex items-center justify-center px-4">
+        <div className="w-full flex items-center justify-center px-4 py-8">
           <ExamTypeScreen 
             examTypes={examTypes} 
             onSelect={handleSelectExamType} 
