@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { db } from '../firebase';
-import { collection, query, where, getDocs, updateDoc, doc, orderBy } from 'firebase/firestore';
-import { isMasterKey } from '../utils/auth';
+import { collection, query, where, getDocs, updateDoc, doc } from 'firebase/firestore';
+import ConfirmModal from './ConfirmModal';
 
 const SEVERITY_ORDER = {
   critical: 0,
@@ -21,10 +21,8 @@ const SEVERITY_CONFIG = {
 const FeedbackReportsScreen = () => {
   const [feedbacks, setFeedbacks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedFeedback, setSelectedFeedback] = useState(null);
-  const [password, setPassword] = useState('');
-  const [passwordError, setPasswordError] = useState('');
   const [isResolving, setIsResolving] = useState(false);
 
   useEffect(() => {
@@ -59,17 +57,10 @@ const FeedbackReportsScreen = () => {
 
   const handleResolveClick = (feedback) => {
     setSelectedFeedback(feedback);
-    setPassword('');
-    setPasswordError('');
-    setShowPasswordModal(true);
+    setShowConfirmModal(true);
   };
 
-  const handlePasswordSubmit = async () => {
-    if (!isMasterKey(password)) {
-      setPasswordError('Invalid password');
-      return;
-    }
-
+  const handleConfirmResolve = async () => {
     setIsResolving(true);
     try {
       await updateDoc(doc(db, 'feedback', selectedFeedback.id), {
@@ -77,10 +68,9 @@ const FeedbackReportsScreen = () => {
         resolvedAt: new Date()
       });
       setFeedbacks(prev => prev.filter(f => f.id !== selectedFeedback.id));
-      setShowPasswordModal(false);
+      setShowConfirmModal(false);
     } catch (err) {
       console.error('Error resolving feedback:', err);
-      setPasswordError('Failed to resolve. Please try again.');
     } finally {
       setIsResolving(false);
     }
@@ -184,63 +174,17 @@ const FeedbackReportsScreen = () => {
         )}
       </div>
 
-      <AnimatePresence>
-        {showPasswordModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-sm"
-            onClick={() => setShowPasswordModal(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="glass-card p-6 w-full max-w-sm mx-4"
-            >
-              <div className="text-center mb-6">
-                <div className="text-4xl mb-3">🔒</div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">Confirm Resolution</h3>
-                <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Enter admin password to resolve this feedback</p>
-              </div>
-
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  setPasswordError('');
-                }}
-                placeholder="Enter password"
-                className={`w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border ${passwordError ? 'border-red-500' : 'border-gray-200 dark:border-white/10'} text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all mb-4`}
-                autoFocus
-              />
-
-              {passwordError && (
-                <p className="text-red-400 text-sm text-center mb-4">{passwordError}</p>
-              )}
-
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setShowPasswordModal(false)}
-                  className="flex-1 py-2.5 rounded-xl bg-black/5 dark:bg-white/10 border border-gray-300 dark:border-white/20 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20 transition-all"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handlePasswordSubmit}
-                  disabled={isResolving}
-                  className="flex-1 py-2.5 rounded-xl bg-green-500 text-white hover:bg-green-600 disabled:opacity-50 transition-all"
-                >
-                  {isResolving ? 'Resolving...' : 'Confirm'}
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <ConfirmModal
+        isOpen={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={handleConfirmResolve}
+        title="Confirm Resolution"
+        description="Are you sure you want to mark this feedback as resolved?"
+        confirmText="Resolve"
+        confirmLoadingText="Resolving..."
+        isLoading={isResolving}
+        variant="success"
+      />
     </div>
   );
 };

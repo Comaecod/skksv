@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTheme } from '../context/ThemeContext';
 import logoImg from '../assets/logo.png';
 import { SCHOOL_CONFIG } from '../config/schoolConfig';
 
@@ -33,6 +34,14 @@ const Header = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const { theme, toggleTheme } = useTheme();
+
+  const ThemeIcon = theme === 'light'
+    ? () => (<svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" /></svg>)
+    : theme === 'dark'
+    ? () => (<svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>)
+    : () => (<svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" /></svg>);
 
   const ChevronIcon = ({ isOpen }) => (
     <svg 
@@ -129,6 +138,15 @@ const Header = () => {
             })}
           </div>
 
+          <button
+            onClick={toggleTheme}
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-gray-600 dark:text-gray-300 text-sm hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-all"
+            title={`Theme: ${theme}`}
+            aria-label={`Switch theme. Currently: ${theme}`}
+          >
+            <ThemeIcon />
+          </button>
+
           <Link
             to="/admin"
             className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-gray-600 dark:text-gray-300 text-sm hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-all"
@@ -215,6 +233,24 @@ const Header = () => {
               </Link>
             );
           })}
+          <div className="border-t border-gray-200 dark:border-white/10 mt-2 pt-2 flex items-center gap-1">
+            <button
+              onClick={toggleTheme}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 text-sm hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-all"
+              aria-label={`Switch theme. Currently: ${theme}`}
+            >
+              <ThemeIcon />
+              <span className="capitalize">{theme}</span>
+            </button>
+            <Link
+              to="/admin"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 text-sm hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-all"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <span>🔐</span>
+              <span>Admin</span>
+            </Link>
+          </div>
         </div>
       </motion.div>
     </header>

@@ -179,7 +179,7 @@ function ThemePrompt({ visible, onSelect }) {
             </div>
 
             <p className="text-center text-xs mt-4" style={{ color: 'var(--text-muted)' }}>
-              You can change this anytime from the footer
+              You can change this anytime from the header
             </p>
           </motion.div>
         </motion.div>

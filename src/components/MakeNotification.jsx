@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { addNotification } from '../services/notificationService';
-import { isMasterKey } from '../utils/auth';
+import ConfirmModal from './ConfirmModal';
 
 const MakeNotification = () => {
   const navigate = useNavigate();
@@ -10,8 +10,6 @@ const MakeNotification = () => {
   const [message, setMessage] = useState('');
   const [expiresAt, setExpiresAt] = useState('');
   const [showModal, setShowModal] = useState(false);
-  const [password, setPassword] = useState('');
-  const [passwordError, setPasswordError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -21,16 +19,9 @@ const MakeNotification = () => {
     e.preventDefault();
     if (!isValid) return;
     setShowModal(true);
-    setPassword('');
-    setPasswordError('');
   };
 
   const handleConfirm = async () => {
-    if (!isMasterKey(password)) {
-      setPasswordError('Incorrect password');
-      return;
-    }
-
     setSubmitting(true);
     try {
       await addNotification({ title: title.trim(), message: message.trim(), expiresAt });
@@ -39,7 +30,6 @@ const MakeNotification = () => {
       setSubmitted(true);
     } catch (err) {
       console.error('Error creating notification:', err);
-      setPasswordError('Failed to create notification. Try again.');
       setSubmitting(false);
     }
   };
@@ -165,68 +155,16 @@ const MakeNotification = () => {
         </div>
       </motion.div>
 
-      <AnimatePresence>
-        {showModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
-            onClick={() => setShowModal(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="p-6 rounded-2xl w-full max-w-sm mx-4"
-              style={{ background: 'var(--bg-card)', border: '1px solid var(--glass-border)' }}
-            >
-              <div className="text-center mb-6">
-                <div className="w-12 h-12 mx-auto mb-3 rounded-full flex items-center justify-center" style={{ background: 'var(--overlay)' }}>
-                  <svg className="w-6 h-6" style={{ color: 'var(--accent)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>Admin Authorization</h3>
-                <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>Enter the admin password to publish this notification</p>
-              </div>
-
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => { setPassword(e.target.value); setPasswordError(''); }}
-                placeholder="Enter admin password"
-                className="w-full px-4 py-3 rounded-xl outline-none transition-all text-sm mb-1"
-                style={{ background: 'var(--overlay)', border: `1px solid ${passwordError ? '#ef4444' : 'var(--border-color)'}`, color: 'var(--text-primary)' }}
-                autoFocus
-              />
-              {passwordError && (
-                <p className="text-red-400 text-xs mt-2">{passwordError}</p>
-              )}
-
-              <div className="flex gap-3 mt-6">
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-all"
-                  style={{ background: 'var(--overlay)', color: 'var(--text-primary)' }}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleConfirm}
-                  disabled={submitting}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-medium text-white transition-all disabled:opacity-50"
-                  style={{ background: submitting ? 'var(--text-muted)' : 'var(--accent)' }}
-                >
-                  {submitting ? 'Publishing...' : 'Publish'}
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <ConfirmModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        onConfirm={handleConfirm}
+        title="Publish Notification"
+        description="Are you sure you want to publish this notification for all users?"
+        confirmText="Publish"
+        confirmLoadingText="Publishing..."
+        isLoading={submitting}
+      />
     </div>
   );
 };

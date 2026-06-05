@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { isMasterKey } from '../utils/auth';
 import { createAssessment as createTimedAssessment } from '../services/timedAssessmentService';
+import CustomSelect from './CustomSelect';
 
 const ASSESSMENT_TYPES = [
   'Slip Test',
@@ -334,15 +335,11 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
 
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Assessment Type</label>
-          <select
+          <CustomSelect
             value={assessmentType}
-            onChange={e => setAssessmentType(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white outline-none focus:border-primary/50"
-          >
-            {ASSESSMENT_TYPES.map(t => (
-              <option key={t} value={t}>{t} — {TYPE_DESCRIPTIONS[t]}</option>
-            ))}
-          </select>
+            onChange={setAssessmentType}
+            options={ASSESSMENT_TYPES.map(t => ({ value: t, label: `${t} — ${TYPE_DESCRIPTIONS[t]}` }))}
+          />
         </div>
 
         {formMode === 'json' ? (
