@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLayout } from '../context/LayoutContext';
 import { getExamTypes, getClassesForType, getSubjectsForClass, getExamConfig } from '../utils/examLoader';
 import { getClassesWithActive } from '../services/timedAssessmentService';
 import { getQuizQuestions } from '../utils/shuffle';
@@ -104,6 +105,15 @@ const AssessmentsScreen = () => {
     };
     loadConfig();
   }, [subject, classNum, selectedExamType]);
+
+  const { setHideHeader, setHideFooter } = useLayout();
+
+  useEffect(() => {
+    const hide = ['preassessment', 'student', 'quiz', 'result'].includes(screen);
+    setHideHeader(hide);
+    setHideFooter(hide);
+    return () => { setHideHeader(false); setHideFooter(false); };
+  }, [screen, setHideHeader, setHideFooter]);
 
   const handleSelectExamType = (type) => {
     if (type === 'Timed Assessment') {

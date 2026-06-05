@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { getPageViewCount } from './services/firebaseService';
 import { NotificationProvider } from './context/NotificationContext';
 import { AdminAuthProvider } from './context/AdminAuthContext';
+import { LayoutProvider } from './context/LayoutContext';
 import BetaBanner from './components/BetaBanner';
 import MainLayout from './components/MainLayout';
 import StaffDirectoryScreen from './components/StaffDirectoryScreen';
@@ -32,9 +33,11 @@ function App() {
   }, []);
 
   const withLayout = (Component) => (
-    <MainLayout pageViewCount={pageViewCount}>
-      <Component />
-    </MainLayout>
+    <LayoutProvider>
+      <MainLayout pageViewCount={pageViewCount}>
+        <Component />
+      </MainLayout>
+    </LayoutProvider>
   );
 
   return (

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLayout } from '../context/LayoutContext';
 import { getHolidayTypes, getHolidayClassesForType, getSubjectsForClass, getExamConfig } from '../utils/examLoader';
 import HolidayTypeScreen from './HolidayTypeScreen';
 import ClassSelectionScreen from './ClassSelectionScreen';
@@ -21,6 +22,15 @@ const HolidayHomeworkScreen = () => {
   const [classNum, setClassNum] = useState(null);
   const [subject, setSubject] = useState(null);
   const [screen, setScreen] = useState('holiday-type');
+
+  const { setHideHeader, setHideFooter } = useLayout();
+
+  useEffect(() => {
+    const hide = screen === 'content';
+    setHideHeader(hide);
+    setHideFooter(hide);
+    return () => { setHideHeader(false); setHideFooter(false); };
+  }, [screen, setHideHeader, setHideFooter]);
 
   useEffect(() => {
     const loadHolidayTypes = async () => {

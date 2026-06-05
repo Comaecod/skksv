@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLayout } from '../context/LayoutContext';
 import { getClassesWithActive, getSubjectsForClassWithActive, getAssessmentsForClassSubject, getAssessmentById, getSubmissionsForAssessment, submitMcqAttempt, submitProject, toDate } from '../services/timedAssessmentService';
 import { getQuizQuestions } from '../utils/shuffle';
 import { calculateTotalScore } from '../utils/scoring';
@@ -37,6 +38,15 @@ const TimedAssessmentScreen = () => {
   const [loadingClasses, setLoadingClasses] = useState(true);
   const [loadingSubjects, setLoadingSubjects] = useState(false);
   const [loadingAssessments, setLoadingAssessments] = useState(false);
+
+  const { setHideHeader, setHideFooter } = useLayout();
+
+  useEffect(() => {
+    const hide = ['entry', 'mcq', 'project', 'result'].includes(screen);
+    setHideHeader(hide);
+    setHideFooter(hide);
+    return () => { setHideHeader(false); setHideFooter(false); };
+  }, [screen, setHideHeader, setHideFooter]);
 
   const updateParams = useCallback((updates) => {
     setSearchParams(prev => {
