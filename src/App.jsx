@@ -8,6 +8,7 @@ import { SankaraProvider } from './context/SankaraContext';
 import BetaBanner from './components/BetaBanner';
 import MainLayout from './components/MainLayout';
 import ChatBot from './components/ChatBot';
+import NotificationWidget from './components/NotificationWidget';
 import StaffDirectoryScreen from './components/StaffDirectoryScreen';
 import HomeScreen from './components/HomeScreen';
 import AssessmentsScreen from './components/AssessmentsScreen';
@@ -72,6 +73,7 @@ function App() {
           <Route path="/admin/images/upload" element={<AdminLayout><UploadImage /></AdminLayout>} />
         </Routes>
         <ChatBot />
+        <NotificationWidget />
       </SankaraProvider>
       </NotificationProvider>
       </AdminAuthProvider>

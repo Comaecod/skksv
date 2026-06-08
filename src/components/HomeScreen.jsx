@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SCHOOL_CONFIG } from '../config/schoolConfig';
 import { getImagesByCategory } from '../services/imageService';
-import NotificationBell from './NotificationBell';
-import NotificationDrawer from './NotificationDrawer';
 import ImageModal from './ImageModal';
 
 const StatItem = ({ icon, value, label }) => (
@@ -135,7 +133,6 @@ const ImageCarousel = ({ images, onImageClick }) => {
 };
 
 const HomeScreen = () => {
-  const [notificationOpen, setNotificationOpen] = useState(false);
   const [images, setImages] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
 
@@ -270,8 +267,6 @@ const HomeScreen = () => {
           </a>
         </motion.div>
       </div>
-      <NotificationBell onClick={() => setNotificationOpen(true)} />
-      <NotificationDrawer isOpen={notificationOpen} onClose={() => setNotificationOpen(false)} />
       <AnimatePresence>
         {selectedImage && (
           <ImageModal image={selectedImage} onClose={() => setSelectedImage(null)} />

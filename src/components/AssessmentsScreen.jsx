@@ -108,15 +108,16 @@ const AssessmentsScreen = () => {
   }, [subject, classNum, selectedExamType]);
 
   const { setHideHeader, setHideFooter } = useLayout();
-  const { setSankaraVisible } = useSankara();
+  const { setSankaraVisible, setNotificationVisible } = useSankara();
 
   useEffect(() => {
     const hide = ['preassessment', 'student', 'quiz', 'result'].includes(screen);
     setHideHeader(hide);
     setHideFooter(hide);
     setSankaraVisible(!hide);
-    return () => { setHideHeader(false); setHideFooter(false); setSankaraVisible(true); };
-  }, [screen, setHideHeader, setHideFooter, setSankaraVisible]);
+    setNotificationVisible(!hide);
+    return () => { setHideHeader(false); setHideFooter(false); setSankaraVisible(true); setNotificationVisible(true); };
+  }, [screen, setHideHeader, setHideFooter, setSankaraVisible, setNotificationVisible]);
 
   const handleSelectExamType = (type) => {
     if (type === 'Timed Assessment') {
