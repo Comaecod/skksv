@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { to: '/admin/assessments/new', icon: '➕', label: 'New Assessment' },
   { to: '/admin/notifications', icon: '🔔', label: 'Notifications' },
   { to: '/admin/feedback', icon: '💬', label: 'Feedback Reports' },
+  { to: '/admin/images', icon: '🖼️', label: 'Images' },
 ];
 
 const AdminLayout = ({ children }) => {

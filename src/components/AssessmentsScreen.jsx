@@ -188,6 +188,19 @@ const AssessmentsScreen = () => {
     );
   }
 
+  if (!loading && screen === 'exam-type' && examTypes.every(t => t === 'Holiday Homework' || t === 'Timed Assessment')) {
+    return (
+      <div className="w-full flex items-center justify-center px-4 py-8">
+        <div className="glass-card p-8 text-center w-full max-w-md animate-slideUp">
+          <div className="text-5xl mb-4">📭</div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">No Assessments Available</h2>
+          <p className="text-gray-500 dark:text-gray-400 mb-6">There are no exams or assessments available at the moment. Please check back later.</p>
+          <button onClick={() => navigate('/')} className="px-6 py-3 rounded-xl font-medium bg-black/5 dark:bg-white/10 border border-gray-300 dark:border-white/20 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20 transition-all">← Back to Home</button>
+        </div>
+      </div>
+    );
+  }
+
   switch (screen) {
     case 'exam-type':
       return (

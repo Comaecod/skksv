@@ -21,6 +21,7 @@ const Header = () => {
       ]
     },
     { to: '/people', icon: '👥', label: 'People' },
+    { to: '/gallery', icon: '🖼️', label: 'Gallery' },
     { to: '/contact', icon: '📞', label: 'Contact' },
     { to: '/feedback', icon: '💬', label: 'Feedback' },
   ];

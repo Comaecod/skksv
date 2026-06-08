@@ -1,22 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SCHOOL_CONFIG } from '../config/schoolConfig';
+import { getImagesByCategory } from '../services/imageService';
 import NotificationBell from './NotificationBell';
 import NotificationDrawer from './NotificationDrawer';
-import skksv1 from '../assets/carousel/skksv1.jpg';
-import skksv2 from '../assets/carousel/skksv2.jpg';
-import skksv3 from '../assets/carousel/skksv3.jpg';
-import skksv4 from '../assets/carousel/skksv4.jpg';
-import skksv5 from '../assets/carousel/skksv5.jpg';
-import skksv6 from '../assets/carousel/skksv6.jpg';
-import skksv7 from '../assets/carousel/skksv7.jpg';
-import skksv8 from '../assets/carousel/skksv8.jpg';
-import skksv9 from '../assets/carousel/skksv9.jpg';
-import skksv10 from '../assets/carousel/skksv10.jpg';
-import skksv11 from '../assets/carousel/skksv11.jpg';
-import skksv12 from '../assets/carousel/skksv12.jpg';
-import skksv13 from '../assets/carousel/skksv13.jpg';
-import skksv14 from '../assets/carousel/skksv14.jpg';
+import ImageModal from './ImageModal';
 
 const StatItem = ({ icon, value, label }) => (
     <div className="flex items-center gap-2 bg-black/5 dark:bg-white/5 rounded-lg px-3 py-2">
@@ -41,7 +29,9 @@ const FeatureCard = ({ icon, title, description }) => (
   </motion.div>
 );
 
-const ImageCarousel = ({ images }) => {
+
+
+const ImageCarousel = ({ images, onImageClick }) => {
   const [current, setCurrent] = useState(0);
   const [loaded, setLoaded] = useState({});
 
@@ -54,13 +44,14 @@ const ImageCarousel = ({ images }) => {
   }, [images.length]);
 
   useEffect(() => {
+    if (images.length === 0) return;
     const preloadNext = () => {
       const nextIndex = (current + 1) % images.length;
       const prevIndex = (current - 1 + images.length) % images.length;
       [nextIndex, prevIndex].forEach(index => {
-        if (!loaded[index]) {
+        if (index >= 0 && index < images.length && !loaded[index]) {
           const img = new Image();
-          img.src = images[index];
+          img.src = images[index].url;
           img.onload = () => setLoaded(prev => ({ ...prev, [index]: true }));
         }
       });
@@ -76,13 +67,15 @@ const ImageCarousel = ({ images }) => {
     );
   }
 
+  const img = images[current];
+
   return (
-    <div className="relative w-full h-64 sm:h-80 lg:h-96 rounded-2xl overflow-hidden mb-8">
+    <div className="relative w-full h-64 sm:h-80 lg:h-96 rounded-2xl overflow-hidden mb-8 group cursor-pointer" onClick={() => onImageClick(img)}>
       <AnimatePresence mode="wait">
         <motion.img
           key={current}
-          src={images[current]}
-          alt={`School image ${current + 1}`}
+          src={img.url}
+          alt={img.title || `School image ${current + 1}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -91,14 +84,29 @@ const ImageCarousel = ({ images }) => {
         />
       </AnimatePresence>
 
+      {(img.title || img.description) && (
+        <div className="absolute top-0 left-0 right-0 p-4 sm:p-6 bg-gradient-to-b from-black/60 via-black/30 to-transparent pointer-events-none">
+          {img.title && (
+            <h3 className="text-white font-semibold text-sm sm:text-base lg:text-lg drop-shadow-md">
+              {img.title}
+            </h3>
+          )}
+          {img.description && (
+            <p className="text-white/80 text-xs sm:text-sm mt-1 line-clamp-3 drop-shadow-md max-w-xl">
+              {img.description}
+            </p>
+          )}
+        </div>
+      )}
+
       {images.length > 1 && (
         <>
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 pointer-events-none">
             {images.map((_, index) => (
               <button
                 key={index}
-                onClick={() => setCurrent(index)}
-                className={`w-2 h-2 rounded-full transition-all ${
+                onClick={(e) => { e.stopPropagation(); setCurrent(index); }}
+                className={`pointer-events-auto w-2 h-2 rounded-full transition-all ${
                   index === current ? 'bg-white w-6' : 'bg-white/50 hover:bg-white/70'
                 }`}
                 aria-label={`Go to slide ${index + 1}`}
@@ -107,14 +115,14 @@ const ImageCarousel = ({ images }) => {
           </div>
 
           <button
-            onClick={() => setCurrent(prev => (prev - 1 + images.length) % images.length)}
+            onClick={(e) => { e.stopPropagation(); setCurrent(prev => (prev - 1 + images.length) % images.length); }}
             className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-all"
             aria-label="Previous image"
           >
             ‹
           </button>
           <button
-            onClick={() => setCurrent(prev => (prev + 1) % images.length)}
+            onClick={(e) => { e.stopPropagation(); setCurrent(prev => (prev + 1) % images.length); }}
             className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-all"
             aria-label="Next image"
           >
@@ -128,11 +136,14 @@ const ImageCarousel = ({ images }) => {
 
 const HomeScreen = () => {
   const [notificationOpen, setNotificationOpen] = useState(false);
-  const images = [
-    skksv1, skksv2, skksv3, skksv4, skksv5, skksv6,
-    skksv7, skksv8, skksv9, skksv10, skksv11, skksv12,
-    skksv13, skksv14
-  ];
+  const [images, setImages] = useState([]);
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  useEffect(() => {
+    getImagesByCategory('carousel').then(items => {
+      setImages(items);
+    }).catch(err => console.error('Carousel fetch error:', err));
+  }, []);
 
   const features = [
     { icon: '🎓', title: 'CBSE Curriculum', description: 'Integrated CBSE Curriculum with academic excellence and holistic development' },
@@ -151,7 +162,7 @@ const HomeScreen = () => {
     <div className="w-full min-h-screen">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mt-6 sm:mt-8">
-          <ImageCarousel images={images} />
+          <ImageCarousel images={images} onImageClick={setSelectedImage} />
         </div>
 
         <motion.div
@@ -261,6 +272,11 @@ const HomeScreen = () => {
       </div>
       <NotificationBell onClick={() => setNotificationOpen(true)} />
       <NotificationDrawer isOpen={notificationOpen} onClose={() => setNotificationOpen(false)} />
+      <AnimatePresence>
+        {selectedImage && (
+          <ImageModal image={selectedImage} onClose={() => setSelectedImage(null)} />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

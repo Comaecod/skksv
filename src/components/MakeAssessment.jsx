@@ -279,6 +279,10 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
         const { db } = await import('../firebase');
         const { collection, addDoc, doc, setDoc } = await import('firebase/firestore');
         const key = `${assessmentType}_${classNum}_${subject}`;
+        await setDoc(doc(db, 'examTypes', assessmentType), {
+          examType: assessmentType,
+          enabled: true
+        });
         await setDoc(doc(db, 'examConfigs', key), {
           ...payload,
           createdAt: new Date().toISOString()

@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import staffData from '../data/staffDirectory.json';
-import { Avatar, PersonCard, capitalize } from './StaffComponents';
+import { Avatar, PersonCard, capitalize, initStaffPhotos } from './StaffComponents';
 import PersonModal from './PersonModal';
 
 const SectionWithConnector = ({ title, icon, count, children, delay = 0 }) => (
@@ -29,6 +29,8 @@ const SectionWithConnector = ({ title, icon, count, children, delay = 0 }) => (
 const StaffDirectoryScreen = () => {
   const { correspondent, principal, director, adminTeam, staff } = staffData;
   const [selectedPerson, setSelectedPerson] = useState(null);
+
+  useEffect(() => { initStaffPhotos(); }, []);
 
   const handlePersonClick = (person) => {
     setSelectedPerson(person);

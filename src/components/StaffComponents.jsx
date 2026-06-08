@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import staffData from '../data/staffDirectory.json';
+import { getImagesByCategory } from '../services/imageService';
 import vvPhoto from '../assets/employees/vv.jpg';
 import apPhoto from '../assets/employees/ap.jpeg';
 
@@ -25,9 +26,23 @@ const getAvatarText = (person) => {
   return parts.slice(0, 3).map(p => p[0].toUpperCase()).join('');
 };
 
-const staffPhotoMap = {
+let staffPhotoMap = {
   'staff-10': apPhoto,
   'staff-13': vvPhoto,
+};
+
+export const initStaffPhotos = async () => {
+  try {
+    const items = await getImagesByCategory('staff');
+    if (items.length === 0) return;
+    const newMap = {};
+    items.forEach(item => {
+      if (item.subCategory) newMap[item.subCategory] = item.url;
+    });
+    if (Object.keys(newMap).length > 0) staffPhotoMap = { ...staffPhotoMap, ...newMap };
+  } catch (e) {
+    // fallback to static
+  }
 };
 
 export const Avatar = ({ person, size = 'md' }) => {

@@ -9,6 +9,7 @@ import MainLayout from './components/MainLayout';
 import StaffDirectoryScreen from './components/StaffDirectoryScreen';
 import HomeScreen from './components/HomeScreen';
 import AssessmentsScreen from './components/AssessmentsScreen';
+import GalleryScreen from './components/GalleryScreen';
 import HolidayHomeworkScreen from './components/HolidayHomeworkScreen';
 import ContactScreen from './components/ContactScreen';
 import FeedbackScreen from './components/FeedbackScreen';
@@ -20,6 +21,8 @@ import MakeAssessment from './components/MakeAssessment';
 import ShowAssessments from './components/ShowAssessments';
 import AdminLayout from './components/admin/AdminLayout';
 import AdminPanel from './components/admin/AdminPanel';
+import AdminImages from './components/admin/AdminImages';
+import UploadImage from './components/admin/UploadImage';
 
 function App() {
   const [pageViewCount, setPageViewCount] = useState(null);
@@ -50,6 +53,7 @@ function App() {
           <Route path="/assessments" element={withLayout(AssessmentsScreen)} />
           <Route path="/holiday-homework" element={withLayout(HolidayHomeworkScreen)} />
           <Route path="/people" element={withLayout(StaffDirectoryScreen)} />
+          <Route path="/gallery" element={withLayout(GalleryScreen)} />
           <Route path="/contact" element={withLayout(ContactScreen)} />
           <Route path="/feedback" element={withLayout(FeedbackScreen)} />
           <Route path="/reports" element={withLayout(ReportsScreen)} />
@@ -61,6 +65,8 @@ function App() {
           <Route path="/admin/assessments/new" element={<AdminLayout><MakeAssessment skipInitialAuth /></AdminLayout>} />
           <Route path="/admin/notifications" element={<AdminLayout><MakeNotification /></AdminLayout>} />
           <Route path="/admin/feedback" element={<AdminLayout><FeedbackReportsScreen /></AdminLayout>} />
+          <Route path="/admin/images" element={<AdminLayout><AdminImages /></AdminLayout>} />
+          <Route path="/admin/images/upload" element={<AdminLayout><UploadImage /></AdminLayout>} />
         </Routes>
       </NotificationProvider>
       </AdminAuthProvider>
