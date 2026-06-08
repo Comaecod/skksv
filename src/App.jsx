@@ -44,7 +44,7 @@ function App() {
   );
 
   return (
-    <BrowserRouter basename="/quiz-app">
+    <BrowserRouter basename="/">
       <AdminAuthProvider>
       <NotificationProvider>
         <BetaBanner />

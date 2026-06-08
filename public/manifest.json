@@ -1,20 +1,14 @@
 {
   "name": "SKKSV Scholar",
-  "short_name": "SKKSV",
-  "description": "Interactive Quiz Application for Students",
-  "start_url": "/quiz-app/",
+  "short_name": "SKKSV Scholar",
+  "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#667eea",
+  "background_color": "#f8fafc",
+  "theme_color": "#f8fafc",
   "icons": [
     {
-      "src": "/assets/logo.png",
+      "src": "/logo.png",
       "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/assets/logo.png",
-      "sizes": "512x512",
       "type": "image/png"
     }
   ]
