@@ -4,8 +4,10 @@ import { getPageViewCount } from './services/firebaseService';
 import { NotificationProvider } from './context/NotificationContext';
 import { AdminAuthProvider } from './context/AdminAuthContext';
 import { LayoutProvider } from './context/LayoutContext';
+import { SankaraProvider } from './context/SankaraContext';
 import BetaBanner from './components/BetaBanner';
 import MainLayout from './components/MainLayout';
+import ChatBot from './components/ChatBot';
 import StaffDirectoryScreen from './components/StaffDirectoryScreen';
 import HomeScreen from './components/HomeScreen';
 import AssessmentsScreen from './components/AssessmentsScreen';
@@ -47,6 +49,7 @@ function App() {
     <BrowserRouter basename="/">
       <AdminAuthProvider>
       <NotificationProvider>
+      <SankaraProvider>
         <BetaBanner />
         <Routes>
           <Route path="/" element={withLayout(HomeScreen)} />
@@ -68,6 +71,8 @@ function App() {
           <Route path="/admin/images" element={<AdminLayout><AdminImages /></AdminLayout>} />
           <Route path="/admin/images/upload" element={<AdminLayout><UploadImage /></AdminLayout>} />
         </Routes>
+        <ChatBot />
+      </SankaraProvider>
       </NotificationProvider>
       </AdminAuthProvider>
     </BrowserRouter>

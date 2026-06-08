@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useLayout } from '../context/LayoutContext';
+import { useSankara } from '../context/SankaraContext';
 import { getClassesWithActive, getSubjectsForClassWithActive, getAssessmentsForClassSubject, getAssessmentById, getSubmissionsForAssessment, submitMcqAttempt, submitProject, toDate } from '../services/timedAssessmentService';
 import { getQuizQuestions } from '../utils/shuffle';
 import { calculateTotalScore } from '../utils/scoring';
@@ -40,13 +41,15 @@ const TimedAssessmentScreen = () => {
   const [loadingAssessments, setLoadingAssessments] = useState(false);
 
   const { setHideHeader, setHideFooter } = useLayout();
+  const { setSankaraVisible } = useSankara();
 
   useEffect(() => {
     const hide = ['entry', 'mcq', 'project', 'result'].includes(screen);
     setHideHeader(hide);
     setHideFooter(hide);
-    return () => { setHideHeader(false); setHideFooter(false); };
-  }, [screen, setHideHeader, setHideFooter]);
+    setSankaraVisible(!hide);
+    return () => { setHideHeader(false); setHideFooter(false); setSankaraVisible(true); };
+  }, [screen, setHideHeader, setHideFooter, setSankaraVisible]);
 
   const updateParams = useCallback((updates) => {
     setSearchParams(prev => {
