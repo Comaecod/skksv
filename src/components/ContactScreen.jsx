@@ -11,7 +11,7 @@ const ContactScreen = () => {
     {
       icon: '🏛️',
       title: 'Sri Kanchi Kamakoti Sankara Vidyalaya',
-      address: 'Sanatana Dharma Seva Gramam,\nPodili - 523252, Prakasam District,\nAndhra Pradesh',
+      address: 'Sanatana Dharma Seva Gramam,\nPodili - 523252, Markapur District,\nAndhra Pradesh',
       description: 'Near Ongole'
     },
     {

@@ -14,6 +14,9 @@ import HomeScreen from './components/HomeScreen';
 import AssessmentsScreen from './components/AssessmentsScreen';
 import GalleryScreen from './components/GalleryScreen';
 import HolidayHomeworkScreen from './components/HolidayHomeworkScreen';
+import AboutShankaracharya from './components/AboutShankaracharya';
+import AboutSchool from './components/AboutSchool';
+import PanchangamScreen from './components/PanchangamScreen';
 import ContactScreen from './components/ContactScreen';
 import FeedbackScreen from './components/FeedbackScreen';
 import FeedbackReportsScreen from './components/FeedbackReportsScreen';
@@ -59,6 +62,9 @@ function App() {
           <Route path="/people" element={withLayout(StaffDirectoryScreen)} />
           <Route path="/gallery" element={withLayout(GalleryScreen)} />
           <Route path="/contact" element={withLayout(ContactScreen)} />
+          <Route path="/panchangam" element={withLayout(PanchangamScreen)} />
+          <Route path="/about-shankaracharya" element={withLayout(AboutShankaracharya)} />
+          <Route path="/about-school" element={withLayout(AboutSchool)} />
           <Route path="/feedback" element={withLayout(FeedbackScreen)} />
           <Route path="/reports" element={withLayout(ReportsScreen)} />
           <Route path="/timed-assessments" element={withLayout(TimedAssessmentScreen)} />

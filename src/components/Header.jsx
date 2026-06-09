@@ -7,9 +7,9 @@ import { SCHOOL_CONFIG } from '../config/schoolConfig';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isAcademicsOpen, setIsAcademicsOpen] = useState(false);
-  const [isMobileAcademicsOpen, setIsMobileAcademicsOpen] = useState(false);
-  const academicsRef = useRef(null);
+  const [openDropdown, setOpenDropdown] = useState(null);
+  const [mobileOpenDropdown, setMobileOpenDropdown] = useState(null);
+  const dropdownRefs = useRef({});
 
   const navItems = [
     {
@@ -20,16 +20,34 @@ const Header = () => {
         { to: '/holiday-homework', icon: '🏖️', label: 'Holiday Homework' },
       ]
     },
-    { to: '/people', icon: '👥', label: 'People' },
-    { to: '/gallery', icon: '🖼️', label: 'Gallery' },
-    { to: '/contact', icon: '📞', label: 'Contact' },
-    { to: '/feedback', icon: '💬', label: 'Feedback' },
+    {
+      label: 'Learn',
+      icon: '📖',
+      children: [
+        { to: '/panchangam', icon: '📅', label: 'Panchangam' },
+        { to: '/about-shankaracharya', icon: '🕉️', label: 'About Shankaracharya' },
+        { to: '/about-school', icon: '🏫', label: 'About Our School' },
+      ]
+    },
+    {
+      label: 'About',
+      icon: 'ℹ️',
+      children: [
+        { to: '/people', icon: '👥', label: 'People' },
+        { to: '/gallery', icon: '🖼️', label: 'Gallery' },
+        { to: '/contact', icon: '📞', label: 'Contact' },
+        { to: '/feedback', icon: '💬', label: 'Feedback' },
+      ]
+    },
   ];
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (academicsRef.current && !academicsRef.current.contains(event.target)) {
-        setIsAcademicsOpen(false);
+      const anyOpen = Object.values(dropdownRefs.current).some(
+        (ref) => ref && ref.contains(event.target)
+      );
+      if (!anyOpen) {
+        setOpenDropdown(null);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -91,17 +109,17 @@ const Header = () => {
             {navItems.map((item) => {
               if (item.children) {
                 return (
-                  <div key={item.label} className="relative" ref={academicsRef}>
+                  <div key={item.label} className="relative" ref={(el) => { dropdownRefs.current[item.label] = el; }}>
                     <button
-                      onClick={() => setIsAcademicsOpen(!isAcademicsOpen)}
+                      onClick={() => setOpenDropdown(openDropdown === item.label ? null : item.label)}
                       className="px-3 py-1.5 rounded-lg text-gray-600 dark:text-gray-300 text-sm hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-all flex items-center gap-2"
                     >
                       <span>{item.icon}</span>
                       <span>{item.label}</span>
-                      <ChevronIcon isOpen={isAcademicsOpen} />
+                      <ChevronIcon isOpen={openDropdown === item.label} />
                     </button>
                     <AnimatePresence>
-                      {isAcademicsOpen && (
+                      {openDropdown === item.label && (
                         <motion.div
                           initial={{ opacity: 0, y: -10 }}
                           animate={{ opacity: 1, y: 0 }}
@@ -114,7 +132,7 @@ const Header = () => {
                               key={child.to}
                               to={child.to}
                               className="block px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-all flex items-center gap-2"
-                              onClick={() => setIsAcademicsOpen(false)}
+                              onClick={() => setOpenDropdown(null)}
                             >
                               <span>{child.icon}</span>
                               <span>{child.label}</span>
@@ -186,15 +204,15 @@ const Header = () => {
               return (
                 <div key={item.label}>
                   <button
-                    onClick={() => setIsMobileAcademicsOpen(!isMobileAcademicsOpen)}
+                    onClick={() => setMobileOpenDropdown(mobileOpenDropdown === item.label ? null : item.label)}
                     className="w-full px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-all flex items-center gap-2"
                   >
                     <span>{item.icon}</span>
                     <span>{item.label}</span>
-                    <ChevronIcon isOpen={isMobileAcademicsOpen} />
+                    <ChevronIcon isOpen={mobileOpenDropdown === item.label} />
                   </button>
                   <AnimatePresence>
-                    {isMobileAcademicsOpen && (
+                    {mobileOpenDropdown === item.label && (
                       <motion.div
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
@@ -209,7 +227,7 @@ const Header = () => {
                             className="block px-6 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-all flex items-center gap-2"
                             onClick={() => {
                               setIsMenuOpen(false);
-                              setIsMobileAcademicsOpen(false);
+                              setMobileOpenDropdown(null);
                             }}
                           >
                             <span>{child.icon}</span>
