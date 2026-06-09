@@ -29,15 +29,32 @@ const TYPE_DESCRIPTIONS = {
 const DEFAULT_QUESTIONS = `[
   {
     "id": 1,
-    "text": "Sample question?",
+    "text": "Sample single-correct question with image hint?",
     "type": "single",
+    "marks": 2,
+    "image": "https://via.placeholder.com/400x200/FFE4B5/000000?text=Question+Image+Hint",
+    "explanation": "This explains why the correct answer is right and the others are wrong. Teachers can provide detailed feedback here.",
     "options": [
-      { "text": "Option A" },
-      { "text": "Option B" },
-      { "text": "Option C" },
-      { "text": "Option D" }
+      { "text": "Correct Answer" },
+      { "text": "Wrong Option" },
+      { "text": "Wrong Option" },
+      { "text": "Wrong Option" }
     ],
     "isCorrect": 0
+  },
+  {
+    "id": 2,
+    "text": "Sample multiple-correct question (select all that apply)?",
+    "type": "multiple",
+    "marks": 3,
+    "explanation": "For multiple-correct questions, isCorrect should be an array of correct option indices.",
+    "options": [
+      { "text": "Correct Answer 1" },
+      { "text": "Correct Answer 2" },
+      { "text": "Wrong Option" },
+      { "text": "Wrong Option" }
+    ],
+    "isCorrect": [0, 1]
   }
 ]`;
 

@@ -6,6 +6,7 @@
   "title": "Computer Basics Test",
   "description": "Test your knowledge of fundamental computer concepts",
   "teacher": "Venkata Vishnu",
+  "invigilator": "Venkata Vishnu",
   "assessmentType": "mcq",
   "startDateTime": "2026-05-10T09:00:00.000Z",
   "endDateTime": "2026-06-15T17:00:00.000Z",
@@ -13,13 +14,30 @@
   "timeLimitMinutes": 15,
   "totalQuestions": 10,
   "totalMarks": 10,
-  "wrongAnswerPenaltyFraction": 0,
-  "sections": [],
+  "wrongAnswerPenaltyFraction": 0.25,
+  "preassessmentsecretkey": "",
+  "secretKey": "",
+  "teacherSecretKey": "teacher@123",
+  "sections": [
+    {
+      "range": [1, 8],
+      "count": 6,
+      "marks": 1
+    },
+    {
+      "range": [9, 11],
+      "count": 2,
+      "marks": 2
+    }
+  ],
   "questions": [
     {
       "id": 1,
       "text": "What is the full form of CPU?",
       "type": "single",
+      "marks": 1,
+      "image": "https://via.placeholder.com/400x150/E8F5E9/2E7D32?text=CPU",
+      "explanation": "CPU stands for Central Processing Unit. It is the primary component of a computer that processes instructions.",
       "options": [
         { "text": "Central Processing Unit" },
         { "text": "Computer Personal Unit" },
@@ -32,6 +50,7 @@
       "id": 2,
       "text": "Which device is used to type text on a computer?",
       "type": "single",
+      "marks": 1,
       "options": [
         { "text": "Mouse" },
         { "text": "Keyboard" },
@@ -44,6 +63,7 @@
       "id": 3,
       "text": "Which of the following is an input device?",
       "type": "single",
+      "marks": 1,
       "options": [
         { "text": "Monitor" },
         { "text": "Speaker" },
@@ -56,6 +76,7 @@
       "id": 4,
       "text": "What does RAM stand for?",
       "type": "single",
+      "marks": 1,
       "options": [
         { "text": "Read Access Memory" },
         { "text": "Random Access Memory" },
@@ -68,6 +89,7 @@
       "id": 5,
       "text": "Which of these is an output device?",
       "type": "single",
+      "marks": 1,
       "options": [
         { "text": "Scanner" },
         { "text": "Microphone" },
@@ -80,6 +102,7 @@
       "id": 6,
       "text": "Which key is used to delete the character before the cursor?",
       "type": "single",
+      "marks": 1,
       "options": [
         { "text": "Delete" },
         { "text": "Backspace" },
@@ -92,6 +115,7 @@
       "id": 7,
       "text": "What is the brain of the computer?",
       "type": "single",
+      "marks": 1,
       "options": [
         { "text": "Monitor" },
         { "text": "Keyboard" },
@@ -104,6 +128,7 @@
       "id": 8,
       "text": "Which device stores data permanently?",
       "type": "single",
+      "marks": 1,
       "options": [
         { "text": "RAM" },
         { "text": "Hard Disk" },
@@ -116,6 +141,7 @@
       "id": 9,
       "text": "What is the use of a mouse?",
       "type": "single",
+      "marks": 1,
       "options": [
         { "text": "To type text" },
         { "text": "To point and click" },
@@ -126,8 +152,25 @@
     },
     {
       "id": 10,
+      "text": "Which of the following are input devices? (Select all that apply)",
+      "type": "multiple",
+      "marks": 2,
+      "explanation": "Keyboard and Mouse are input devices. Monitor is an output device, and Printer is an output device.",
+      "options": [
+        { "text": "Keyboard" },
+        { "text": "Mouse" },
+        { "text": "Monitor" },
+        { "text": "Printer" }
+      ],
+      "isCorrect": [0, 1]
+    },
+    {
+      "id": 11,
       "text": "Which of the following is an example of system software?",
       "type": "single",
+      "marks": 2,
+      "image": "https://via.placeholder.com/400x150/FFF3E0/E65100?text=System+Software",
+      "explanation": "Windows 10 is an operating system, which is system software. Microsoft Word and Paint are application software. Google Chrome is a web browser (application software).",
       "options": [
         { "text": "Microsoft Word" },
         { "text": "Windows 10" },
