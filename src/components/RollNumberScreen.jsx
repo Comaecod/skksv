@@ -1,10 +1,11 @@
 import { useState, useCallback, useRef } from 'react';
 import { formatName } from '../utils/format';
 
-const RollNumberScreen = ({ onStartQuiz, questionsCount, onBack }) => {
+const RollNumberScreen = ({ onStartQuiz, questionsCount, onBack, authUser }) => {
+  const nameParts = authUser?.displayName ? authUser.displayName.split(' ') : [];
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    firstName: nameParts[0] || '',
+    lastName: nameParts.slice(1).join(' ') || '',
     rollNumber: ''
   });
   const [errors, setErrors] = useState({});
@@ -13,7 +14,6 @@ const RollNumberScreen = ({ onStartQuiz, questionsCount, onBack }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -21,33 +21,29 @@ const RollNumberScreen = ({ onStartQuiz, questionsCount, onBack }) => {
 
   const validateForm = () => {
     const newErrors = {};
-    
     if (!formData.firstName.trim()) {
       newErrors.firstName = 'First name is required';
     }
-    
     if (!formData.lastName.trim()) {
       newErrors.lastName = 'Last name is required';
     }
-    
     if (!formData.rollNumber.trim()) {
       newErrors.rollNumber = 'Roll number is required';
     } else if (!/^\d+$/.test(formData.rollNumber.trim())) {
       newErrors.rollNumber = 'Must be numeric';
     }
-    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
     if (validateForm()) {
       onStartQuiz({
         firstName: formatName(formData.firstName),
         lastName: formatName(formData.lastName),
-        rollNumber: Number(formData.rollNumber.trim()) || formData.rollNumber.trim()
+        rollNumber: Number(formData.rollNumber.trim()) || formData.rollNumber.trim(),
+        userId: authUser?.id || null,
       });
     } else {
       if (errors.firstName || errors.lastName || errors.rollNumber) {

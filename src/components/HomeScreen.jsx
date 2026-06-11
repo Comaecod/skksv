@@ -132,7 +132,12 @@ const ImageCarousel = ({ images, onImageClick }) => {
   );
 };
 
+import { Link } from 'react-router-dom';
+import { useAuth } from '../auth/contexts/AuthContext';
+import { ROLES } from '../auth/types/roles';
+
 const HomeScreen = () => {
+  const { isAuthenticated, userProfile, loading } = useAuth();
   const [images, setImages] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
 
@@ -158,6 +163,26 @@ const HomeScreen = () => {
   return (
     <div className="w-full min-h-screen">
       <div className="max-w-7xl mx-auto px-4 py-8">
+        {isAuthenticated && !loading && (
+          <div className="mb-6 p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xl font-bold">
+                {(userProfile?.displayName || userProfile?.email || 'U')[0].toUpperCase()}
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+                  Welcome back, {userProfile?.displayName || 'User'}!
+                </h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {userProfile?.role === ROLES.SUPER_ADMIN && 'You have full access to manage the platform.'}
+                  {userProfile?.role === ROLES.ADMIN && 'You can manage users, exams, and content.'}
+                  {userProfile?.role === ROLES.STAFF && 'Manage your assigned classes and students.'}
+                  {userProfile?.role === ROLES.STUDENT && 'Continue your learning journey.'}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
         <div className="mt-6 sm:mt-8">
           <ImageCarousel images={images} onImageClick={setSelectedImage} />
         </div>

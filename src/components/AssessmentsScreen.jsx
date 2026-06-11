@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../auth/contexts/AuthContext';
 import { useLayout } from '../context/LayoutContext';
 import { useSankara } from '../context/SankaraContext';
 import { getExamTypes, getClassesForType, getSubjectsForClass, getExamConfig } from '../utils/examLoader';
@@ -17,6 +18,7 @@ import EmptyState from './EmptyState';
 
 const AssessmentsScreen = () => {
   const navigate = useNavigate();
+  const { userProfile: authUser } = useAuth();
   
   const [examConfig, setExamConfig] = useState(null);
   const [studentInfo, setStudentInfo] = useState(null);
@@ -289,6 +291,7 @@ const AssessmentsScreen = () => {
             onStartQuiz={handleStartQuiz} 
             questionsCount={examConfig.totalQuestions || 0} 
             onBack={goBack} 
+            authUser={authUser}
           />
         </div>
       ) : (

@@ -1,8 +1,13 @@
 import { useState, useRef } from 'react';
 import { formatName } from '../utils/format';
 
-const TimedAssessmentEntryScreen = ({ onStart, onBack }) => {
-  const [formData, setFormData] = useState({ firstName: '', lastName: '', rollNumber: '' });
+const TimedAssessmentEntryScreen = ({ onStart, onBack, authUser }) => {
+  const nameParts = authUser?.displayName ? authUser.displayName.split(' ') : [];
+  const [formData, setFormData] = useState({
+    firstName: nameParts[0] || '',
+    lastName: nameParts.slice(1).join(' ') || '',
+    rollNumber: ''
+  });
   const [errors, setErrors] = useState({});
   const firstInputRef = useRef(null);
 
@@ -28,7 +33,8 @@ const TimedAssessmentEntryScreen = ({ onStart, onBack }) => {
       onStart({
         firstName: formatName(formData.firstName),
         lastName: formatName(formData.lastName),
-        rollNumber: Number(formData.rollNumber.trim())
+        rollNumber: Number(formData.rollNumber.trim()),
+        userId: authUser?.id || null,
       });
     }
   };
@@ -115,9 +121,9 @@ const TimedAssessmentEntryScreen = ({ onStart, onBack }) => {
 
         <button
           type="submit"
-          className="w-full px-8 py-4 rounded-xl font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 transition-all text-lg mb-3"
+          className="w-full px-8 py-4 rounded-xl font-medium bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:opacity-90 transition-all text-lg mb-3"
         >
-          Continue <span aria-hidden="true">→</span>
+          Begin <span aria-hidden="true">🏁</span>
         </button>
 
         <div className="text-center">

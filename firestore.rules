@@ -1,0 +1,126 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isSuperAdmin() {
+      return isAuthenticated()
+        && request.auth.token.email == 'venkatavishnu.skksv@gmail.com'
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+    }
+
+    function isAdmin() {
+      return isAuthenticated()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['super_admin', 'admin'];
+    }
+
+    function isStaff() {
+      return isAuthenticated()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'staff';
+    }
+
+    function isStudent() {
+      return isAuthenticated()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'student';
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function userHasStatus(status) {
+      return isAuthenticated()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == status;
+    }
+
+    // Users collection
+    match /users/{userId} {
+      // Users can read their own profile
+      // Admins can read any profile
+      allow read: if isAuthenticated()
+        && (isAdmin() || isOwner(userId)
+        || (isStaff() && resource.data.role in ['student', 'staff'])
+        || (isStudent() && isOwner(userId)));
+
+      // Users can update their own profile (limited fields)
+      // Admins can update any user
+      allow create: if isAdmin();
+      allow update: if isAdmin()
+        || (isOwner(userId) && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['displayName', 'phone', 'profileImage', 'customFields']));
+      allow delete: if isSuperAdmin();
+    }
+
+    // Roles collection
+    match /roles/{roleId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // Permissions collection
+    match /permissions/{permissionId} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin();
+    }
+
+    // Role-Permissions collection
+    match /rolePermissions/{roleId} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin();
+    }
+
+    // Audit logs collection
+    match /auditLogs/{logId} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated();
+      allow write: if isSuperAdmin();
+    }
+
+    // Students collection
+    match /students/{studentId} {
+      allow read: if isAuthenticated()
+        && (isAdmin() || isStaff() || isOwner(studentId));
+      allow write: if isAdmin() || isStaff();
+    }
+
+    // Staff collection
+    match /staff/{staffId} {
+      allow read: if isAuthenticated()
+        && (isAdmin() || isOwner(staffId));
+      allow write: if isAdmin();
+    }
+
+    // Schools collection (future multi-school support)
+    match /schools/{schoolId} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin();
+    }
+
+    // Images collection (carousel, gallery, etc.)
+    match /images/{imageId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Existing collections (keep access patterns)
+    match /quizResults/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAdmin();
+    }
+
+    match /analytics/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

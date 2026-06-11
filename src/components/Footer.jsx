@@ -1,16 +1,16 @@
+import { Link } from 'react-router-dom';
+import { useAuth } from '../auth/contexts/AuthContext';
+
 const formatViewCount = (count) => {
   if (count === null || count === undefined) return null;
-  if (count >= 1000000) {
-    return (count / 1000000).toFixed(1) + 'm';
-  }
-  if (count >= 1000) {
-    return (count / 1000).toFixed(1) + 'k';
-  }
+  if (count >= 1000000) return (count / 1000000).toFixed(1) + 'm';
+  if (count >= 1000) return (count / 1000).toFixed(1) + 'k';
   return count.toString();
 };
 
 const Footer = ({ pageViewCount }) => {
   const formattedCount = formatViewCount(pageViewCount);
+  const { isAuthenticated, userProfile } = useAuth();
 
   return (
     <footer className="py-3 sm:py-4 backdrop-blur-md border-t" style={{ background: 'var(--bg-card)', borderColor: 'var(--border-color)' }} role="contentinfo">
@@ -22,6 +22,11 @@ const Footer = ({ pageViewCount }) => {
           {formattedCount !== null && (
             <span style={{ color: 'var(--text-muted)' }}>
               👁 {formattedCount} views
+            </span>
+          )}
+          {isAuthenticated && (
+            <span style={{ color: 'var(--text-muted)' }}>
+              👤 {userProfile?.displayName || 'Logged in'}
             </span>
           )}
         </p>

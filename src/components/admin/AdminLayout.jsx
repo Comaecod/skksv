@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '../../context/AdminAuthContext';
+import { useAuth } from '../../auth/contexts/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import ScrollableArea from '../ui/ScrollableArea';
 
 const NAV_ITEMS = [
   { to: '/admin', icon: '📊', label: 'Dashboard' },
+  { to: '/admin/users', icon: '👥', label: 'Users' },
   { to: '/admin/assessments', icon: '📝', label: 'Assessments' },
   { to: '/admin/assessments/new', icon: '➕', label: 'New Assessment' },
   { to: '/admin/notifications', icon: '🔔', label: 'Notifications' },
@@ -12,14 +15,35 @@ const NAV_ITEMS = [
   { to: '/admin/images', icon: '🖼️', label: 'Images' },
 ];
 
+if (import.meta.env.VITE_SUPER_ADMIN_EMAIL) {
+  NAV_ITEMS.splice(2, 0, { to: '/admin/audit', icon: '📋', label: 'Audit Logs' });
+}
+
 const AdminLayout = ({ children }) => {
-  const { isAuthed, login, logout } = useAdminAuth();
+  const { isAuthed: legacyAuthed, login: legacyLogin, logout: legacyLogout } = useAdminAuth();
+  const { isAuthenticated, userProfile, logout: authLogout, loading: authLoading } = useAuth();
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
+
+  const hasAdminAccess = isAuthenticated && (userProfile?.role === 'super_admin' || userProfile?.role === 'admin');
+  const isAuthed = hasAdminAccess || legacyAuthed;
+
+  const handleLogout = () => {
+    legacyLogout();
+    authLogout();
+    navigate('/');
+  };
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (isAuthenticated && !hasAdminAccess) {
+      navigate('/unauthorized', { replace: true });
+    }
+  }, [isAuthenticated, hasAdminAccess, authLoading, navigate]);
 
   const ThemeIcon = theme === 'light'
     ? () => (<svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" /></svg>)
@@ -36,7 +60,7 @@ const AdminLayout = ({ children }) => {
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Admin Panel</h2>
             <p className="text-gray-500 dark:text-gray-400">Enter admin password to continue</p>
           </div>
-          <form onSubmit={(e) => { e.preventDefault(); if (login(password)) { setError(false); } else { setError(true); } }} className="space-y-4">
+          <form onSubmit={(e) => { e.preventDefault(); if (legacyLogin(password)) { setError(false); } else { setError(true); } }} className="space-y-4">
             <input
               type="password"
               value={password}
@@ -50,6 +74,11 @@ const AdminLayout = ({ children }) => {
               Authorize 🔓
             </button>
           </form>
+          <p className="mt-4 text-center">
+            <Link to="/login" className="text-sm text-primary dark:text-primary-light hover:underline">
+              Sign in with Firebase Auth →
+            </Link>
+          </p>
         </div>
       </div>
     );
@@ -78,7 +107,7 @@ const AdminLayout = ({ children }) => {
             <ThemeIcon />
           </button>
           <button
-            onClick={() => { logout(); navigate('/'); }}
+            onClick={handleLogout}
             className="px-3 py-1.5 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all"
           >
             Logout
@@ -95,8 +124,8 @@ const AdminLayout = ({ children }) => {
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed top-0 left-0 z-40 h-full w-64 bg-white/95 dark:bg-slate-900/95 border-r border-gray-200 dark:border-white/10 transform transition-transform duration-200 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
-        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200 dark:border-white/10">
+      <aside className={`fixed top-0 left-0 z-40 h-full w-64 bg-white/95 dark:bg-slate-900/95 border-r border-gray-200 dark:border-white/10 transform transition-transform duration-200 ease-in-out flex flex-col ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
+        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200 dark:border-white/10 shrink-0">
           <Link to="/admin" className="flex items-center gap-3" onClick={() => setSidebarOpen(false)}>
             <span className="text-2xl">🔐</span>
             <div>
@@ -106,30 +135,32 @@ const AdminLayout = ({ children }) => {
           </Link>
         </div>
 
-        <nav className="px-3 py-4 space-y-1">
-          {NAV_ITEMS.map((item) => {
-            const isActive = item.to === '/admin'
-              ? location.pathname === '/admin'
-              : location.pathname.startsWith(item.to);
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  isActive
-                    ? 'bg-primary/10 text-primary dark:text-primary-light shadow-sm'
-                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5'
-                }`}
-              >
-                <span className="text-lg">{item.icon}</span>
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
-        </nav>
+        <ScrollableArea className="flex-1 px-3 py-4" hideTrack>
+          <nav className="space-y-1">
+            {NAV_ITEMS.map((item) => {
+              const isActive = item.to === '/admin'
+                ? location.pathname === '/admin'
+                : location.pathname.startsWith(item.to);
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  onClick={() => setSidebarOpen(false)}
+                  className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                    isActive
+                      ? 'bg-primary/10 text-primary dark:text-primary-light shadow-sm'
+                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5'
+                  }`}
+                >
+                  <span className="text-lg">{item.icon}</span>
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </nav>
+        </ScrollableArea>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-white/10">
+        <div className="p-4 border-t border-gray-200 dark:border-white/10 shrink-0">
           <button
             onClick={toggleTheme}
             className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 transition-all mb-1"
@@ -145,7 +176,7 @@ const AdminLayout = ({ children }) => {
             <span>Back to Site</span>
           </Link>
           <button
-            onClick={() => { logout(); navigate('/'); }}
+            onClick={handleLogout}
             className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all mt-1"
           >
             <span>🚪</span>

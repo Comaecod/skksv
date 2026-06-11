@@ -1,0 +1,179 @@
+export const ROLES = {
+  SUPER_ADMIN: 'super_admin',
+  ADMIN: 'admin',
+  STAFF: 'staff',
+  STUDENT: 'student',
+  GUEST: 'guest',
+};
+
+export const STAFF_SUBTYPES = {
+  PRINCIPAL: 'principal',
+  TEACHER: 'teacher',
+  RECEPTION: 'reception',
+  LIBRARIAN: 'librarian',
+};
+
+export const USER_STATUS = {
+  ACTIVE: 'active',
+  INACTIVE: 'inactive',
+  SUSPENDED: 'suspended',
+  PENDING: 'pending',
+};
+
+export const PERMISSIONS = {
+  // User management
+  USER_CREATE: 'user:create',
+  USER_READ: 'user:read',
+  USER_UPDATE: 'user:update',
+  USER_DELETE: 'user:delete',
+  USER_ACTIVATE: 'user:activate',
+  USER_DEACTIVATE: 'user:deactivate',
+  USER_RESET_PASSWORD: 'user:reset_password',
+
+  // Role management
+  ROLE_CREATE: 'role:create',
+  ROLE_READ: 'role:read',
+  ROLE_UPDATE: 'role:update',
+  ROLE_DELETE: 'role:delete',
+  ROLE_ASSIGN: 'role:assign',
+
+  // Permission management
+  PERMISSION_CREATE: 'permission:create',
+  PERMISSION_READ: 'permission:read',
+  PERMISSION_UPDATE: 'permission:update',
+  PERMISSION_DELETE: 'permission:delete',
+
+  // Student management
+  STUDENT_CREATE: 'student:create',
+  STUDENT_READ: 'student:read',
+  STUDENT_UPDATE: 'student:update',
+  STUDENT_DELETE: 'student:delete',
+
+  // Staff management
+  STAFF_CREATE: 'staff:create',
+  STAFF_READ: 'staff:read',
+  STAFF_UPDATE: 'staff:update',
+  STAFF_DELETE: 'staff:delete',
+
+  // Exam management
+  EXAM_CREATE: 'exam:create',
+  EXAM_READ: 'exam:read',
+  EXAM_UPDATE: 'exam:update',
+  EXAM_DELETE: 'exam:delete',
+  EXAM_TAKE: 'exam:take',
+  EXAM_GRADE: 'exam:grade',
+
+  // Content management
+  CONTENT_CREATE: 'content:create',
+  CONTENT_READ: 'content:read',
+  CONTENT_UPDATE: 'content:update',
+  CONTENT_DELETE: 'content:delete',
+
+  // Settings
+  SETTINGS_READ: 'settings:read',
+  SETTINGS_UPDATE: 'settings:update',
+
+  // Audit
+  AUDIT_READ: 'audit:read',
+  AUDIT_EXPORT: 'audit:export',
+
+  // Profile
+  PROFILE_READ: 'profile:read',
+  PROFILE_UPDATE: 'profile:update',
+};
+
+export const DEFAULT_ROLE_PERMISSIONS = {
+  [ROLES.SUPER_ADMIN]: Object.values(PERMISSIONS),
+
+  [ROLES.ADMIN]: [
+    PERMISSIONS.USER_CREATE,
+    PERMISSIONS.USER_READ,
+    PERMISSIONS.USER_UPDATE,
+    PERMISSIONS.USER_ACTIVATE,
+    PERMISSIONS.USER_DEACTIVATE,
+    PERMISSIONS.USER_RESET_PASSWORD,
+    PERMISSIONS.ROLE_READ,
+    PERMISSIONS.ROLE_ASSIGN,
+    PERMISSIONS.PERMISSION_READ,
+    PERMISSIONS.STUDENT_CREATE,
+    PERMISSIONS.STUDENT_READ,
+    PERMISSIONS.STUDENT_UPDATE,
+    PERMISSIONS.STUDENT_DELETE,
+    PERMISSIONS.STAFF_CREATE,
+    PERMISSIONS.STAFF_READ,
+    PERMISSIONS.STAFF_UPDATE,
+    PERMISSIONS.STAFF_DELETE,
+    PERMISSIONS.EXAM_CREATE,
+    PERMISSIONS.EXAM_READ,
+    PERMISSIONS.EXAM_UPDATE,
+    PERMISSIONS.EXAM_DELETE,
+    PERMISSIONS.EXAM_GRADE,
+    PERMISSIONS.CONTENT_CREATE,
+    PERMISSIONS.CONTENT_READ,
+    PERMISSIONS.CONTENT_UPDATE,
+    PERMISSIONS.CONTENT_DELETE,
+    PERMISSIONS.SETTINGS_READ,
+    PERMISSIONS.SETTINGS_UPDATE,
+    PERMISSIONS.PROFILE_READ,
+    PERMISSIONS.PROFILE_UPDATE,
+  ],
+
+  [ROLES.STAFF]: {
+    [STAFF_SUBTYPES.PRINCIPAL]: [
+      PERMISSIONS.STUDENT_READ,
+      PERMISSIONS.STUDENT_CREATE,
+      PERMISSIONS.STUDENT_UPDATE,
+      PERMISSIONS.STAFF_READ,
+      PERMISSIONS.EXAM_READ,
+      PERMISSIONS.EXAM_CREATE,
+      PERMISSIONS.EXAM_UPDATE,
+      PERMISSIONS.EXAM_GRADE,
+      PERMISSIONS.CONTENT_READ,
+      PERMISSIONS.CONTENT_CREATE,
+      PERMISSIONS.PROFILE_READ,
+      PERMISSIONS.PROFILE_UPDATE,
+    ],
+    [STAFF_SUBTYPES.TEACHER]: [
+      PERMISSIONS.STUDENT_READ,
+      PERMISSIONS.STUDENT_CREATE,
+      PERMISSIONS.STUDENT_UPDATE,
+      PERMISSIONS.EXAM_READ,
+      PERMISSIONS.EXAM_CREATE,
+      PERMISSIONS.EXAM_UPDATE,
+      PERMISSIONS.EXAM_GRADE,
+      PERMISSIONS.CONTENT_READ,
+      PERMISSIONS.CONTENT_CREATE,
+      PERMISSIONS.PROFILE_READ,
+      PERMISSIONS.PROFILE_UPDATE,
+    ],
+    [STAFF_SUBTYPES.RECEPTION]: [
+      PERMISSIONS.STUDENT_READ,
+      PERMISSIONS.STUDENT_CREATE,
+      PERMISSIONS.PROFILE_READ,
+      PERMISSIONS.PROFILE_UPDATE,
+    ],
+    [STAFF_SUBTYPES.LIBRARIAN]: [
+      PERMISSIONS.STUDENT_READ,
+      PERMISSIONS.PROFILE_READ,
+      PERMISSIONS.PROFILE_UPDATE,
+    ],
+  },
+
+  [ROLES.STUDENT]: [
+    PERMISSIONS.PROFILE_READ,
+    PERMISSIONS.PROFILE_UPDATE,
+    PERMISSIONS.EXAM_READ,
+    PERMISSIONS.EXAM_TAKE,
+    PERMISSIONS.CONTENT_READ,
+  ],
+
+  [ROLES.GUEST]: [],
+};
+
+export const ROLE_HIERARCHY = [
+  ROLES.SUPER_ADMIN,
+  ROLES.ADMIN,
+  ROLES.STAFF,
+  ROLES.STUDENT,
+  ROLES.GUEST,
+];

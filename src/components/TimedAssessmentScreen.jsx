@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useAuth } from '../auth/contexts/AuthContext';
 import { useLayout } from '../context/LayoutContext';
 import { useSankara } from '../context/SankaraContext';
 import { getClassesWithActive, getSubjectsForClassWithActive, getAssessmentsForClassSubject, getAssessmentById, getSubmissionsForAssessment, submitMcqAttempt, submitProject, toDate } from '../services/timedAssessmentService';
@@ -18,6 +19,7 @@ import EmptyState from './EmptyState';
 const TimedAssessmentScreen = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { userProfile: authUser } = useAuth();
 
   const selectedClass = searchParams.get('class');
   const selectedSubject = searchParams.get('subject');
@@ -216,7 +218,7 @@ const TimedAssessmentScreen = () => {
     case 'entry':
       return (
         <div className={containerClass}>
-          <TimedAssessmentEntryScreen onStart={handleEntrySubmit} onBack={goBack} />
+          <TimedAssessmentEntryScreen onStart={handleEntrySubmit} onBack={goBack} authUser={authUser} />
         </div>
       );
 
