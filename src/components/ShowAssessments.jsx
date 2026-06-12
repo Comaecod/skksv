@@ -220,7 +220,7 @@ const ShowAssessments = ({ skipInitialAuth } = {}) => {
                   {CATEGORY_ICONS[cat] || '📋'} {cat} ({grouped[cat].length})
                 </button>
               ))}
-              <button className="px-3 py-2 rounded-xl text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-green-500/30" onClick={() => navigate('/admin/assessments/new')}>+ New</button>
+              <button className="px-3 py-2 rounded-xl text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-green-500/30" onClick={() => navigate('/dashboard/assessments/new')}>+ New</button>
               <button className="px-3 py-2 rounded-xl text-xs font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:bg-blue-500/30" onClick={fetchAll}>🔄 Refresh</button>
             </div>
           </div>
@@ -269,15 +269,18 @@ const ShowAssessments = ({ skipInitialAuth } = {}) => {
                                 <div className="flex-1 min-w-0">
                                   <div className="font-semibold text-gray-900 dark:text-white">{item.title || item.id}</div>
                                   <div className="flex gap-3 mt-1 text-xs text-gray-500 dark:text-gray-400 flex-wrap">
-                                    {item.classNum && <span>Class {item.classNum}</span>}
                                     {item.subject && <span>{item.subject}</span>}
                                     {item.teacher && <span>Teacher: {item.teacher}</span>}
                                     <span className={`px-1.5 py-0.5 rounded text-xs ${item._source === 'timedAssessments' ? 'bg-cyan-500/20 text-cyan-400' : 'bg-gray-500/20 text-gray-400'}`}>
                                       {item._source === 'timedAssessments' ? '⏱️ Timed' : '📋 Standard'}
                                     </span>
-                                    {item.assessmentType && (
-                                      <span className={`px-1.5 py-0.5 rounded text-xs ${item.assessmentType === 'mcq' ? 'bg-purple-500/20 text-purple-400' : 'bg-orange-500/20 text-orange-400'}`}>
-                                        {item.assessmentType === 'mcq' ? 'MCQ' : 'Project'}
+                                    {item.assessmentFormat && (
+                                      <span className={`px-1.5 py-0.5 rounded text-xs ${
+                                        item.assessmentFormat === 'mcq' ? 'bg-purple-500/20 text-purple-400' :
+                                        item.assessmentFormat === 'project' ? 'bg-orange-500/20 text-orange-400' :
+                                        'bg-green-500/20 text-green-400'
+                                      }`}>
+                                        {item.assessmentFormat === 'mcq' ? 'MCQ' : item.assessmentFormat === 'project' ? 'Project' : 'Coding'}
                                       </span>
                                     )}
                                     {item.enabled === false && (
@@ -323,7 +326,7 @@ const ShowAssessments = ({ skipInitialAuth } = {}) => {
           )}
 
           <div className="text-center mt-8">
-            <button className="px-6 py-3 rounded-xl font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90" onClick={() => navigate(skipInitialAuth ? '/admin' : '/')}>← Back to Home</button>
+            <button className="px-6 py-3 rounded-xl font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90" onClick={() => navigate(skipInitialAuth ? '/dashboard' : '/')}>← Back to Home</button>
           </div>
         </div>
       </div>

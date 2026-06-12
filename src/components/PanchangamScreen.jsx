@@ -40,7 +40,7 @@ const sankalpaLines = [
   { text: 'Bhāratavarshe', te: 'భారతవర్షే', sa: 'भारतवर्षे' },
   { text: 'Bhāratakhande', te: 'భారతఖండే', sa: 'भारतखण्डे' },
   { text: 'Meroḥ Dakṣiṇa Digbhāge', te: 'మేరోః దక్షిణ దిగ్భాగే', sa: 'मेरोः दक्षिण दिग्भागे' },
-  { text: 'Śrīśailasya Vāyavya Bhāge', te: 'శ్రీశైలస్య వాయవ్య భాగే', sa: 'श्रीशैलस्य वायव्य भागे' },
+  { text: 'Śrīśailasya Āgneya Bhāge', te: 'శ్రీశైలస్య ఆగ్నేయ భాగే', sa: 'श्रीशैलस्य आग्नेय भागे' },
   { text: 'Krishna Kaverī Madhya Pradēśe', te: 'కృష్ణా కావేరీ మధ్య ప్రదేశే', sa: 'कृष्णा कावेरी मध्य प्रदेशे' },
   { text: 'Prudulapuri Nagare', te: 'ప్రుదులపురి నగరే', sa: 'प्रुदुलपुरि नगरे' },
 ];

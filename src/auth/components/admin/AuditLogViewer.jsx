@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { auditService } from '../../services/auditService';
+import CustomSelect from '../../../components/CustomSelect';
 
 export default function AuditLogViewer() {
   const [logs, setLogs] = useState([]);
@@ -45,16 +46,15 @@ export default function AuditLogViewer() {
       </div>
 
       <div className="flex gap-3 mb-4">
-        <select
+        <CustomSelect
           value={actionFilter}
-          onChange={(e) => setActionFilter(e.target.value)}
-          className="px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white outline-none focus:border-primary/50 transition-all text-sm"
-        >
-          <option value="">All Actions</option>
-          {uniqueActions.map((action) => (
-            <option key={action} value={action}>{action}</option>
-          ))}
-        </select>
+          onChange={setActionFilter}
+          options={[
+            { value: '', label: 'All Actions' },
+            ...uniqueActions.map((a) => ({ value: a, label: a })),
+          ]}
+          className="min-w-[160px]"
+        />
         <button
           onClick={loadLogs}
           className="px-4 py-2.5 rounded-xl text-sm font-medium border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-all"

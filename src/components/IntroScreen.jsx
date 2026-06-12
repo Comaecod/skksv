@@ -1,4 +1,4 @@
-const IntroScreen = ({ config, onStart, onReports }) => {
+const IntroScreen = ({ config, onStart, onReports, userRole }) => {
   const { 
     examTitle, 
     className, 
@@ -47,22 +47,25 @@ const IntroScreen = ({ config, onStart, onReports }) => {
       </div>
 
       <div className="flex justify-center gap-4 sm:gap-6 mt-6 sm:mt-8 flex-wrap">
-        <button 
-          className="px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 transition-all hover:scale-105 min-w-[180px] sm:min-w-[200px] flex items-center justify-center gap-2 text-base sm:text-lg" 
-          onClick={onStart}
-          aria-label="Start Assessments"
-        >
-          <span className="text-xl sm:text-2xl" aria-hidden="true">📝</span>
-          <span>Assessments</span>
-        </button>
-        <button 
-          className="px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-medium bg-black/5 dark:bg-white/10 border border-gray-300 dark:border-white/20 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20 transition-all min-w-[180px] sm:min-w-[200px] flex items-center justify-center gap-2 text-base sm:text-lg" 
-          onClick={onReports}
-          aria-label="View Reports"
-        >
-          <span className="text-xl sm:text-2xl" aria-hidden="true">📊</span>
-          <span>Reports</span>
-        </button>
+        {userRole && userRole !== 'student' ? (
+          <button
+            className="px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 transition-all hover:scale-105 min-w-[180px] sm:min-w-[200px] flex items-center justify-center gap-2 text-base sm:text-lg"
+            onClick={onReports}
+            aria-label="View Reports"
+          >
+            <span className="text-xl sm:text-2xl" aria-hidden="true">📊</span>
+            <span>Reports</span>
+          </button>
+        ) : (
+          <button
+            className="px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 transition-all hover:scale-105 min-w-[180px] sm:min-w-[200px] flex items-center justify-center gap-2 text-base sm:text-lg"
+            onClick={onStart}
+            aria-label="Take Assessment"
+          >
+            <span className="text-xl sm:text-2xl" aria-hidden="true">📝</span>
+            <span>Take Assessment</span>
+          </button>
+        )}
       </div>
     </div>
   );

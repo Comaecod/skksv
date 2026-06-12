@@ -10,30 +10,31 @@ import { AuthProvider } from './auth/contexts/AuthContext';
 import { ProtectedRoute, RoleRoute, PublicRoute, GuestRoute } from './auth/components/ProtectedRoute';
 import BetaBanner from './components/BetaBanner';
 import MainLayout from './components/MainLayout';
-import ChatBot from './components/ChatBot';
-import NotificationWidget from './components/NotificationWidget';
-import StaffDirectoryScreen from './components/StaffDirectoryScreen';
 import HomeScreen from './components/HomeScreen';
-import AssessmentsScreen from './components/AssessmentsScreen';
-import GalleryScreen from './components/GalleryScreen';
-import HolidayHomeworkScreen from './components/HolidayHomeworkScreen';
-import AboutShankaracharya from './components/AboutShankaracharya';
-import AboutSchool from './components/AboutSchool';
-import PanchangamScreen from './components/PanchangamScreen';
-import ContactScreen from './components/ContactScreen';
-import FeedbackScreen from './components/FeedbackScreen';
-import FeedbackReportsScreen from './components/FeedbackReportsScreen';
-import ReportsScreen from './components/ReportsScreen';
-import MakeNotification from './components/MakeNotification';
-import TimedAssessmentScreen from './components/TimedAssessmentScreen';
-import MakeAssessment from './components/MakeAssessment';
-import ShowAssessments from './components/ShowAssessments';
-import AdminLayout from './components/admin/AdminLayout';
-import AdminPanel from './components/admin/AdminPanel';
-import AdminImages from './components/admin/AdminImages';
-import UploadImage from './components/admin/UploadImage';
+import DashboardLayout from './components/admin/AdminLayout';
 
-// Auth components (lazy loaded)
+const ChatBot = lazy(() => import('./components/ChatBot'));
+const NotificationWidget = lazy(() => import('./components/NotificationWidget'));
+const StaffDirectoryScreen = lazy(() => import('./components/StaffDirectoryScreen'));
+const AssessmentsScreen = lazy(() => import('./components/AssessmentsScreen'));
+const GalleryScreen = lazy(() => import('./components/GalleryScreen'));
+const HolidayHomeworkScreen = lazy(() => import('./components/HolidayHomeworkScreen'));
+const AboutShankaracharya = lazy(() => import('./components/AboutShankaracharya'));
+const AboutSchool = lazy(() => import('./components/AboutSchool'));
+const PanchangamScreen = lazy(() => import('./components/PanchangamScreen'));
+const ContactScreen = lazy(() => import('./components/ContactScreen'));
+const FeedbackScreen = lazy(() => import('./components/FeedbackScreen'));
+const FeedbackReportsScreen = lazy(() => import('./components/FeedbackReportsScreen'));
+const ReportsScreen = lazy(() => import('./components/ReportsScreen'));
+const StudentResults = lazy(() => import('./components/StudentResults'));
+const MakeNotification = lazy(() => import('./components/MakeNotification'));
+const TimedAssessmentScreen = lazy(() => import('./components/TimedAssessmentScreen'));
+const MakeAssessment = lazy(() => import('./components/MakeAssessment'));
+const ShowAssessments = lazy(() => import('./components/ShowAssessments'));
+const AdminImages = lazy(() => import('./components/admin/AdminImages'));
+const UploadImage = lazy(() => import('./components/admin/UploadImage'));
+const AdminResults = lazy(() => import('./components/admin/AdminResults'));
+
 const LoginScreen = lazy(() => import('./auth/components/LoginScreen'));
 const ForgotPassword = lazy(() => import('./auth/components/ForgotPassword'));
 const ResetPassword = lazy(() => import('./auth/components/ResetPassword'));
@@ -41,8 +42,8 @@ const Unauthorized = lazy(() => import('./auth/components/Unauthorized'));
 const ProfileScreen = lazy(() => import('./auth/components/ProfileScreen'));
 const Dashboard = lazy(() => import('./auth/components/Dashboard'));
 const EmailLinkCallback = lazy(() => import('./auth/components/EmailLinkCallback'));
-const AdminDashboard = lazy(() => import('./auth/components/admin/AdminDashboard'));
 const AdminUserManagement = lazy(() => import('./auth/components/admin/AdminUserManagement'));
+const StudentManagement = lazy(() => import('./auth/components/admin/StudentManagement'));
 const AuditLogViewer = lazy(() => import('./auth/components/admin/AuditLogViewer'));
 
 const AuthFallback = () => (
@@ -53,6 +54,7 @@ const AuthFallback = () => (
 
 function App() {
   const [pageViewCount, setPageViewCount] = useState(null);
+  const [activeFloating, setActiveFloating] = useState(null);
 
   useEffect(() => {
     const initAnalytics = async () => {
@@ -65,7 +67,9 @@ function App() {
   const withLayout = (Component) => (
     <LayoutProvider>
       <MainLayout pageViewCount={pageViewCount}>
-        <Component />
+        <Suspense fallback={<AuthFallback />}>
+          <Component />
+        </Suspense>
       </MainLayout>
     </LayoutProvider>
   );
@@ -80,8 +84,6 @@ function App() {
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={withLayout(HomeScreen)} />
-          <Route path="/assessments" element={withLayout(AssessmentsScreen)} />
-          <Route path="/holiday-homework" element={withLayout(HolidayHomeworkScreen)} />
           <Route path="/people" element={withLayout(StaffDirectoryScreen)} />
           <Route path="/gallery" element={withLayout(GalleryScreen)} />
           <Route path="/contact" element={withLayout(ContactScreen)} />
@@ -89,8 +91,6 @@ function App() {
           <Route path="/about-shankaracharya" element={withLayout(AboutShankaracharya)} />
           <Route path="/about-school" element={withLayout(AboutSchool)} />
           <Route path="/feedback" element={withLayout(FeedbackScreen)} />
-          <Route path="/reports" element={withLayout(ReportsScreen)} />
-          <Route path="/timed-assessments" element={withLayout(TimedAssessmentScreen)} />
 
           {/* Auth Routes */}
           <Route path="/login" element={
@@ -125,14 +125,6 @@ function App() {
             </Suspense>
           } />
 
-          {/* Protected User Dashboard */}
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <Suspense fallback={<AuthFallback />}>
-                <Dashboard />
-              </Suspense>
-            </ProtectedRoute>
-          } />
           <Route path="/profile" element={
             <ProtectedRoute>
               <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
@@ -143,67 +135,118 @@ function App() {
             </ProtectedRoute>
           } />
 
-          {/* Admin Panel Routes */}
-          <Route path="/admin" element={
+          <Route path="/assessments" element={
             <ProtectedRoute>
-              <AdminLayout>
+              <DashboardLayout>
                 <Suspense fallback={<AuthFallback />}>
-                  <AdminDashboard userRole="super_admin" />
+                  <AssessmentsScreen />
                 </Suspense>
-              </AdminLayout>
+              </DashboardLayout>
             </ProtectedRoute>
           } />
-          <Route path="/admin/users" element={
+          <Route path="/holiday-homework" element={
             <ProtectedRoute>
-              <AdminLayout>
+              <DashboardLayout>
+                <Suspense fallback={<AuthFallback />}>
+                  <HolidayHomeworkScreen />
+                </Suspense>
+              </DashboardLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/reports" element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Suspense fallback={<AuthFallback />}>
+                  <StudentResults />
+                </Suspense>
+              </DashboardLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/timed-assessments" element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Suspense fallback={<AuthFallback />}>
+                  <TimedAssessmentScreen />
+                </Suspense>
+              </DashboardLayout>
+            </ProtectedRoute>
+          } />
+
+          {/* Dashboard Panel Routes */}
+          <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Suspense fallback={<AuthFallback />}>
+                  <Dashboard />
+                </Suspense>
+              </DashboardLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/dashboard/users" element={
+            <ProtectedRoute>
+              <DashboardLayout>
                 <Suspense fallback={<AuthFallback />}>
                   <AdminUserManagement />
                 </Suspense>
-              </AdminLayout>
+              </DashboardLayout>
             </ProtectedRoute>
           } />
-          <Route path="/admin/audit" element={
+          <Route path="/dashboard/students" element={
             <ProtectedRoute>
-              <AdminLayout>
+              <DashboardLayout>
+                <Suspense fallback={<AuthFallback />}>
+                  <StudentManagement />
+                </Suspense>
+              </DashboardLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/dashboard/audit" element={
+            <ProtectedRoute>
+              <DashboardLayout>
                 <Suspense fallback={<AuthFallback />}>
                   <AuditLogViewer />
                 </Suspense>
-              </AdminLayout>
+              </DashboardLayout>
             </ProtectedRoute>
           } />
-          <Route path="/admin/assessments" element={
+          <Route path="/dashboard/assessments" element={
             <ProtectedRoute>
-              <AdminLayout><ShowAssessments skipInitialAuth /></AdminLayout>
+              <DashboardLayout><ShowAssessments skipInitialAuth /></DashboardLayout>
             </ProtectedRoute>
           } />
-          <Route path="/admin/assessments/new" element={
+          <Route path="/dashboard/assessments/new" element={
             <ProtectedRoute>
-              <AdminLayout><MakeAssessment skipInitialAuth /></AdminLayout>
+              <DashboardLayout><MakeAssessment skipInitialAuth /></DashboardLayout>
             </ProtectedRoute>
           } />
-          <Route path="/admin/notifications" element={
+          <Route path="/dashboard/notifications" element={
             <ProtectedRoute>
-              <AdminLayout><MakeNotification /></AdminLayout>
+              <DashboardLayout><MakeNotification /></DashboardLayout>
             </ProtectedRoute>
           } />
-          <Route path="/admin/feedback" element={
+          <Route path="/dashboard/feedback" element={
             <ProtectedRoute>
-              <AdminLayout><FeedbackReportsScreen /></AdminLayout>
+              <DashboardLayout><FeedbackReportsScreen /></DashboardLayout>
             </ProtectedRoute>
           } />
-          <Route path="/admin/images" element={
+          <Route path="/dashboard/images" element={
             <ProtectedRoute>
-              <AdminLayout><AdminImages /></AdminLayout>
+              <DashboardLayout><AdminImages /></DashboardLayout>
             </ProtectedRoute>
           } />
-          <Route path="/admin/images/upload" element={
+          <Route path="/dashboard/images/upload" element={
             <ProtectedRoute>
-              <AdminLayout><UploadImage /></AdminLayout>
+              <DashboardLayout><UploadImage /></DashboardLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/dashboard/results" element={
+            <ProtectedRoute>
+              <DashboardLayout><AdminResults /></DashboardLayout>
             </ProtectedRoute>
           } />
         </Routes>
-        <ChatBot />
-        <NotificationWidget />
+        <ChatBot isOpen={activeFloating === 'chat'} onToggle={() => setActiveFloating(prev => prev === 'chat' ? null : 'chat')} />
+        <NotificationWidget isOpen={activeFloating === 'notifications'} onToggle={() => setActiveFloating(prev => prev === 'notifications' ? null : 'notifications')} />
       </SankaraProvider>
       </NotificationProvider>
       </AdminAuthProvider>

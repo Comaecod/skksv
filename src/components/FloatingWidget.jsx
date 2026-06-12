@@ -21,15 +21,19 @@ const FloatingWidget = ({
   onToggle,
   panelHeight,
   visible = true,
+  buttonOffset = 0,
+  buttonColor,
 }) => {
   if (!visible) return null;
 
   const isLeft = position === 'left';
   const sideClass = isLeft ? 'left-4 sm:left-6' : 'right-4 sm:right-6';
   const alignClass = isLeft ? 'items-start' : 'items-end';
+  const bgGradient = buttonColor || 'linear-gradient(135deg, var(--accent), #764ba2)';
 
   return (
-    <div className={`fixed bottom-4 ${sideClass} z-40 flex flex-col ${alignClass}`}>
+    <div className={`fixed bottom-4 ${sideClass} z-40 flex flex-col ${alignClass}`}
+      style={buttonOffset ? { bottom: `${buttonOffset}px` } : undefined}>
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -55,7 +59,7 @@ const FloatingWidget = ({
               <div className="flex items-center gap-2 min-w-0 flex-1">
                 {headerIcon && (
                   <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
-                    style={{ background: 'linear-gradient(135deg, var(--accent), #764ba2)', color: 'white' }}>
+                    style={{ background: bgGradient, color: 'white' }}>
                     {headerIcon}
                   </div>
                 )}
@@ -91,7 +95,7 @@ const FloatingWidget = ({
       <motion.button
         onClick={onToggle}
         className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center shadow-lg transition-all shrink-0 relative"
-        style={{ background: 'linear-gradient(135deg, var(--accent), #764ba2)', color: 'white' }}
+        style={{ background: bgGradient, color: 'white' }}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         aria-label={isOpen ? `Close ${title}` : buttonLabel}

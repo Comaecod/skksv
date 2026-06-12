@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNotifications } from '../context/NotificationContext';
 import { useSankara } from '../context/SankaraContext';
 import FloatingWidget from './FloatingWidget';
@@ -44,8 +43,7 @@ function formatRelativeTime(date) {
   return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
 }
 
-function NotificationWidget() {
-  const [isOpen, setIsOpen] = useState(false);
+function NotificationWidget({ isOpen, onToggle }) {
   const { isNotificationVisible } = useSankara();
   const {
     notifications,
@@ -147,9 +145,10 @@ function NotificationWidget() {
       title="Notifications"
       subtitle={unreadCount > 0 ? `${unreadCount} unread` : 'All caught up'}
       isOpen={isOpen}
-      onToggle={() => setIsOpen(prev => !prev)}
+      onToggle={onToggle}
       visible={isNotificationVisible}
       footer={footer}
+      buttonColor="linear-gradient(135deg, #f59e0b, #ef4444)"
     >
       {content}
     </FloatingWidget>

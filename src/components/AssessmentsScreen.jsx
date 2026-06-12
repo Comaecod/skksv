@@ -3,16 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/contexts/AuthContext';
 import { useLayout } from '../context/LayoutContext';
 import { useSankara } from '../context/SankaraContext';
-import { getExamTypes, getClassesForType, getSubjectsForClass, getExamConfig } from '../utils/examLoader';
+import { getExamTypes, getExamTypesForClass, getSubjectsForClass, getExamConfig } from '../utils/examLoader';
 import { getClassesWithActive } from '../services/timedAssessmentService';
 import { getQuizQuestions } from '../utils/shuffle';
+import { checkExistingQuizResult, checkExistingCodingSubmission } from '../services/firebaseService';
 import ExamTypeScreen from './ExamTypeScreen';
-import ClassSelectionScreen from './ClassSelectionScreen';
 import SubjectSelectionScreen from './SubjectSelectionScreen';
 import IntroScreen from './IntroScreen';
 import PreAssessmentScreen from './PreAssessmentScreen';
-import RollNumberScreen from './RollNumberScreen';
+
 import QuizScreen from './QuizScreen';
+import CodingScreen from './CodingScreen';
 import ResultScreen from './ResultScreen';
 import EmptyState from './EmptyState';
 
@@ -25,7 +26,6 @@ const AssessmentsScreen = () => {
   const [quizQuestions, setQuizQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
   const [examTypes, setExamTypes] = useState([]);
-  const [classes, setClasses] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [subjectsLoading, setSubjectsLoading] = useState(false);
   const [configLoading, setConfigLoading] = useState(false);
@@ -35,14 +35,18 @@ const AssessmentsScreen = () => {
   const [classNum, setClassNum] = useState(null);
   const [subject, setSubject] = useState(null);
   const [screen, setScreen] = useState('exam-type');
+  const [alreadyTaken, setAlreadyTaken] = useState(false);
 
   useEffect(() => {
     const loadExamTypes = async () => {
       setLoading(true);
       try {
-        const types = await getExamTypes();
+        const allTypes = authUser?.studentClass
+          ? await getExamTypesForClass(authUser.studentClass)
+          : await getExamTypes();
         const activeTimedClasses = await getClassesWithActive();
-        setExamTypes(activeTimedClasses.length > 0 ? types : types.filter(t => t !== 'Timed Assessment'));
+        const types = activeTimedClasses.length > 0 ? allTypes : allTypes.filter(t => t !== 'Timed Assessment');
+        setExamTypes(types);
       } catch (err) {
         console.error('Error loading exam types:', err);
       } finally {
@@ -51,25 +55,6 @@ const AssessmentsScreen = () => {
     };
     loadExamTypes();
   }, []);
-
-  useEffect(() => {
-    const loadClasses = async () => {
-      if (!selectedExamType) {
-        setClasses([]);
-        return;
-      }
-      setLoading(true);
-      try {
-        const cls = await getClassesForType(selectedExamType);
-        setClasses(cls);
-      } catch (err) {
-        console.error('Error loading classes:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadClasses();
-  }, [selectedExamType]);
 
   useEffect(() => {
     const loadSubjects = async () => {
@@ -113,7 +98,7 @@ const AssessmentsScreen = () => {
   const { setSankaraVisible, setNotificationVisible } = useSankara();
 
   useEffect(() => {
-    const hide = ['preassessment', 'student', 'quiz', 'result'].includes(screen);
+    const hide = ['preassessment', 'student', 'quiz', 'coding', 'result'].includes(screen);
     setHideHeader(hide);
     setHideFooter(hide);
     setSankaraVisible(!hide);
@@ -127,14 +112,8 @@ const AssessmentsScreen = () => {
       return;
     }
     setSelectedExamType(type);
-    setClassNum(null);
     setSubject(null);
-    setScreen('class');
-  };
-
-  const handleSelectClass = (num) => {
-    setClassNum(num);
-    setSubject(null);
+    setClassNum(authUser?.studentClass || 1);
     setScreen('subject');
   };
 
@@ -143,13 +122,42 @@ const AssessmentsScreen = () => {
     setScreen('intro');
   };
 
+  const buildStudentInfo = () => {
+    const nameParts = authUser?.displayName ? authUser.displayName.split(' ') : [];
+    return {
+      firstName: nameParts[0] || '',
+      lastName: nameParts.slice(1).join(' ') || '',
+      rollNumber: authUser?.admissionNo || 1,
+      userId: authUser?.id || authUser?.uid || null,
+    };
+  };
+
   const handleStartQuiz = (info) => {
+    if (examConfig?.assessmentFormat === 'coding') {
+      setStudentInfo(info);
+      setScreen('coding');
+      return;
+    }
     if (!examConfig?.questions) return;
     const preparedQuestions = getQuizQuestions(examConfig.questions, examConfig.sections);
     setStudentInfo(info);
     setQuizQuestions(preparedQuestions);
     setAnswers({});
     setScreen('quiz');
+  };
+
+  const handlePreAssessmentSuccess = async () => {
+    const info = buildStudentInfo();
+    const examKey = `${examConfig.examType}_${examConfig.classNum}_${examConfig.subject}`;
+    const checkFn = examConfig?.assessmentFormat === 'coding'
+      ? checkExistingCodingSubmission
+      : checkExistingQuizResult;
+    const exists = await checkFn(info.userId, examKey);
+    if (exists) {
+      setAlreadyTaken(true);
+      return;
+    }
+    handleStartQuiz(info);
   };
 
   const handleQuizComplete = (finalAnswers) => {
@@ -159,29 +167,33 @@ const AssessmentsScreen = () => {
 
   const goBack = useCallback(() => {
     if (screen === 'subject') {
-      setScreen('class');
+      setScreen('exam-type');
+      setSelectedExamType(null);
       setClassNum(null);
       return;
     }
     if (screen === 'intro') { setScreen('subject'); return; }
     if (screen === 'preassessment') { setScreen('intro'); return; }
-    if (screen === 'student') { setScreen('preassessment'); return; }
-    if (screen === 'quiz') { setScreen('student'); return; }
-    if (screen === 'class') {
-      setScreen('exam-type');
-      setSelectedExamType(null);
-      return;
-    }
+    if (screen === 'quiz') { setScreen('preassessment'); return; }
+    if (screen === 'coding') { setScreen('preassessment'); return; }
     navigate('/');
   }, [screen, navigate]);
 
   const handleBackToHome = useCallback(() => {
-    navigate('/');
-  }, [navigate]);
+    setAlreadyTaken(false);
+    setSelectedExamType(null);
+    setClassNum(null);
+    setSubject(null);
+    setScreen('exam-type');
+  }, []);
 
   const handleOpenReports = useCallback(() => {
-    navigate('/reports', { state: { config: examConfig } });
-  }, [navigate, examConfig]);
+    if (authUser?.role && authUser.role !== 'student') {
+      navigate('/dashboard/results');
+    } else {
+      navigate('/reports', { state: { config: examConfig } });
+    }
+  }, [navigate, examConfig, authUser]);
 
   if (loading && !examTypes.length) {
     return (
@@ -201,7 +213,20 @@ const AssessmentsScreen = () => {
           <div className="text-5xl mb-4">📭</div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">No Assessments Available</h2>
           <p className="text-gray-500 dark:text-gray-400 mb-6">There are no exams or assessments available at the moment. Please check back later.</p>
-          <button onClick={() => navigate('/')} className="px-6 py-3 rounded-xl font-medium bg-black/5 dark:bg-white/10 border border-gray-300 dark:border-white/20 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20 transition-all">← Back to Home</button>
+          <button onClick={handleBackToHome} className="px-6 py-3 rounded-xl font-medium bg-black/5 dark:bg-white/10 border border-gray-300 dark:border-white/20 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20 transition-all">← Back to Assessments</button>
+        </div>
+      </div>
+    );
+  }
+
+  if (alreadyTaken) {
+    return (
+      <div className="w-full flex items-center justify-center px-4 py-8">
+        <div className="glass-card p-8 text-center w-full max-w-md animate-slideUp">
+          <div className="text-5xl mb-4">⚠️</div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Already Submitted</h2>
+          <p className="text-gray-500 dark:text-gray-400 mb-6">You have already taken this assessment. Multiple submissions are not allowed.</p>
+          <button onClick={handleBackToHome} className="px-6 py-3 rounded-xl font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 transition-all">← Back to Assessments</button>
         </div>
       </div>
     );
@@ -215,19 +240,6 @@ const AssessmentsScreen = () => {
             examTypes={examTypes} 
             onSelect={handleSelectExamType} 
             onBack={handleBackToHome} 
-          />
-        </div>
-      );
-
-    case 'class':
-      return (
-        <div className="w-full flex items-center justify-center px-4 py-8">
-          <ClassSelectionScreen 
-            examType={selectedExamType} 
-            classes={classes} 
-            onSelect={handleSelectClass} 
-            onBack={goBack} 
-            isLoading={loading}
           />
         </div>
       );
@@ -260,7 +272,8 @@ const AssessmentsScreen = () => {
             config={examConfig} 
             onStart={() => setScreen('preassessment')} 
             onReports={handleOpenReports}
-            onBack={goBack} 
+            onBack={goBack}
+            userRole={authUser?.role}
           />
         </div>
       ) : (
@@ -274,24 +287,8 @@ const AssessmentsScreen = () => {
         <div className="w-full flex items-center justify-center px-4 py-8">
           <PreAssessmentScreen 
             config={examConfig} 
-            onSuccess={() => setScreen('student')} 
+            onSuccess={handlePreAssessmentSuccess}
             onBack={goBack} 
-          />
-        </div>
-      ) : (
-        <div className="w-full flex items-center justify-center px-4 py-8">
-          <EmptyState />
-        </div>
-      );
-
-    case 'student':
-      return examConfig ? (
-        <div className="w-full flex items-center justify-center px-4 py-8">
-          <RollNumberScreen 
-            onStartQuiz={handleStartQuiz} 
-            questionsCount={examConfig.totalQuestions || 0} 
-            onBack={goBack} 
-            authUser={authUser}
           />
         </div>
       ) : (
@@ -311,6 +308,15 @@ const AssessmentsScreen = () => {
             onQuizComplete={handleQuizComplete} 
           />
         </div>
+      );
+
+    case 'coding':
+      return (
+        <CodingScreen
+          config={examConfig}
+          studentInfo={studentInfo}
+          onComplete={() => navigate('/')}
+        />
       );
 
     case 'result':

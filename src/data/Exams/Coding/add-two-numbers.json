@@ -1,0 +1,27 @@
+{
+  "examType": "Slip Test",
+  "subject": "Computers",
+  "classNum": "8",
+  "title": "Add Two Numbers",
+  "teacher": "Venkata Vishnu",
+  "assessmentFormat": "coding",
+  "totalQuestions": 3,
+  "totalMarks": 3,
+  "timeLimitMinutes": 15,
+  "wrongAnswerPenaltyFraction": 0,
+  "preassessmentsecretkey": "",
+  "secretKey": "",
+  "teacherSecretKey": "",
+  "schoolName": "Sri Kanchi Kamakoti Sankara Vidyalaya",
+  "coding": {
+    "problemStatement": "Write a Python function `add(a, b)` that takes two integers and returns their sum.",
+    "examples": "Input: a=2, b=3 → Output: 5\nInput: a=10, b=20 → Output: 30\nInput: a=-5, b=5 → Output: 0",
+    "starterCode": "def add(a, b):\n    # Your code here\n    return a + b\n\n# Test your function\nprint(add(2, 3))",
+    "functionName": "add",
+    "testCases": [
+      { "input": [2, 3], "expected": 5 },
+      { "input": [10, 20], "expected": 30 },
+      { "input": [-5, 5], "expected": 0 }
+    ]
+  }
+}

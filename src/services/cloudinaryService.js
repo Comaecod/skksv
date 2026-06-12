@@ -3,6 +3,40 @@ const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 const API_KEY = import.meta.env.VITE_CLOUDINARY_API_KEY;
 const API_SECRET = import.meta.env.VITE_CLOUDINARY_API_SECRET;
 
+export const uploadAvatar = (file, onProgress) => {
+  return new Promise((resolve, reject) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', UPLOAD_PRESET);
+    formData.append('folder', 'user-avatars');
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`);
+
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable && onProgress) {
+        onProgress(Math.round((e.loaded / e.total) * 100));
+      }
+    };
+
+    xhr.onload = () => {
+      try {
+        const data = JSON.parse(xhr.responseText);
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve({ url: data.secure_url, publicId: data.public_id });
+        } else {
+          reject(new Error(data.error?.message || 'Upload failed'));
+        }
+      } catch (e) {
+        reject(new Error('Invalid response from server'));
+      }
+    };
+
+    xhr.onerror = () => reject(new Error('Network error'));
+    xhr.send(formData);
+  });
+};
+
 export const uploadImage = (file, onProgress) => {
   return new Promise((resolve, reject) => {
     const formData = new FormData();

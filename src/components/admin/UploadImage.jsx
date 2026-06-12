@@ -146,7 +146,7 @@ const UploadImage = () => {
         </div>
 
         <div className="text-center mt-6">
-          <button onClick={() => navigate('/admin/images')} className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all">
+          <button onClick={() => navigate('/dashboard/images')} className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all">
             ← View all images
           </button>
         </div>

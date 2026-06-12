@@ -1,198 +1,193 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAdminAuth } from '../../context/AdminAuthContext';
 import { useAuth } from '../../auth/contexts/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import { LayoutProvider } from '../../context/LayoutContext';
 import ScrollableArea from '../ui/ScrollableArea';
+import { ROLES } from '../../auth/types/roles';
 
-const NAV_ITEMS = [
-  { to: '/admin', icon: '📊', label: 'Dashboard' },
-  { to: '/admin/users', icon: '👥', label: 'Users' },
-  { to: '/admin/assessments', icon: '📝', label: 'Assessments' },
-  { to: '/admin/assessments/new', icon: '➕', label: 'New Assessment' },
-  { to: '/admin/notifications', icon: '🔔', label: 'Notifications' },
-  { to: '/admin/feedback', icon: '💬', label: 'Feedback Reports' },
-  { to: '/admin/images', icon: '🖼️', label: 'Images' },
-];
+const ALL_NAV_ITEMS = {
+  super_admin: [
+    { to: '/dashboard', icon: '📊', label: 'Dashboard' },
+    { to: '/dashboard/users', icon: '👥', label: 'Users' },
+    { to: '/dashboard/students', icon: '🎓', label: 'Students' },
+    { to: '/dashboard/audit', icon: '📋', label: 'Audit Logs' },
+    { to: '/dashboard/results', icon: '📊', label: 'Results' },
+    { to: '/dashboard/assessments', icon: '📝', label: 'Assessments' },
+    { to: '/dashboard/assessments/new', icon: '➕', label: 'New Assessment' },
+    { to: '/dashboard/notifications', icon: '🔔', label: 'Notifications' },
+    { to: '/dashboard/feedback', icon: '💬', label: 'Feedback Reports' },
+    { to: '/dashboard/images', icon: '🖼️', label: 'Images' },
+  ],
+  admin: [
+    { to: '/dashboard', icon: '📊', label: 'Dashboard' },
+    { to: '/dashboard/users', icon: '👥', label: 'Users' },
+    { to: '/dashboard/students', icon: '🎓', label: 'Students' },
+    { to: '/dashboard/results', icon: '📊', label: 'Results' },
+    { to: '/dashboard/assessments', icon: '📝', label: 'Assessments' },
+    { to: '/dashboard/assessments/new', icon: '➕', label: 'New Assessment' },
+    { to: '/dashboard/notifications', icon: '🔔', label: 'Notifications' },
+    { to: '/dashboard/feedback', icon: '💬', label: 'Feedback Reports' },
+    { to: '/dashboard/images', icon: '🖼️', label: 'Images' },
+  ],
+  staff: [
+    { to: '/dashboard', icon: '📊', label: 'Dashboard' },
+    { to: '/dashboard/students', icon: '🎓', label: 'Students' },
+    { to: '/dashboard/results', icon: '📊', label: 'Results' },
+    { to: '/dashboard/assessments', icon: '📝', label: 'Assessments' },
+    { to: '/dashboard/assessments/new', icon: '➕', label: 'New Assessment' },
+  ],
+  student: [
+    { to: '/dashboard', icon: '📊', label: 'Dashboard' },
+    { to: '/assessments', icon: '📝', label: 'Assessments' },
+    { to: '/reports', icon: '📊', label: 'My Results' },
+  ],
+};
 
-if (import.meta.env.VITE_SUPER_ADMIN_EMAIL) {
-  NAV_ITEMS.splice(2, 0, { to: '/admin/audit', icon: '📋', label: 'Audit Logs' });
-}
-
-const AdminLayout = ({ children }) => {
-  const { isAuthed: legacyAuthed, login: legacyLogin, logout: legacyLogout } = useAdminAuth();
-  const { isAuthenticated, userProfile, logout: authLogout, loading: authLoading } = useAuth();
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+const DashboardLayout = ({ children }) => {
+  const { isAuthenticated, userProfile, logout, loading: authLoading } = useAuth();
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
 
-  const hasAdminAccess = isAuthenticated && (userProfile?.role === 'super_admin' || userProfile?.role === 'admin');
-  const isAuthed = hasAdminAccess || legacyAuthed;
-
-  const handleLogout = () => {
-    legacyLogout();
-    authLogout();
-    navigate('/');
-  };
+  const role = userProfile?.role;
+  const navItems = ALL_NAV_ITEMS[role] || ALL_NAV_ITEMS.student;
 
   useEffect(() => {
     if (authLoading) return;
-    if (isAuthenticated && !hasAdminAccess) {
-      navigate('/unauthorized', { replace: true });
+    if (!isAuthenticated) {
+      navigate('/login', { replace: true });
     }
-  }, [isAuthenticated, hasAdminAccess, authLoading, navigate]);
+  }, [isAuthenticated, authLoading, navigate]);
 
-  const ThemeIcon = theme === 'light'
-    ? () => (<svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" /></svg>)
-    : theme === 'dark'
-    ? () => (<svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>)
-    : () => (<svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" /></svg>);
-
-  if (!isAuthed) {
+  if (authLoading || !isAuthenticated) {
     return (
-      <div className="w-full min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-        <div className="glass-card w-full max-w-md animate-slideUp p-8">
-          <div className="text-center mb-8">
-            <div className="text-6xl mb-4">🔐</div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Admin Panel</h2>
-            <p className="text-gray-500 dark:text-gray-400">Enter admin password to continue</p>
-          </div>
-          <form onSubmit={(e) => { e.preventDefault(); if (legacyLogin(password)) { setError(false); } else { setError(true); } }} className="space-y-4">
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => { setPassword(e.target.value); if (error) setError(false); }}
-              placeholder="Enter admin password"
-              className={`w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border text-gray-900 dark:text-white placeholder-gray-400 outline-none ${error ? 'border-red-500' : 'border-gray-200 dark:border-white/10 focus:border-primary/50'}`}
-              autoFocus
-            />
-            {error && <p className="text-red-400 text-sm">⚠️ Incorrect password</p>}
-            <button type="submit" className="w-full px-6 py-3 rounded-xl font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 transition-all">
-              Authorize 🔓
-            </button>
-          </form>
-          <p className="mt-4 text-center">
-            <Link to="/login" className="text-sm text-primary dark:text-primary-light hover:underline">
-              Sign in with Firebase Auth →
-            </Link>
-          </p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
+  };
+
+  const isActive = (path) => {
+    if (path === '/dashboard') return location.pathname === '/dashboard';
+    return location.pathname.startsWith(path);
+  };
+
+  const sidebarWidth = collapsed ? 'w-16' : 'w-64';
+  const sidebarPadding = collapsed ? 'px-2' : 'px-3';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
       {/* Mobile header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b border-gray-200 dark:border-white/10 px-4 py-3 flex items-center justify-between">
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10"
-          aria-label="Toggle sidebar"
-        >
+        <button onClick={() => setMobileOpen(!mobileOpen)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10" aria-label="Toggle sidebar">
           <svg className="w-6 h-6 text-gray-900 dark:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={sidebarOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={mobileOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
           </svg>
         </button>
-        <h1 className="text-lg font-bold text-gray-900 dark:text-white">Admin Panel</h1>
-        <div className="flex items-center gap-1">
-          <button
-            onClick={toggleTheme}
-            className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-all"
-            title={`Theme: ${theme}`}
-          >
-            <ThemeIcon />
-          </button>
-          <button
-            onClick={handleLogout}
-            className="px-3 py-1.5 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all"
-          >
-            Logout
-          </button>
-        </div>
+        <h1 className="text-lg font-bold text-gray-900 dark:text-white">Dashboard</h1>
+        <button
+          onClick={handleLogout}
+          className="px-3 py-1.5 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all"
+        >
+          Logout
+        </button>
       </div>
 
-      {/* Sidebar overlay */}
-      {sidebarOpen && (
-        <div
-          className="lg:hidden fixed inset-0 z-30 bg-black/40"
-          onClick={() => setSidebarOpen(false)}
-        />
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div className="lg:hidden fixed inset-0 z-30 bg-black/40" onClick={() => setMobileOpen(false)} />
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed top-0 left-0 z-40 h-full w-64 bg-white/95 dark:bg-slate-900/95 border-r border-gray-200 dark:border-white/10 transform transition-transform duration-200 ease-in-out flex flex-col ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
-        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200 dark:border-white/10 shrink-0">
-          <Link to="/admin" className="flex items-center gap-3" onClick={() => setSidebarOpen(false)}>
-            <span className="text-2xl">🔐</span>
-            <div>
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white">Admin Panel</h2>
-              <p className="text-xs text-gray-500 dark:text-gray-400">School Management</p>
-            </div>
-          </Link>
+      <aside className={`fixed top-0 left-0 z-40 h-full ${sidebarWidth} bg-white/95 dark:bg-slate-900/95 border-r border-gray-200 dark:border-white/10 transform transition-all duration-200 ease-in-out flex flex-col ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
+        <div className={`flex items-center ${collapsed ? 'justify-center' : 'justify-between'} px-4 py-5 border-b border-gray-200 dark:border-white/10 shrink-0`}>
+          {!collapsed && (
+            <Link to="/dashboard" className="flex items-center gap-3" onClick={() => setMobileOpen(false)}>
+              <span className="text-2xl">📊</span>
+              <div>
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white">Dashboard</h2>
+                <p className="text-xs text-gray-500 dark:text-gray-400">School Management</p>
+              </div>
+            </Link>
+          )}
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="hidden lg:flex p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500 dark:text-gray-400 transition-all"
+            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            <svg className={`w-4 h-4 transition-transform ${collapsed ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+            </svg>
+          </button>
         </div>
 
-        <ScrollableArea className="flex-1 px-3 py-4" hideTrack>
+        <ScrollableArea className={`flex-1 ${sidebarPadding} py-4`} hideTrack>
           <nav className="space-y-1">
-            {NAV_ITEMS.map((item) => {
-              const isActive = item.to === '/admin'
-                ? location.pathname === '/admin'
-                : location.pathname.startsWith(item.to);
-              return (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  onClick={() => setSidebarOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                    isActive
-                      ? 'bg-primary/10 text-primary dark:text-primary-light shadow-sm'
-                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5'
-                  }`}
-                >
-                  <span className="text-lg">{item.icon}</span>
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
+            {navItems.map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                onClick={() => setMobileOpen(false)}
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  isActive(item.to)
+                    ? 'bg-primary/10 text-primary dark:text-primary-light shadow-sm'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5'
+                } ${collapsed ? 'justify-center px-2' : ''}`}
+                title={collapsed ? item.label : undefined}
+              >
+                <span className="text-lg shrink-0">{item.icon}</span>
+                {!collapsed && <span className="truncate">{item.label}</span>}
+              </Link>
+            ))}
           </nav>
         </ScrollableArea>
 
-        <div className="p-4 border-t border-gray-200 dark:border-white/10 shrink-0">
+        <div className={`p-4 border-t border-gray-200 dark:border-white/10 shrink-0 ${collapsed ? 'px-2' : ''}`}>
           <button
             onClick={toggleTheme}
-            className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 transition-all mb-1"
+            className={`w-full flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 transition-all mb-1 ${collapsed ? 'justify-center px-2' : ''}`}
+            title={`Theme: ${theme}`}
           >
-            <ThemeIcon />
-            <span className="capitalize">{theme}</span>
+            <span className="text-lg">{theme === 'dark' ? '🌙' : theme === 'light' ? '☀️' : '💻'}</span>
+            {!collapsed && <span className="capitalize">{theme}</span>}
           </button>
           <Link
             to="/"
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 transition-all"
+            className={`w-full flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 transition-all ${collapsed ? 'justify-center px-2' : ''}`}
+            title="Back to Site"
           >
             <span>←</span>
-            <span>Back to Site</span>
+            {!collapsed && <span>Back to Site</span>}
           </Link>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all mt-1"
+            className={`w-full flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all mt-1 ${collapsed ? 'justify-center px-2' : ''}`}
+            title="Logout"
           >
             <span>🚪</span>
-            <span>Logout</span>
+            {!collapsed && <span>Logout</span>}
           </button>
         </div>
       </aside>
 
       {/* Main content */}
-      <div className="lg:pl-64 pt-14 lg:pt-0">
+      <div className={`${collapsed ? 'lg:pl-16' : 'lg:pl-64'} pt-14 lg:pt-0 transition-all duration-200`}>
         <main className="p-4 sm:p-6 lg:p-8">
-          {children}
+          <LayoutProvider>
+            {children}
+          </LayoutProvider>
         </main>
       </div>
     </div>
   );
 };
 
-export default AdminLayout;
+export default DashboardLayout;

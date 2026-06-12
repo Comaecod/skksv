@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../auth/contexts/AuthContext';
 import { useLayout } from '../context/LayoutContext';
-import { getHolidayTypes, getHolidayClassesForType, getSubjectsForClass, getExamConfig } from '../utils/examLoader';
-import HolidayTypeScreen from './HolidayTypeScreen';
+import { db } from '../firebase';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { getSubjectsForClass, getExamConfig } from '../utils/examLoader';
 import ClassSelectionScreen from './ClassSelectionScreen';
 import SubjectSelectionScreen from './SubjectSelectionScreen';
 import HolidayHomeworkContent from './HolidayHomeworkContent';
@@ -10,18 +12,18 @@ import EmptyState from './EmptyState';
 
 const HolidayHomeworkScreen = () => {
   const navigate = useNavigate();
-  
-  const [holidayTypes, setHolidayTypes] = useState([]);
+  const { userProfile: authUser } = useAuth();
+
   const [classes, setClasses] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [examConfig, setExamConfig] = useState(null);
   const [loading, setLoading] = useState(true);
   const [subjectsLoading, setSubjectsLoading] = useState(false);
 
-  const [holidayType, setHolidayType] = useState(null);
-  const [classNum, setClassNum] = useState(null);
+  const profileClass = authUser?.studentClass;
+  const [classNum, setClassNum] = useState(profileClass || null);
   const [subject, setSubject] = useState(null);
-  const [screen, setScreen] = useState('holiday-type');
+  const [screen, setScreen] = useState(profileClass ? 'subject' : 'class');
 
   const { setHideHeader, setHideFooter } = useLayout();
 
@@ -33,30 +35,20 @@ const HolidayHomeworkScreen = () => {
   }, [screen, setHideHeader, setHideFooter]);
 
   useEffect(() => {
-    const loadHolidayTypes = async () => {
-      setLoading(true);
-      try {
-        const types = await getHolidayTypes();
-        setHolidayTypes(types);
-      } catch (err) {
-        console.error('Error loading holiday types:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadHolidayTypes();
-  }, []);
-
-  useEffect(() => {
     const loadClasses = async () => {
-      if (!holidayType) {
-        setClasses([]);
-        return;
-      }
       setLoading(true);
       try {
-        const cls = await getHolidayClassesForType(holidayType);
-        setClasses(cls);
+        const q = query(
+          collection(db, 'examConfigs'),
+          where('examType', '==', 'Holiday Homework')
+        );
+        const snapshot = await getDocs(q);
+        const cls = new Set();
+        snapshot.forEach(d => {
+          const data = d.data();
+          if (data.classNum) cls.add(data.classNum);
+        });
+        setClasses([...cls].sort((a, b) => Number(a) - Number(b)));
       } catch (err) {
         console.error('Error loading classes:', err);
       } finally {
@@ -64,14 +56,11 @@ const HolidayHomeworkScreen = () => {
       }
     };
     loadClasses();
-  }, [holidayType]);
+  }, []);
 
   useEffect(() => {
     const loadSubjects = async () => {
-      if (!classNum) {
-        setSubjects([]);
-        return;
-      }
+      if (!classNum) { setSubjects([]); return; }
       setSubjectsLoading(true);
       try {
         const subs = await getSubjectsForClass('Holiday Homework', classNum);
@@ -87,44 +76,21 @@ const HolidayHomeworkScreen = () => {
 
   useEffect(() => {
     const loadConfig = async () => {
-      if (!subject) {
-        setExamConfig(null);
-        return;
-      }
+      if (!subject) { setExamConfig(null); return; }
       try {
-        const config = await getExamConfig('Holiday Homework', classNum, subject, holidayType);
+        const config = await getExamConfig('Holiday Homework', classNum, subject);
         setExamConfig(config);
       } catch (err) {
         console.error('Error loading config:', err);
       }
     };
     loadConfig();
-  }, [subject, classNum, holidayType]);
+  }, [subject, classNum]);
 
   const goBack = () => {
-    if (screen === 'class') {
-      setScreen('holiday-type');
-      setHolidayType(null);
-      return;
-    }
-    if (screen === 'subject') {
-      setScreen('class');
-      setClassNum(null);
-      return;
-    }
-    if (screen === 'content') {
-      setScreen('subject');
-      setSubject(null);
-      return;
-    }
+    if (screen === 'subject' && !profileClass) { setScreen('class'); setClassNum(null); return; }
+    if (screen === 'content') { setScreen('subject'); setSubject(null); return; }
     navigate('/');
-  };
-
-  const handleSelectHolidayType = (type) => {
-    setHolidayType(type);
-    setClassNum(null);
-    setSubject(null);
-    setScreen('class');
   };
 
   const handleSelectClass = (num) => {
@@ -138,7 +104,7 @@ const HolidayHomeworkScreen = () => {
     setScreen('content');
   };
 
-  if (loading && !holidayTypes.length) {
+  if (loading && !classes.length) {
     return (
       <div className="w-full flex items-center justify-center px-4 py-8">
         <div className="glass-card p-8 text-center w-full max-w-md">
@@ -150,17 +116,10 @@ const HolidayHomeworkScreen = () => {
   }
 
   switch (screen) {
-    case 'holiday-type':
-      return (
-        <div className="w-full flex items-center justify-center px-4 py-8">
-          <HolidayTypeScreen holidayTypes={holidayTypes} onSelect={handleSelectHolidayType} onBack={() => navigate('/')} />
-        </div>
-      );
-
     case 'class':
       return (
         <div className="w-full flex items-center justify-center px-4 py-8">
-          <ClassSelectionScreen examType="Holiday Homework" classes={classes} onSelect={handleSelectClass} onBack={goBack} isLoading={loading} />
+          <ClassSelectionScreen examType="Holiday Homework" classes={classes} onSelect={handleSelectClass} onBack={() => navigate('/')} isLoading={loading} />
         </div>
       );
 
@@ -185,7 +144,7 @@ const HolidayHomeworkScreen = () => {
     default:
       return (
         <div className="w-full flex items-center justify-center px-4 py-8">
-          <HolidayTypeScreen holidayTypes={holidayTypes} onSelect={handleSelectHolidayType} onBack={() => navigate('/')} />
+          <EmptyState />
         </div>
       );
   }

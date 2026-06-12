@@ -146,7 +146,7 @@ const AdminImages = () => {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Manage Images</h2>
           <p className="text-gray-500 dark:text-gray-400 text-sm">{hasMore ? 'At least ' : ''}{images.length} image(s)</p>
         </div>
-        <button onClick={() => navigate('/admin/images/upload')} className="px-4 py-2 rounded-xl text-sm font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 transition-all">
+        <button onClick={() => navigate('/dashboard/images/upload')} className="px-4 py-2 rounded-xl text-sm font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 transition-all">
           + Upload New
         </button>
       </div>
@@ -165,7 +165,7 @@ const AdminImages = () => {
         <div className="glass-card p-8 text-center">
           <div className="text-4xl mb-4">📭</div>
           <p className="text-gray-500 dark:text-gray-400">No images found</p>
-          <button onClick={() => navigate('/admin/images/upload')} className="mt-4 px-4 py-2 rounded-xl text-sm bg-primary/20 text-primary border border-primary/30 hover:bg-primary/30 transition-all">Upload your first image</button>
+          <button onClick={() => navigate('/dashboard/images/upload')} className="mt-4 px-4 py-2 rounded-xl text-sm bg-primary/20 text-primary border border-primary/30 hover:bg-primary/30 transition-all">Upload your first image</button>
         </div>
       ) : (
         <>

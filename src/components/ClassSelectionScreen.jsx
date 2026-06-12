@@ -46,7 +46,7 @@ const ClassSelectionScreen = ({ examType, classes, onSelect, onBack, isLoading }
           onClick={onBack}
           className="px-6 py-3 rounded-xl font-medium bg-black/5 dark:bg-white/10 border border-gray-300 dark:border-white/20 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20 transition-all"
         >
-          ← Back to Home
+          ← Back to Assessments
         </button>
       </div>
     </div>

@@ -8,7 +8,6 @@ import CustomSelect from '../../../components/CustomSelect';
 const ROLE_OPTIONS = [
   { value: ROLES.ADMIN, label: 'Admin' },
   { value: ROLES.STAFF, label: 'Staff' },
-  { value: ROLES.STUDENT, label: 'Student' },
 ];
 
 const STAFF_SUBTYPE_OPTIONS = [
@@ -22,7 +21,7 @@ const initialFormState = {
   email: '',
   password: '',
   displayName: '',
-  role: ROLES.STUDENT,
+  role: ROLES.STAFF,
   roleSubtype: '',
   phone: '',
   forcePasswordChange: true,

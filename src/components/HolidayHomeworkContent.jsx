@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 
 const HolidayHomeworkContent = ({ config, onBack }) => {
-  const { title, classNum, subject, holidayType, teacher, content } = config;
+  const { examTitle, title, classNum, subject, holidayType, teacher, content } = config;
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4 py-6">
@@ -23,7 +23,7 @@ const HolidayHomeworkContent = ({ config, onBack }) => {
             <span>📚</span>
             <span className="text-sm font-medium">Holiday Homework</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">{title}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">{examTitle || title}</h1>
           <p className="text-gray-500 dark:text-gray-400">Class {classNum} • {subject}</p>
         </div>
 

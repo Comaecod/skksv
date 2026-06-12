@@ -61,15 +61,6 @@ const ExamTypeScreen = ({ examTypes, onSelect, onBack }) => {
           </motion.button>
         ))}
       </div>
-
-      <div className="text-center mt-6">
-        <button
-          onClick={onBack}
-          className="px-6 py-3 rounded-xl font-medium bg-black/5 dark:bg-white/10 border border-gray-300 dark:border-white/20 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20 transition-all"
-        >
-          ← Back to Home
-        </button>
-      </div>
     </motion.div>
   );
 };

@@ -46,10 +46,15 @@ service cloud.firestore {
         || (isStaff() && resource.data.role in ['student', 'staff'])
         || (isStudent() && isOwner(userId)));
 
-      // Users can update their own profile (limited fields)
+      // Admins can create any user
+      // Staff can create student users
+      allow create: if isAdmin()
+        || (isStaff() && request.resource.data.role == 'student');
       // Admins can update any user
-      allow create: if isAdmin();
+      // Staff can update student users
+      // Users can update their own limited fields
       allow update: if isAdmin()
+        || (isStaff() && resource.data.role == 'student')
         || (isOwner(userId) && request.resource.data.diff(resource.data).affectedKeys()
           .hasOnly(['displayName', 'phone', 'profileImage', 'customFields']));
       allow delete: if isSuperAdmin();
@@ -104,6 +109,30 @@ service cloud.firestore {
     match /images/{imageId} {
       allow read: if true;
       allow write: if isAdmin();
+    }
+
+    // Exam types collection
+    match /examTypes/{typeId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || isStaff();
+    }
+
+    // Exam configs collection (assessment content)
+    match /examConfigs/{configId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || isStaff();
+    }
+
+    // Exam index collection (class/subject mappings)
+    match /examIndex/{indexId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || isStaff();
+    }
+
+    // Submissions collection (coding, projects, etc.)
+    match /submissions/{submissionId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
     }
 
     // Existing collections (keep access patterns)

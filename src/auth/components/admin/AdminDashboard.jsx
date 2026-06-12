@@ -1,17 +1,21 @@
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 const CARDS = [
-  { to: '/admin/users', icon: '👥', title: 'User Management', desc: 'Create, edit, and manage user accounts', color: 'from-blue-500 to-blue-600', roles: ['super_admin', 'admin'] },
-  { to: '/admin/assessments', icon: '📝', title: 'Assessments', desc: 'View and manage all assessments', color: 'from-green-500 to-emerald-600', roles: ['super_admin', 'admin'] },
-  { to: '/admin/assessments/new', icon: '➕', title: 'New Assessment', desc: 'Create new assessments and exams', color: 'from-amber-500 to-orange-600', roles: ['super_admin', 'admin'] },
-  { to: '/admin/notifications', icon: '🔔', title: 'Notifications', desc: 'Send announcements to users', color: 'from-purple-500 to-violet-600', roles: ['super_admin', 'admin'] },
-  { to: '/admin/feedback', icon: '💬', title: 'Feedback Reports', desc: 'Review user feedback', color: 'from-pink-500 to-rose-600', roles: ['super_admin', 'admin'] },
-  { to: '/admin/images', icon: '🖼️', title: 'Image Gallery', desc: 'Manage uploaded images', color: 'from-cyan-500 to-teal-600', roles: ['super_admin', 'admin'] },
-  { to: '/admin/audit', icon: '📋', title: 'Audit Logs', desc: 'View system activity logs', color: 'from-slate-500 to-slate-600', roles: ['super_admin'] },
-  { to: '/admin/settings', icon: '⚙️', title: 'Settings', desc: 'Global application settings', color: 'from-gray-500 to-gray-600', roles: ['super_admin'] },
+  { to: '/dashboard/users', icon: '👥', title: 'User Management', desc: 'Create, edit, and manage user accounts', color: 'from-blue-500 to-blue-600', roles: ['super_admin', 'admin'] },
+  { to: '/dashboard/students', icon: '🎓', title: 'Students', desc: 'Manage student profiles and accounts', color: 'from-indigo-500 to-purple-600', roles: ['super_admin', 'admin', 'staff'] },
+  { to: '/dashboard/assessments', icon: '📝', title: 'Assessments', desc: 'View and manage all assessments', color: 'from-green-500 to-emerald-600', roles: ['super_admin', 'admin', 'staff'] },
+  { to: '/dashboard/assessments/new', icon: '➕', title: 'New Assessment', desc: 'Create new assessments and exams', color: 'from-amber-500 to-orange-600', roles: ['super_admin', 'admin', 'staff'] },
+  { to: '/dashboard/notifications', icon: '🔔', title: 'Notifications', desc: 'Send announcements to users', color: 'from-purple-500 to-violet-600', roles: ['super_admin', 'admin'] },
+  { to: '/dashboard/feedback', icon: '💬', title: 'Feedback Reports', desc: 'Review user feedback', color: 'from-pink-500 to-rose-600', roles: ['super_admin', 'admin'] },
+  { to: '/dashboard/images', icon: '🖼️', title: 'Image Gallery', desc: 'Manage uploaded images', color: 'from-cyan-500 to-teal-600', roles: ['super_admin', 'admin'] },
+  { to: '/dashboard/audit', icon: '📋', title: 'Audit Logs', desc: 'View system activity logs', color: 'from-slate-500 to-slate-600', roles: ['super_admin'] },
+  { to: '/dashboard/settings', icon: '⚙️', title: 'Settings', desc: 'Global application settings', color: 'from-gray-500 to-gray-600', roles: ['super_admin'] },
 ];
 
-export default function AdminDashboard({ userRole }) {
+export default function AdminDashboard() {
+  const { userProfile } = useAuth();
+  const userRole = userProfile?.role;
   const accessibleCards = CARDS.filter((card) => card.roles.includes(userRole));
 
   return (

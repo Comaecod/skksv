@@ -2,15 +2,15 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../auth/contexts/AuthContext';
 
 const DASHBOARD_CARDS = [
-  { to: '/admin/assessments', icon: '📝', title: 'Assessments', desc: 'View and manage all assessments, edit or delete existing ones', color: 'from-blue-500 to-blue-600' },
-  { to: '/admin/assessments/new', icon: '➕', title: 'New Assessment', desc: 'Create new assessments including timed exams and projects', color: 'from-green-500 to-emerald-600' },
-  { to: '/admin/notifications', icon: '🔔', title: 'Notifications', desc: 'Send announcements and notifications to users', color: 'from-amber-500 to-orange-600' },
-  { to: '/admin/feedback', icon: '💬', title: 'Feedback Reports', desc: 'Review and resolve user feedback and complaints', color: 'from-purple-500 to-violet-600' },
+  { to: '/dashboard/assessments', icon: '📝', title: 'Assessments', desc: 'View and manage all assessments, edit or delete existing ones', color: 'from-blue-500 to-blue-600' },
+  { to: '/dashboard/assessments/new', icon: '➕', title: 'New Assessment', desc: 'Create new assessments including timed exams and projects', color: 'from-green-500 to-emerald-600' },
+  { to: '/dashboard/notifications', icon: '🔔', title: 'Notifications', desc: 'Send announcements and notifications to users', color: 'from-amber-500 to-orange-600' },
+  { to: '/dashboard/feedback', icon: '💬', title: 'Feedback Reports', desc: 'Review and resolve user feedback and complaints', color: 'from-purple-500 to-violet-600' },
 ];
 
 const SUPER_ADMIN_CARDS = [
-  { to: '/admin/users', icon: '👥', title: 'User Management', desc: 'Create and manage user accounts, assign roles', color: 'from-cyan-500 to-teal-600' },
-  { to: '/admin/audit', icon: '📋', title: 'Audit Logs', desc: 'View system activity and change logs', color: 'from-slate-500 to-slate-600' },
+  { to: '/dashboard/users', icon: '👥', title: 'User Management', desc: 'Create and manage user accounts, assign roles', color: 'from-cyan-500 to-teal-600' },
+  { to: '/dashboard/audit', icon: '📋', title: 'Audit Logs', desc: 'View system activity and change logs', color: 'from-slate-500 to-slate-600' },
 ];
 
 const AdminPanel = () => {

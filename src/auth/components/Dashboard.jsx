@@ -24,20 +24,20 @@ export default function Dashboard() {
 
     if (role === ROLES.SUPER_ADMIN || role === ROLES.ADMIN) {
       cards.push(
-        { to: '/admin/users', icon: '👥', title: 'User Management', desc: 'Create and manage accounts', color: 'from-cyan-500 to-teal-600', roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN] },
-        { to: '/admin', icon: '🔐', title: 'Admin Panel', desc: 'Full administration', color: 'from-purple-500 to-violet-600', roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN] },
+        { to: '/dashboard/users', icon: '👥', title: 'User Management', desc: 'Create and manage accounts', color: 'from-cyan-500 to-teal-600', roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN] },
+        { to: '/dashboard/students', icon: '🎓', title: 'Students', desc: 'Manage student accounts', color: 'from-purple-500 to-violet-600', roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN] },
       );
     }
 
     if (role === ROLES.STAFF && subtype === STAFF_SUBTYPES.TEACHER) {
       cards.push(
-        { to: '/admin/assessments/new', icon: '➕', title: 'Create Assessment', desc: 'Create new exam', color: 'from-amber-500 to-orange-600', roles: [ROLES.STAFF] },
+        { to: '/dashboard/assessments/new', icon: '➕', title: 'Create Assessment', desc: 'Create new exam', color: 'from-amber-500 to-orange-600', roles: [ROLES.STAFF] },
       );
     }
 
     if (role === ROLES.STUDENT) {
       cards.push(
-        { to: '/timed-assessments', icon: '⏱️', title: 'Timed Exams', desc: 'Take timed assessments', color: 'from-pink-500 to-rose-600', roles: [ROLES.STUDENT] },
+        { to: '/reports', icon: '📊', title: 'My Results', desc: 'View your assessment results and reports', color: 'from-pink-500 to-rose-600', roles: [ROLES.STUDENT] },
       );
     }
 

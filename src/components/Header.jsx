@@ -7,15 +7,7 @@ import { ROLES } from '../auth/types/roles';
 import logoImg from '../assets/logo.png';
 import { SCHOOL_CONFIG } from '../config/schoolConfig';
 
-const NAV_ITEMS = [
-  {
-    label: 'Academics',
-    icon: '📚',
-    children: [
-      { to: '/assessments', icon: '📝', label: 'Assessments' },
-      { to: '/holiday-homework', icon: '🏖️', label: 'Holiday Homework' },
-    ]
-  },
+const PUBLIC_NAV_ITEMS = [
   {
     label: 'Learn',
     icon: '📖',
@@ -56,8 +48,9 @@ const Header = () => {
   const { isAuthenticated, user, userProfile, logout, loading } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
-  const canViewAdmin = isAuthenticated && (userProfile?.role === ROLES.SUPER_ADMIN || userProfile?.role === ROLES.ADMIN);
   const canViewDashboard = isAuthenticated;
+
+  const navItems = PUBLIC_NAV_ITEMS;
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -102,7 +95,11 @@ const Header = () => {
         onClick={() => setUserMenuOpen(!userMenuOpen)}
         className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-600 dark:text-gray-300 text-sm hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-all"
       >
-        <span className="text-lg">{ROLE_ICONS[userProfile?.role] || '👤'}</span>
+        {userProfile?.profileImage ? (
+          <img src={userProfile.profileImage} alt="" className="w-7 h-7 rounded-full object-cover shrink-0" />
+        ) : (
+          <span className="text-lg">{ROLE_ICONS[userProfile?.role] || '👤'}</span>
+        )}
         <span className="hidden sm:inline max-w-[120px] truncate">
           {userProfile?.displayName || user?.email?.split('@')[0] || 'User'}
         </span>
@@ -144,15 +141,7 @@ const Header = () => {
             >
               <span>👤</span> My Profile
             </Link>
-            {canViewAdmin && (
-              <Link
-                to="/admin"
-                onClick={() => setUserMenuOpen(false)}
-                className="block px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-all flex items-center gap-2 text-sm"
-              >
-                <span>🔐</span> Admin Panel
-              </Link>
-            )}
+
             <div className="border-t border-gray-200 dark:border-white/10 mt-1 pt-1">
               <button
                 onClick={handleLogout}
@@ -192,12 +181,6 @@ const Header = () => {
             className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 text-sm hover:bg-gray-100 dark:hover:bg-white/5">
             <span>👤</span> My Profile
           </Link>
-          {canViewAdmin && (
-            <Link to="/admin" onClick={() => setIsMenuOpen(false)}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 text-sm hover:bg-gray-100 dark:hover:bg-white/5">
-              <span>🔐</span> Admin Panel
-            </Link>
-          )}
           <button onClick={handleLogout}
             className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 text-sm hover:bg-red-50 dark:hover:bg-red-500/10">
             <span>🚪</span> Logout
@@ -209,10 +192,7 @@ const Header = () => {
             className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90">
             <span>🔑</span> Sign In
           </Link>
-          <Link to="/admin" onClick={() => setIsMenuOpen(false)}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 text-sm hover:bg-gray-100 dark:hover:bg-white/5">
-            <span>🔐</span> Admin
-          </Link>
+
         </>
       )}
     </div>
@@ -251,7 +231,7 @@ const Header = () => {
 
         <div className="flex items-center gap-2">
           <div className="hidden sm:flex items-center gap-1">
-            {NAV_ITEMS.map((item) => (
+            {navItems.map((item) => (
               <div key={item.label} className="relative" ref={(el) => { dropdownRefs.current[item.label] = el; }}>
                 <button
                   onClick={() => setOpenDropdown(openDropdown === item.label ? null : item.label)}
@@ -303,13 +283,7 @@ const Header = () => {
             <UserMenu />
           ) : (
             <>
-              <Link
-                to="/admin"
-                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-gray-600 dark:text-gray-300 text-sm hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-all"
-                title="Admin Panel"
-              >
-                <span>🔐</span>
-              </Link>
+
               <Link
                 to="/login"
                 className="hidden sm:flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 transition-all"
@@ -346,7 +320,7 @@ const Header = () => {
             transition={{ duration: 0.2 }}
           >
             <div className="px-4 py-3 border-t border-gray-200 dark:border-white/10 bg-white/95 dark:bg-slate-900/95">
-              {NAV_ITEMS.map((item) => (
+              {navItems.map((item) => (
                 <div key={item.label}>
                   <button
                     onClick={() => setMobileOpenDropdown(mobileOpenDropdown === item.label ? null : item.label)}

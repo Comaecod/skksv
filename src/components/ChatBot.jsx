@@ -64,8 +64,7 @@ function renderMessageText(text) {
   });
 }
 
-function ChatBot() {
-  const [isOpen, setIsOpen] = useState(false);
+function ChatBot({ isOpen, onToggle }) {
   const [messages, setMessages] = useState([WELCOME_MESSAGE]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -179,16 +178,18 @@ function ChatBot() {
 
   return (
     <FloatingWidget
-      position="left"
+      position="right"
       buttonIcon={<SparkleIcon />}
       buttonLabel="Open Sankara AI chat"
       headerIcon={<SparkleIcon />}
       title="Sankara AI"
       subtitle={currentPage ? `Help for ${currentPage}` : 'Online'}
       isOpen={isOpen}
-      onToggle={() => setIsOpen(prev => !prev)}
+      onToggle={onToggle}
       visible={isSankaraVisible}
       footer={chatFooter}
+      buttonOffset={80}
+      buttonColor="linear-gradient(135deg, #6366f1, #8b5cf6)"
     >
       {chatContent}
     </FloatingWidget>

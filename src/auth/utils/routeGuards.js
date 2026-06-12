@@ -1,19 +1,19 @@
 import { ROLES } from '../types/roles';
 
 export const ROUTE_PERMISSIONS = {
-  '/admin': { roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN] },
-  '/admin/assessments': { roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.STAFF] },
-  '/admin/assessments/new': { roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.STAFF] },
-  '/admin/notifications': { roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN] },
-  '/admin/feedback': { roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN] },
-  '/admin/images': { roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN] },
-  '/admin/images/upload': { roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN] },
-  '/admin/users': { roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN] },
-  '/admin/audit': { roles: [ROLES.SUPER_ADMIN] },
-  '/admin/settings': { roles: [ROLES.SUPER_ADMIN] },
+  '/dashboard': { roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.STAFF, ROLES.STUDENT] },
+  '/dashboard/assessments': { roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.STAFF, ROLES.STUDENT] },
+  '/dashboard/assessments/new': { roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.STAFF] },
+  '/dashboard/notifications': { roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN] },
+  '/dashboard/feedback': { roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN] },
+  '/dashboard/images': { roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN] },
+  '/dashboard/images/upload': { roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN] },
+  '/dashboard/users': { roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN] },
+  '/dashboard/students': { roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.STAFF] },
+  '/dashboard/audit': { roles: [ROLES.SUPER_ADMIN] },
+  '/dashboard/settings': { roles: [ROLES.SUPER_ADMIN] },
   '/profile': { roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.STAFF, ROLES.STUDENT] },
   '/exams': { roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.STAFF, ROLES.STUDENT] },
-  '/dashboard': { roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.STAFF, ROLES.STUDENT] },
 };
 
 export function canAccessRoute(pathname, userRole) {
