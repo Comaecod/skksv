@@ -1,5 +1,6 @@
 import { SCHOOL_CONFIG, GRADING_SYSTEM } from '../config/schoolConfig';
 import STAFF_DATA from '../data/staffDirectory.json';
+import EXECUTIVE_COMMITTEE from '../data/executiveCommittee.json';
 
 const SCHOOL = SCHOOL_CONFIG;
 
@@ -23,6 +24,11 @@ function buildStaffContext() {
         lines.push(`    Career: ${s.career}`);
       }
     }
+  }
+  lines.push('\n\nExecutive Committee:');
+  for (const m of EXECUTIVE_COMMITTEE) {
+    lines.push(`  ${m.salutation} ${m.name} - ${m.designation}`);
+    if (m.description) lines.push(`    About: ${m.description}`);
   }
   return lines.join('\n');
 }
