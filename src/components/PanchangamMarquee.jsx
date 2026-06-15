@@ -1,27 +1,8 @@
 import { useState, useEffect } from 'react';
 import { getPanchangam } from '../services/panchangamAPI';
-import { PANCHANGAM_DICTIONARY, translate } from '../data/panchangamDictionary';
+import { PANCHANGAM_DICTIONARY, PANCHANGAM_ICONS, PANCHANGAM_FIELDS, FIELD_LABELS, translate } from '../data/panchangamDictionary';
 
-const LABELS = {
-  samvatsara: 'संवत्सर', ayana: 'अयन', rutu: 'ऋतु', masa: 'मास',
-  paksha: 'पक्ष', tithi: 'तिथि', vara: 'वार', nakshatra: 'नक्षत्र',
-  yoga: 'योग', karana: 'करण',
-};
-
-const ICONS = {
-  samvatsara: '🌞', ayana: '🌅', rutu: '🌿', masa: '🌙',
-  paksha: '☀️', tithi: '✨', vara: '📅', nakshatra: '⭐',
-  yoga: '🔄', karana: '⚡',
-};
-
-const FALLBACK = [
-  '🌞 संवत्सर - पराभव', '🌅 अयन - उत्तरायण', '🌿 ऋतु - ग्रीष्म',
-  '🌙 मास - ज्येष्ठ', '☀️ पक्ष - कृष्ण पक्षः', '✨ तिथि - प्रथमा',
-  '📅 वार - इन्दुवासरे', '⭐ नक्षत्र - मृगशिरा', '🔄 योग - गण्ड',
-  '⚡ करण - किंस्तुघ्न',
-];
-
-const FIELDS = Object.keys(LABELS);
+const FALLBACK_MSG = '⚠️ Panchangam temporarily unavailable';
 
 const weekdayToIndex = {
   sunday: '1', monday: '2', tuesday: '3', wednesday: '4',
@@ -77,25 +58,32 @@ function getSanskrit(field, name, idx) {
 
 const PanchangamMarquee = () => {
   const [items, setItems] = useState(null);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     let mounted = true;
     getPanchangam()
       .then(data => {
         if (!mounted) return;
-        const result = FIELDS.map(field => {
+        const result = PANCHANGAM_FIELDS.map(field => {
           const val = data[field];
           const sa = getSanskrit(field, val?.name, val?.index);
-          return `${ICONS[field]} ${LABELS[field]} - ${sa}`;
+          return `${PANCHANGAM_ICONS[field]} ${FIELD_LABELS.sa[field]} - ${sa}`;
         });
         setItems(result);
       })
       .catch(() => {
         if (!mounted) return;
-        setItems(FALLBACK);
+        setError(true);
       });
     return () => { mounted = false; };
   }, []);
+
+  if (error) return (
+    <div className="bg-gradient-to-r from-amber-900/10 via-amber-700/15 to-amber-900/10 border-b border-amber-700/20 py-2">
+      <p className="text-center text-sm text-amber-800 dark:text-amber-400 font-medium">{FALLBACK_MSG}</p>
+    </div>
+  );
 
   if (!items) return null;
 

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getPanchangam } from '../services/panchangamAPI';
-import { PANCHANGAM_DICTIONARY, translate } from '../data/panchangamDictionary';
+import { PANCHANGAM_DICTIONARY, PANCHANGAM_ICONS, PANCHANGAM_FIELDS, FIELD_LABELS, translate } from '../data/panchangamDictionary';
 
 const LANGUAGES = [
   { code: 'en', label: 'English', script: 'EN' },
@@ -15,25 +15,6 @@ const TABS = [
 ];
 
 const masaToRutu = { 1: 1, 2: 1, 3: 2, 4: 2, 5: 3, 6: 3, 7: 4, 8: 4, 9: 5, 10: 5, 11: 6, 12: 6 };
-
-const FIELD_LABELS = {
-  en: { samvatsara: 'Samvatsara', ayana: 'Ayana', rutu: 'Rutu', masa: 'Masa', paksha: 'Paksha', tithi: 'Tithi', vara: 'Vara', nakshatra: 'Nakshatra', yoga: 'Yoga', karana: 'Karana' },
-  te: { samvatsara: 'సంవత్సర', ayana: 'అయన', rutu: 'ఋతువు', masa: 'మాస', paksha: 'పక్ష', tithi: 'తిథి', vara: 'వార', nakshatra: 'నక్షత్ర', yoga: 'యోగ', karana: 'కరణ' },
-  sa: { samvatsara: 'संवत्सर', ayana: 'अयन', rutu: 'ऋतु', masa: 'मास', paksha: 'पक्ष', tithi: 'तिथि', vara: 'वार', nakshatra: 'नक्षत्र', yoga: 'योग', karana: 'करण' },
-};
-
-const panchangamFields = [
-  { key: 'samvatsara', icon: '🌞' },
-  { key: 'ayana', icon: '🌅' },
-  { key: 'rutu', icon: '🌿' },
-  { key: 'masa', icon: '🌙' },
-  { key: 'paksha', icon: '☀️' },
-  { key: 'tithi', icon: '✨' },
-  { key: 'vara', icon: '📅' },
-  { key: 'nakshatra', icon: '⭐' },
-  { key: 'yoga', icon: '🔄' },
-  { key: 'karana', icon: '⚡' },
-];
 
 const sankalpaLines = [
   { text: 'Jambudvīpe', te: 'జంబూద్వీపే', sa: 'जम्बुद्वीपे' },
@@ -337,9 +318,9 @@ const PanchangamScreen = () => {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {panchangamFields.map((field, idx) => (
+                  {PANCHANGAM_FIELDS.map((field, idx) => (
                     <motion.div
-                      key={field.key}
+                      key={field}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.4, delay: idx * 0.05 }}
@@ -347,12 +328,12 @@ const PanchangamScreen = () => {
                       <div className="h-full p-5 rounded-2xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border border-gray-200/50 dark:border-white/10 hover:shadow-lg hover:border-amber-200/50 dark:hover:border-amber-700/50 transition-all duration-300">
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
-                            {FIELD_LABELS[lang]?.[field.key] || field.key}
+                            {FIELD_LABELS[lang]?.[field] || field}
                           </span>
-                          <span className="text-lg">{field.icon}</span>
+                          <span className="text-lg">{PANCHANGAM_ICONS[field]}</span>
                         </div>
                         <p className="text-lg font-bold text-gray-900 dark:text-white">
-                          {tl(field.key) || '—'}
+                          {tl(field) || '—'}
                         </p>
                       </div>
                     </motion.div>

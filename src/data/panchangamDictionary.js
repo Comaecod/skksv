@@ -594,6 +594,20 @@ export const PANCHANGAM_DICTIONARY = {
   }
 };
 
+export const PANCHANGAM_ICONS = {
+  samvatsara: '🌞', ayana: '🌅', rutu: '🌿', masa: '🌙',
+  paksha: '☀️', tithi: '✨', vara: '📅', nakshatra: '⭐',
+  yoga: '🔄', karana: '⚡',
+};
+
+export const PANCHANGAM_FIELDS = Object.keys(PANCHANGAM_ICONS);
+
+export const FIELD_LABELS = {
+  en: { samvatsara: 'Samvatsara', ayana: 'Ayana', rutu: 'Rutu', masa: 'Masa', paksha: 'Paksha', tithi: 'Tithi', vara: 'Vara', nakshatra: 'Nakshatra', yoga: 'Yoga', karana: 'Karana' },
+  te: { samvatsara: 'సంవత్సర', ayana: 'అయన', rutu: 'ఋతువు', masa: 'మాస', paksha: 'పక్ష', tithi: 'తిథి', vara: 'వార', nakshatra: 'నక్షత్ర', yoga: 'యోగ', karana: 'కరణ' },
+  sa: { samvatsara: 'संवत्सर', ayana: 'अयन', rutu: 'ऋतु', masa: 'मास', paksha: 'पक्ष', tithi: 'तिथि', vara: 'वार', nakshatra: 'नक्षत्र', yoga: 'योग', karana: 'करण' },
+};
+
 export function translate(type, index, lang) {
   const dict = PANCHANGAM_DICTIONARY[type];
   if (!dict) return index;
