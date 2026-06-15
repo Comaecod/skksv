@@ -158,42 +158,11 @@ const Header = () => {
 
   const UserMenuMobile = () => (
     <div className="border-t border-gray-200 dark:border-white/10 mt-2 pt-2 space-y-1">
-      {isAuthenticated ? (
-        <>
-          <div className="px-3 py-2">
-            <p className="text-sm font-medium text-gray-900 dark:text-white">
-              {userProfile?.displayName || user?.email}
-            </p>
-            {userProfile?.role && (
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                {ROLE_ICONS[userProfile.role]} {userProfile.role}
-                {userProfile.roleSubtype ? ` (${userProfile.roleSubtype})` : ''}
-              </p>
-            )}
-          </div>
-          {canViewDashboard && (
-            <Link to="/dashboard" onClick={() => setIsMenuOpen(false)}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 text-sm hover:bg-gray-100 dark:hover:bg-white/5">
-              <span>📊</span> Dashboard
-            </Link>
-          )}
-          <Link to="/profile" onClick={() => setIsMenuOpen(false)}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 text-sm hover:bg-gray-100 dark:hover:bg-white/5">
-            <span>👤</span> My Profile
-          </Link>
-          <button onClick={handleLogout}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 text-sm hover:bg-red-50 dark:hover:bg-red-500/10">
-            <span>🚪</span> Logout
-          </button>
-        </>
-      ) : (
-        <>
-          <Link to="/login" onClick={() => setIsMenuOpen(false)}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90">
-            <span>🔑</span> Sign In
-          </Link>
-
-        </>
+      {!isAuthenticated && (
+        <Link to="/login" onClick={() => setIsMenuOpen(false)}
+          className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90">
+          <span>🔑</span> Sign In
+        </Link>
       )}
     </div>
   );
