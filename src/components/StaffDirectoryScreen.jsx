@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import staffData from '../data/staffDirectory.json';
 import { Avatar, PersonCard, capitalize, initStaffPhotos } from './StaffComponents';
 import PersonModal from './PersonModal';
@@ -29,6 +30,7 @@ const SectionWithConnector = ({ title, icon, count, children, delay = 0 }) => (
 const StaffDirectoryScreen = () => {
   const { correspondent, principal, director, adminTeam, staff } = staffData;
   const [selectedPerson, setSelectedPerson] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => { initStaffPhotos(); }, []);
 
@@ -70,6 +72,14 @@ const StaffDirectoryScreen = () => {
           People of SKKSV
         </h1>
         <p className="text-gray-500 dark:text-gray-400 text-sm text-center">Our School Family</p>
+        <div className="flex justify-center mt-4">
+          <button
+            onClick={() => navigate('/people/executive')}
+            className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary/20 to-secondary/20 border border-primary/30 text-primary text-sm font-medium hover:from-primary/30 hover:to-secondary/30 transition-all"
+          >
+            👥 Executive Members
+          </button>
+        </div>
       </motion.div>
 
       <div className="px-4 space-y-8">

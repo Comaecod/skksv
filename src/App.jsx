@@ -16,6 +16,7 @@ import DashboardLayout from './components/admin/AdminLayout';
 const ChatBot = lazy(() => import('./components/ChatBot'));
 const NotificationWidget = lazy(() => import('./components/NotificationWidget'));
 const StaffDirectoryScreen = lazy(() => import('./components/StaffDirectoryScreen'));
+const ExecutiveMembersScreen = lazy(() => import('./components/ExecutiveMembersScreen'));
 const AssessmentsScreen = lazy(() => import('./components/AssessmentsScreen'));
 const GalleryScreen = lazy(() => import('./components/GalleryScreen'));
 const HolidayHomeworkScreen = lazy(() => import('./components/HolidayHomeworkScreen'));
@@ -85,6 +86,7 @@ function App() {
           {/* Public Routes */}
           <Route path="/" element={withLayout(HomeScreen)} />
           <Route path="/people" element={withLayout(StaffDirectoryScreen)} />
+          <Route path="/people/executive" element={withLayout(ExecutiveMembersScreen)} />
           <Route path="/gallery" element={withLayout(GalleryScreen)} />
           <Route path="/contact" element={withLayout(ContactScreen)} />
           <Route path="/panchangam" element={withLayout(PanchangamScreen)} />

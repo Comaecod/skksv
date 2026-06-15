@@ -1,0 +1,63 @@
+[
+  {
+    "id": "ec-1",
+    "name": "Vempati Kutumba Sastry",
+    "salutation": "Mr",
+    "designation": "Chairman",
+    "description": "Renowned Indian Academician and author, current Chancellor of Sri Chandrasekharendra Saraswathi Viswa Mahavidyalaya, ex-VC of Rashtriya Sanskrit Sansthan."
+  },
+  {
+    "id": "ec-2",
+    "name": "Guda Rama Mohan Rao",
+    "salutation": "Mr",
+    "designation": "Vice-Chairman",
+    "description": "Entrepreneur and Engineer by Education"
+  },
+  {
+    "id": "ec-3",
+    "name": "M K Prabhakar",
+    "salutation": "Mr",
+    "designation": "Correspondent",
+    "description": "Entrepreneur and early example of integrated education (vedic & modern)"
+  },
+  {
+    "id": "ec-4",
+    "name": "Andukuri Rama Subramaniam",
+    "salutation": "Mr",
+    "designation": "Board Member"
+  },
+  {
+    "id": "ec-5",
+    "name": "Dr. Machavaram Subramanyam",
+    "salutation": "Mr",
+    "designation": "Board Member",
+    "description": "Pediatrician in Podili"
+  },
+  {
+    "id": "ec-6",
+    "name": "Ramesh Bhattiprolu",
+    "salutation": "Mr",
+    "designation": "Board Member",
+    "description": "IT professional"
+  },
+  {
+    "id": "ec-7",
+    "name": "K. Usha Kumari",
+    "salutation": "Mrs",
+    "designation": "Board Member"
+  },
+  {
+    "id": "ec-8",
+    "name": "Surya Rao Mandhata",
+    "salutation": "Mr",
+    "designation": "Board Member",
+    "description": "Renowned Auditor"
+  },
+  {
+    "id": "ec-9",
+    "name": "Chandrabhatla Patanjali",
+    "salutation": "Mr",
+    "designation": "Board Member",
+    "description": "Entrepreneur"
+  }
+]
