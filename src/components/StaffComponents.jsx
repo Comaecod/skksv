@@ -27,8 +27,8 @@ const getAvatarText = (person) => {
 };
 
 let staffPhotoMap = {
-  'staff-10': apPhoto,
-  'staff-13': vvPhoto,
+  'staff-12': apPhoto,
+  'staff-15': vvPhoto,
 };
 
 export const initStaffPhotos = async () => {

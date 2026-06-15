@@ -1,6 +1,6 @@
 export default function ScrollableArea({ children, className = '', hideTrack = false }) {
   return (
-    <div className={`overflow-y-auto ${className}`}
+    <div className={`overflow-y-auto scrollable-area-custom ${className}`}
       style={{
         scrollbarWidth: 'thin',
         scrollbarColor: 'rgba(148,163,184,0.4) transparent',
@@ -25,7 +25,7 @@ export default function ScrollableArea({ children, className = '', hideTrack = f
         ${hideTrack ? `.scrollable-area-custom::-webkit-scrollbar { width: 0; }
         .scrollable-area-custom:hover::-webkit-scrollbar { width: 5px; }` : ''}
       `}</style>
-      <div className="scrollable-area-custom h-full">
+      <div>
         {children}
       </div>
     </div>

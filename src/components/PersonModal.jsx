@@ -1,9 +1,13 @@
 import { motion } from 'framer-motion';
 import { Avatar, getHierarchy, capitalize } from './StaffComponents';
+import Timetable from './Timetable';
+import ScrollableArea from './ui/ScrollableArea';
+import { useAuth } from '../auth/contexts/AuthContext';
 
 const PersonModal = ({ person, onClose }) => {
   if (!person) return null;
 
+  const { isSuperAdmin } = useAuth();
   const displayName = capitalize(person.name);
   const salutation = person.salutation === 'Mr' ? 'Mr.' : person.salutation === 'Mrs' ? 'Mrs.' : '';
   const hierarchy = getHierarchy(person);
@@ -17,14 +21,14 @@ const PersonModal = ({ person, onClose }) => {
       onClick={onClose}
     >
       <motion.div
-        className="glass-card w-full max-w-md max-h-[90vh] overflow-y-auto"
+        className="glass-card w-full max-w-4xl max-h-[90vh]"
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-6">
-          <div className="flex justify-between items-start mb-4">
+        <ScrollableArea className="p-6 pb-12 max-h-[80vh]">
+          <div className="flex justify-between items-start mb-2">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">Profile Details</h2>
             <button
               onClick={onClose}
@@ -36,7 +40,7 @@ const PersonModal = ({ person, onClose }) => {
             </button>
           </div>
 
-          <div className="flex flex-col items-center mb-6">
+          <div className="flex flex-col items-center mb-4">
             <Avatar person={person} size="xl" />
             <h3 className="mt-4 font-bold text-gray-900 dark:text-white text-lg text-center">
               {salutation} {displayName}
@@ -67,14 +71,21 @@ const PersonModal = ({ person, onClose }) => {
             )}
           </div>
 
-          <div className="mt-6 pt-4 border-t border-gray-200 dark:border-white/10">
+          {isSuperAdmin && person.timetable && (
+          <div className="mt-6 pt-4 border-t border-gray-200 dark:border-white/10 pb-8">
+              <h4 className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-3">Weekly Timetable</h4>
+              <Timetable timetable={person.timetable} subject={person.timetableSubject || person.subject} />
+            </div>
+          )}
+
+          <div className="mt-6 pt-4 border-t border-gray-200 dark:border-white/10 pb-8">
             <h4 className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-3">Hierarchy Path</h4>
             <div className="flex flex-col items-center">
               {hierarchy.map((item, index) => (
                 <div key={index} className="flex flex-col items-center">
-                  <div className={`px-3 py-1.5 rounded-lg min-w-[180px] text-center ${item.role === person.designation ? 'bg-primary/20 border border-primary/40' : 'bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10'}`}>
+                  <div className={`px-3 py-1.5 rounded-lg min-w-[180px] max-w-full text-center ${item.role === person.designation ? 'bg-primary/20 border border-primary/40' : 'bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10'}`}>
                     <span className="text-xs text-gray-500 dark:text-gray-400">{item.role}</span>
-                    <p className={`text-sm ${item.role === person.designation ? 'text-gray-900 dark:text-white font-medium' : 'text-gray-600 dark:text-gray-300'}`}>
+                    <p className={`text-sm break-words ${item.role === person.designation ? 'text-gray-900 dark:text-white font-medium' : 'text-gray-600 dark:text-gray-300'}`}>
                       {item.name}
                     </p>
                   </div>
@@ -85,7 +96,7 @@ const PersonModal = ({ person, onClose }) => {
               ))}
             </div>
           </div>
-        </div>
+        </ScrollableArea>
       </motion.div>
     </motion.div>
   );

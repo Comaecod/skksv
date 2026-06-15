@@ -77,7 +77,20 @@
       "designation": "Teacher",
       "subject": "Mathematics, Physics",
       "qualifications": "MSc Physics (1994, HCU), PhD Physics (2010, HCU)",
-      "career": "Highly qualified with an MSc in Physics from HCU (1994) and a PhD in Physics from HCU (2010). Has over two decades of academic experience. Teaches Mathematics and Physics at SKKSV."
+      "career": "Highly qualified with an MSc in Physics from HCU (1994) and a PhD in Physics from HCU (2010). Has over two decades of academic experience. Teaches Mathematics and Physics at SKKSV.",
+      "timetable": {
+        "periods": [
+          { "time": "09:00 - 09:40", "mon": ["10","Mathematics"], "tue": ["10","Mathematics"], "wed": ["10","Mathematics"], "thu": ["10","Mathematics"], "fri": ["10","Mathematics"], "sat": ["10","Mathematics"] },
+          { "time": "09:40 - 10:20", "mon": ["9","Mathematics"], "tue": "", "wed": "", "thu": ["8","Mathematics"], "fri": "", "sat": ["9","Physics"] },
+          { "time": "10:30 - 11:10", "mon": "", "tue": "", "wed": ["9","Mathematics"], "thu": "", "fri": ["8","Mathematics"], "sat": "" },
+          { "time": "11:10 - 11:50", "mon": ["8","Mathematics"], "tue": ["9","Mathematics"], "wed": "", "thu": "", "fri": ["8","Physics"], "sat": ["8","Mathematics"] },
+          { "time": "11:50 - 12:30", "mon": ["10","Physics"], "tue": "", "wed": ["10","Physics"], "thu": ["10","Mathematics"], "fri": ["9","Mathematics"], "sat": ["8","Physics"] },
+          { "time": "01:30 - 02:10", "mon": "", "tue": ["8","Mathematics"], "wed": ["9","Physics"], "thu": "", "fri": "", "sat": "" },
+          { "time": "02:10 - 02:50", "mon": ["10","Mathematics"], "tue": "", "wed": ["8","Mathematics"], "thu": ["9","Mathematics"], "fri": ["9","Mathematics"], "sat": ["9","Mathematics"] },
+          { "time": "02:50 - 03:25", "mon": ["8B","Olympiad"], "tue": ["8A","Olympiad"], "wed": ["CCA",""], "thu": ["9","Olympiad"], "fri": "", "sat": ["Weekend test",""] },
+          { "time": "03:25 - 04:00", "mon": ["8B","Olympiad"], "tue": ["8A","Olympiad"], "wed": ["MPT",""], "thu": ["9","Olympiad"], "fri": "", "sat": ["Weekend test",""] }
+        ]
+      }
     },
     {
       "id": "staff-2",
@@ -88,7 +101,20 @@
       "designation": "Teacher",
       "subject": "Mathematics, EVS, English",
       "qualifications": "SSLC (J.G.G.H.S.S, Nanganallur), HSC (J.G.G.H.S.S, Nanganallur), B.Sc. (Ideal College), B.Ed. (Mohan College)",
-      "career": "Completed her schooling at J.G.G.H.S.S, Nanganallur, followed by B.Sc. from Ideal College and B.Ed. from Mohan College. Teaches Mathematics, EVS, and English at SKKSV."
+      "career": "Completed her schooling at J.G.G.H.S.S, Nanganallur, followed by B.Sc. from Ideal College and B.Ed. from Mohan College. Teaches Mathematics, EVS, and English at SKKSV.",
+      "timetable": {
+        "periods": [
+          { "time": "09:00 - 09:40", "mon": ["4","Mathematics"], "tue": ["4","Mathematics"], "wed": ["4","Mathematics"], "thu": ["4","Mathematics"], "fri": ["4","Mathematics"], "sat": ["4","Mathematics"] },
+          { "time": "09:40 - 10:20", "mon": ["5","Mathematics"], "tue": ["5","Mathematics"], "wed": "", "thu": "", "fri": ["4","English"], "sat": "" },
+          { "time": "10:30 - 11:10", "mon": "", "tue": "", "wed": "", "thu": "", "fri": ["4","EVS"], "sat": "" },
+          { "time": "11:10 - 11:50", "mon": ["4","EVS"], "tue": ["4","EVS"], "wed": ["5","EVS"], "thu": ["5","EVS"], "fri": "", "sat": "" },
+          { "time": "11:50 - 12:30", "mon": "", "tue": ["6","Art"], "wed": ["4","English"], "thu": ["4","English"], "fri": ["4","Art"], "sat": ["5","Mathematics"] },
+          { "time": "01:30 - 02:10", "mon": ["4","English"], "tue": "", "wed": ["4","EVS"], "thu": "", "fri": ["5","Mathematics"], "sat": "" },
+          { "time": "02:10 - 02:50", "mon": "", "tue": "", "wed": ["5","Mathematics"], "thu": "", "fri": "", "sat": "" },
+          { "time": "02:50 - 03:25", "mon": ["4","Olympiad"], "tue": "", "wed": ["MPT",""], "thu": ["5","Olympiad"], "fri": ["4","Spoken English"], "sat": ["Weekend test",""] },
+          { "time": "03:25 - 04:00", "mon": ["4","Olympiad"], "tue": "", "wed": ["CCA",""], "thu": ["5","Olympiad"], "fri": ["4","English"], "sat": ["Weekend test",""] }
+        ]
+      }
     },
     {
       "id": "staff-3",
@@ -109,6 +135,7 @@
       "alias": "GNL",
       "designation": "Teacher",
       "subject": "Chemistry",
+      "onLeave": true,
       "qualifications": "SSC, Intermediate, B.Sc.",
       "career": "Has a B.Sc. degree. Teaches Chemistry at SKKSV. Currently on leave."
     },
@@ -120,8 +147,22 @@
       "alias": "VNR",
       "designation": "Teacher",
       "subject": "Biology, General Science",
+      "timetableSubject": "General Science",
       "qualifications": "SSC, Intermediate (Bi.P.C), B.Sc. (B.Z.C)",
-      "career": "Has a B.Sc. in B.Z.C (Botany, Zoology, Chemistry) with a Bi.P.C background in Intermediate. Teaches Biology and General Science at SKKSV."
+      "career": "Has a B.Sc. in B.Z.C (Botany, Zoology, Chemistry) with a Bi.P.C background in Intermediate. Teaches Biology and General Science at SKKSV.",
+      "timetable": {
+        "periods": [
+          { "time": "09:00 - 09:40", "mon": ["8","Biology"], "tue": ["8","Biology"], "wed": ["8","Chemistry"], "thu": ["7","General Science"], "fri": ["7","General Science"], "sat": ["7","General Science"] },
+          { "time": "09:40 - 10:20", "mon": "", "tue": ["9","Biology"], "wed": "", "thu": ["9","Chemistry"], "fri": "", "sat": "" },
+          { "time": "10:30 - 11:10", "mon": "", "tue": "", "wed": ["6","General Science"], "thu": "", "fri": ["9","Biology"], "sat": "" },
+          { "time": "11:10 - 11:50", "mon": ["6","General Science"], "tue": "", "wed": "", "thu": ["6","General Science"], "fri": ["10","Chemistry"], "sat": "" },
+          { "time": "11:50 - 12:30", "mon": ["7","General Science"], "tue": ["10","Biology"], "wed": "", "thu": ["8","Chemistry"], "fri": "", "sat": ["6","General Science"] },
+          { "time": "01:30 - 02:10", "mon": ["9","Chemistry"], "tue": ["6","General Science"], "wed": "", "thu": "", "fri": "", "sat": ["10","Chemistry"] },
+          { "time": "02:10 - 02:50", "mon": ["Art",""], "tue": ["7","General Science"], "wed": ["7","General Science"], "thu": ["10","Biology"], "fri": ["6","General Science"], "sat": "" },
+          { "time": "02:50 - 03:25", "mon": "", "tue": ["6","Olympiad"], "wed": ["MPT",""], "thu": "", "fri": ["7","Olympiad"], "sat": ["Weekend test",""] },
+          { "time": "03:25 - 04:00", "mon": "", "tue": ["6","Olympiad"], "wed": ["CCA",""], "thu": "", "fri": ["7","Olympiad"], "sat": ["Weekend test",""] }
+        ]
+      }
     },
     {
       "id": "staff-6",
@@ -143,7 +184,20 @@
       "designation": "Teacher",
       "subject": "Hindi",
       "qualifications": "SSC, Hindi Vidwan, B.A. (Telugu)",
-      "career": "Qualified with Hindi Vidwan and a B.A. in Telugu. Teaches Hindi at SKKSV."
+      "career": "Qualified with Hindi Vidwan and a B.A. in Telugu. Teaches Hindi at SKKSV.",
+      "timetable": {
+        "periods": [
+          { "time": "09:00 - 09:40", "mon": ["7","Hindi"], "tue": ["7","Hindi"], "wed": ["7","Hindi"], "thu": "", "fri": "", "sat": "" },
+          { "time": "09:40 - 10:20", "mon": "", "tue": "", "wed": "", "thu": ["7","Hindi"], "fri": ["8B","Hindi"], "sat": "" },
+          { "time": "10:30 - 11:10", "mon": ["8B","Hindi"], "tue": "", "wed": "", "thu": "", "fri": "", "sat": ["8B","Hindi"] },
+          { "time": "11:10 - 11:50", "mon": "", "tue": ["8B","Hindi"], "wed": "", "thu": ["7","Hindi 3L"], "fri": "", "sat": ["9","Hindi 3L"] },
+          { "time": "11:50 - 12:30", "mon": "", "tue": ["9A","Hindi"], "wed": "", "thu": "", "fri": ["7","Hindi"], "sat": ["7","Hindi"] },
+          { "time": "01:30 - 02:10", "mon": "", "tue": "", "wed": ["8B","Hindi"], "thu": ["8B","Hindi"], "fri": "", "sat": ["7","Hindi 3L"] },
+          { "time": "02:10 - 02:50", "mon": ["9A","Hindi"], "tue": "", "wed": "", "thu": "", "fri": "", "sat": "" },
+          { "time": "02:50 - 03:25", "mon": "", "tue": "", "wed": "", "thu": "", "fri": "", "sat": "" },
+          { "time": "03:25 - 04:00", "mon": "", "tue": "", "wed": "", "thu": "", "fri": "", "sat": "" }
+        ]
+      }
     },
     {
       "id": "staff-8",
@@ -153,11 +207,50 @@
       "alias": "GR",
       "designation": "Teacher",
       "subject": "Hindi",
+      "timetableSubject": "2L Hindi",
       "qualifications": "Intermediate, Degree, BA, MA (Hindi), B.Ed., HPT, PGDCA",
-      "career": "Highly qualified with an MA in Hindi, B.Ed., HPT (Hindi Pandit Training), and PGDCA. Teaches Hindi at SKKSV."
+      "career": "Highly qualified with an MA in Hindi, B.Ed., HPT (Hindi Pandit Training), and PGDCA. Teaches Hindi at SKKSV.",
+      "timetable": {
+        "periods": [
+          { "time": "09:00 - 09:40", "mon": ["5","2L Hindi"], "tue": ["5","2L Hindi"], "wed": ["5","2L Hindi"], "thu": ["5","2L Hindi"], "fri": ["5","2L Hindi"], "sat": ["5","2L Hindi"] },
+          { "time": "09:40 - 10:20", "mon": "", "tue": "", "wed": ["4","2L Hindi"], "thu": ["4","2L Hindi"], "fri": ["6","2L Hindi"], "sat": ["6","2L Hindi"] },
+          { "time": "10:30 - 11:10", "mon": ["6","Hindi 2L"], "tue": ["6","Hindi 2L"], "wed": "", "thu": "", "fri": "", "sat": "" },
+          { "time": "11:10 - 11:50", "mon": "", "tue": "", "wed": "", "thu": "", "fri": ["4","2L Hindi"], "sat": ["4","2L Hindi"] },
+          { "time": "11:50 - 12:30", "mon": "", "tue": "", "wed": ["6","Hindi 3L"], "thu": "", "fri": "", "sat": "" },
+          { "time": "01:30 - 02:10", "mon": "", "tue": "", "wed": ["5","Art"], "thu": ["6","Hindi 2L"], "fri": ["6","Hindi 3L"], "sat": ["5","Art"] },
+          { "time": "02:10 - 02:50", "mon": ["4","2L Hindi"], "tue": ["4","2L Hindi"], "wed": ["6","Hindi 2L"], "thu": "", "fri": "", "sat": "" },
+          { "time": "02:50 - 03:25", "mon": ["5","Spoken Hindi"], "tue": ["5","Spoken Hindi"], "wed": "", "thu": ["4","Spoken Hindi"], "fri": "", "sat": "" },
+          { "time": "03:25 - 04:00", "mon": ["4","2L Hindi"], "tue": ["5","2L Hindi"], "wed": "", "thu": "", "fri": "", "sat": "" }
+        ]
+      }
     },
     {
       "id": "staff-9",
+      "name": "Narsing",
+      "salutation": "Mr",
+      "gender": "M",
+      "alias": null,
+      "designation": "Teacher",
+      "subject": "Hindi",
+      "timetableSubject": "2L Hindi",
+      "qualifications": null,
+      "career": "Teaches Hindi at SKKSV.",
+      "timetable": {
+        "periods": [
+          { "time": "09:00 - 09:40", "mon": "", "tue": "", "wed": "", "thu": "", "fri": ["9B","2L Hindi"], "sat": ["9B","2L Hindi"] },
+          { "time": "09:40 - 10:20", "mon": "", "tue": "", "wed": ["9B","2L Hindi"], "thu": "", "fri": "", "sat": "" },
+          { "time": "10:30 - 11:10", "mon": "", "tue": ["9B","2L Hindi"], "wed": ["8A","2L Hindi"], "thu": ["9B","2L Hindi"], "fri": ["10","2L Hindi"], "sat": "" },
+          { "time": "11:10 - 11:50", "mon": ["10","2L Hindi"], "tue": "", "wed": "", "thu": "", "fri": "", "sat": "" },
+          { "time": "11:50 - 12:30", "mon": ["9B","2L Hindi"], "tue": "", "wed": "", "thu": "", "fri": "", "sat": "" },
+          { "time": "01:30 - 02:10", "mon": "", "tue": "", "wed": ["10","2L Hindi"], "thu": "", "fri": "", "sat": "" },
+          { "time": "02:10 - 02:50", "mon": "", "tue": "", "wed": "", "thu": ["8A","Hindi 3L"], "fri": "", "sat": "" },
+          { "time": "02:50 - 03:25", "mon": "", "tue": ["10","2L Hindi"], "wed": ["MPT",""], "thu": "", "fri": ["10","2L Hindi"], "sat": "" },
+          { "time": "03:25 - 04:00", "mon": "", "tue": "", "wed": ["CCA",""], "thu": "", "fri": "", "sat": "" }
+        ]
+      }
+    },
+    {
+      "id": "staff-10",
       "name": "Pidathala Sankara Narayana Sastry",
       "salutation": "Mr",
       "gender": "M",
@@ -165,10 +258,34 @@
       "designation": "Teacher",
       "subject": "Telugu",
       "qualifications": "MASTER OF ARTS (TELUGU), B.Ed., TPT",
-      "career": "Has a Master of Arts in Telugu, B.Ed., and TPT (Telugu Pandit Training). Teaches Telugu at SKKSV."
+      "career": "Has a Master of Arts in Telugu, B.Ed., and TPT (Telugu Pandit Training). Teaches Telugu at SKKSV.",
+      "timetable": {
+        "periods": [
+          { "time": "09:00 - 09:40", "mon": "", "tue": "", "wed": "", "thu": "", "fri": ["9A","Telugu"], "sat": ["9A","Telugu"] },
+          { "time": "09:40 - 10:20", "mon": ["10","Telugu"], "tue": "", "wed": ["9A","Telugu"], "thu": ["10","Telugu"], "fri": ["8A","Telugu"], "sat": ["10","Telugu"] },
+          { "time": "10:30 - 11:10", "mon": ["8A","Telugu"], "tue": ["9A","Telugu"], "wed": "", "thu": ["9A","Telugu"], "fri": "", "sat": ["8A","Telugu"] },
+          { "time": "11:10 - 11:50", "mon": "", "tue": ["8A","Telugu"], "wed": ["10","Telugu"], "thu": ["7","Telugu 3L"], "fri": "", "sat": "" },
+          { "time": "11:50 - 12:30", "mon": ["9A","Telugu"], "tue": "", "wed": ["6","Telugu 3L"], "thu": "", "fri": ["10","Telugu"], "sat": "" },
+          { "time": "01:30 - 02:10", "mon": "", "tue": "", "wed": ["8A","Telugu"], "thu": ["8","Telugu 2L"], "fri": ["6","Telugu 3L"], "sat": ["7","Telugu 3L"] },
+          { "time": "02:10 - 02:50", "mon": "", "tue": "", "wed": "", "thu": "", "fri": "", "sat": "" },
+          { "time": "02:50 - 03:25", "mon": "", "tue": "", "wed": ["MPT",""], "thu": "", "fri": "", "sat": "" },
+          { "time": "03:25 - 04:00", "mon": "", "tue": "", "wed": ["CCA",""], "thu": "", "fri": "", "sat": "" }
+        ]
+      }
     },
     {
-      "id": "staff-10",
+      "id": "staff-11",
+      "name": "Pratyusha",
+      "salutation": "Mrs",
+      "gender": "F",
+      "alias": "P",
+      "designation": "Teacher",
+      "subject": "Telugu",
+      "qualifications": null,
+      "career": "Teaches Telugu at SKKSV."
+    },
+    {
+      "id": "staff-12",
       "name": "Arjun Padhan",
       "salutation": "Mr",
       "gender": "M",
@@ -179,7 +296,7 @@
       "career": "Has a B.Ed qualification. Teaches Sanskrit at SKKSV."
     },
     {
-      "id": "staff-11",
+      "id": "staff-13",
       "name": "Renjith M N",
       "salutation": "Mr",
       "gender": "M",
@@ -190,7 +307,7 @@
       "career": "Has a BA and B.Ed. Teaches Social Science at SKKSV."
     },
     {
-      "id": "staff-12",
+      "id": "staff-14",
       "name": "Jonnavittula Venugopal",
       "salutation": "Mr",
       "gender": "M",
@@ -201,7 +318,7 @@
       "career": "Holds a Master's degree (MA) and B.Ed. Teaches Social Science at SKKSV."
     },
     {
-      "id": "staff-13",
+      "id": "staff-15",
       "name": "Venkata Vishnu",
       "salutation": "Mr",
       "gender": "M",
@@ -209,10 +326,23 @@
       "designation": "Computer Teacher",
       "subject": "Computers",
       "qualifications": "MCA (Master of Computer Applications), B.Voc (Software Development)",
-      "career": "Holds an MCA and B.Voc in Software Development. Also the developer of this digital platform. Teaches Computers at SKKSV."
+      "career": "Holds an MCA and B.Voc in Software Development. Also the developer of this digital platform. Teaches Computers at SKKSV.",
+      "timetable": {
+        "periods": [
+          { "time": "09:00 - 09:40", "mon": "", "tue": "", "wed": "", "thu": "", "fri": "", "sat": "" },
+          { "time": "09:40 - 10:20", "mon": "", "tue": ["5","English"], "wed": ["5","English"], "thu": ["5","English"], "fri": ["10","Computers"], "sat": "" },
+          { "time": "10:30 - 11:10", "mon": ["9B","Computers"], "tue": "", "wed": "", "thu": ["6","English"], "fri": ["5","English"], "sat": ["5","English"] },
+          { "time": "11:10 - 11:50", "mon": ["5","English"], "tue": ["5","English"], "wed": ["6","English"], "thu": ["9A","Computers"], "fri": "", "sat": "" },
+          { "time": "11:50 - 12:30", "mon": ["6","English"], "tue": ["6","English"], "wed": "", "thu": "", "fri": ["6","English"], "sat": ["9B","Computers"] },
+          { "time": "01:30 - 02:10", "mon": "", "tue": ["10","Computers"], "wed": "", "thu": "", "fri": "", "sat": ["6","English"] },
+          { "time": "02:10 - 02:50", "mon": "", "tue": ["9A","Computers"], "wed": "", "thu": "", "fri": "", "sat": ["10","Computers"] },
+          { "time": "02:50 - 03:25", "mon": "", "tue": "", "wed": "", "thu": "", "fri": ["6","Spoken English"], "sat": "" },
+          { "time": "03:25 - 04:00", "mon": "", "tue": "", "wed": "", "thu": "", "fri": ["6","Spoken English"], "sat": "" }
+        ]
+      }
     },
     {
-      "id": "staff-14",
+      "id": "staff-16",
       "name": "Kasibhotla Sri Ram Kiran",
       "salutation": "Mr",
       "gender": "M",
@@ -223,7 +353,7 @@
       "career": "Holds a BCA degree. Teaches Computers at SKKSV."
     },
     {
-      "id": "staff-15",
+      "id": "staff-17",
       "name": "Mukku Trinath",
       "salutation": "Mr",
       "gender": "M",
@@ -231,10 +361,23 @@
       "designation": "Librarian",
       "subject": "Library",
       "qualifications": "10th Class (MH School, Nandyal), Intermediate (MPC), B.A. (PPS), B.L.I.Sc., M.A. (Public Admin), PGD LAN, M.L.Sc.",
-      "career": "Highly qualified with a B.L.I.Sc., M.A. in Public Administration, M.L.Sc., and PGD LAN. Serves as the Librarian at SKKSV, managing the school library and resources."
+      "career": "Highly qualified with a B.L.I.Sc., M.A. in Public Administration, M.L.Sc., and PGD LAN. Serves as the Librarian at SKKSV, managing the school library and resources.",
+      "timetable": {
+        "periods": [
+          { "time": "09:00 - 09:40", "mon": ["7","Library"], "tue": ["7","Library"], "wed": ["7","Library"], "thu": "", "fri": "", "sat": "" },
+          { "time": "09:40 - 10:20", "mon": "", "tue": "", "wed": "", "thu": ["7","Library"], "fri": ["8B","Library"], "sat": "" },
+          { "time": "10:30 - 11:10", "mon": ["8B","Library"], "tue": "", "wed": "", "thu": "", "fri": "", "sat": ["8B","Library"] },
+          { "time": "11:10 - 11:50", "mon": "", "tue": ["8B","Library"], "wed": "", "thu": ["7","Library 3L"], "fri": "", "sat": ["9","Library 3L"] },
+          { "time": "11:50 - 12:30", "mon": "", "tue": ["9A","Library"], "wed": "", "thu": "", "fri": ["7","Library"], "sat": ["7","Library"] },
+          { "time": "01:30 - 02:10", "mon": "", "tue": "", "wed": ["8B","Library"], "thu": ["8B","Library"], "fri": "", "sat": ["7","Library 3L"] },
+          { "time": "02:10 - 02:50", "mon": ["9A","Library"], "tue": "", "wed": "", "thu": "", "fri": "", "sat": "" },
+          { "time": "02:50 - 03:25", "mon": "", "tue": "", "wed": "", "thu": "", "fri": "", "sat": "" },
+          { "time": "03:25 - 04:00", "mon": "", "tue": "", "wed": "", "thu": "", "fri": "", "sat": "" }
+        ]
+      }
     },
     {
-      "id": "staff-16",
+      "id": "staff-18",
       "name": "Bandaru Chandra Mohan Rao",
       "salutation": "Mr",
       "gender": "M",
@@ -245,7 +388,7 @@
       "career": "Has a Degree qualification. Serves as a Physical Training Instructor, handling Physical Education at SKKSV."
     },
     {
-      "id": "staff-17",
+      "id": "staff-19",
       "name": "Ranganayakulu Podili",
       "salutation": "Mr",
       "gender": "M",
