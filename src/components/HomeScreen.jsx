@@ -59,8 +59,11 @@ const ImageCarousel = ({ images, onImageClick }) => {
 
   if (images.length === 0) {
     return (
-      <div className="w-full h-64 sm:h-80 lg:h-96 bg-gradient-to-br from-primary/30 to-purple-600/30 rounded-2xl flex items-center justify-center">
-        <span className="text-gray-500 dark:text-gray-400 text-sm">Gallery coming soon</span>
+      <div className="w-full h-64 sm:h-80 lg:h-96 bg-[#282843] rounded-2xl flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+          <span className="text-gray-400 text-sm">Loading...</span>
+        </div>
       </div>
     );
   }
