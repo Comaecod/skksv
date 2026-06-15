@@ -1,8 +1,33 @@
 import { SCHOOL_CONFIG, GRADING_SYSTEM } from '../config/schoolConfig';
+import STAFF_DATA from '../data/staffDirectory.json';
 
 const SCHOOL = SCHOOL_CONFIG;
 
 const APP_DESCRIPTION = `This is the official digital platform of ${SCHOOL.name}. Students can take assessments, view holiday homework, browse staff directory, view gallery, submit feedback, and access timed assessments.`;
+
+function buildStaffContext() {
+  const lines = [];
+  const allStaff = [
+    { type: 'Management', items: [STAFF_DATA.correspondent, STAFF_DATA.principal, STAFF_DATA.director] },
+    { type: 'Admin Team', items: STAFF_DATA.adminTeam },
+    { type: 'Teaching Staff', items: STAFF_DATA.staff },
+  ];
+  for (const group of allStaff) {
+    lines.push(`\n${group.type}:`);
+    for (const s of group.items) {
+      const alias = s.alias ? ` (${s.alias})` : '';
+      const subject = s.subject ? ` - ${s.subject}` : '';
+      const onLeave = s.onLeave ? ' [On Leave]' : '';
+      lines.push(`  ${s.salutation} ${s.name}${alias} - ${s.designation}${subject}${onLeave}`);
+      if (s.career) {
+        lines.push(`    Career: ${s.career}`);
+      }
+    }
+  }
+  return lines.join('\n');
+}
+
+const STAFF_CONTEXT = buildStaffContext();
 
 const INTENTS = [
   {
@@ -66,7 +91,107 @@ const INTENTS = [
       /full\s+(name\s+)?of\s+school/i,
     ],
     response: () => {
-      return SCHOOL.name + ' (' + SCHOOL.shortName + ') is a prestigious educational institution committed to academic excellence and holistic development of students.';
+      return SCHOOL.name + ' (' + SCHOOL.shortName + ') is a prestigious educational institution committed to academic excellence and holistic development of students, established under the patronage of the Sri Kanchi Kamakoti Peetham.';
+    },
+  },
+  {
+    id: 'about_shankaracharya',
+    patterns: [
+      /(who\s+is|about|tell\s+about)\s+(adi\s+)?shankara/,
+      /adi\s+shankara(cha|charya)?/i,
+      /shankara(cha|charya)/i,
+      /about\s+shankaracharya/i,
+      /who\s+(is|was)\s+(adi\s+)?shankaracharya/i,
+    ],
+    response: () => {
+      return '**Adi Shankaracharya** (c. 788–820 CE) was one of the most revered philosophers and theologians in Hinduism. He consolidated the doctrine of Advaita Vedanta (non-duality) and established four mathas (monasteries) across India — in Sringeri, Dwarka, Puri, and Joshimath. His works include commentaries on the Brahma Sutras, Upanishads, and Bhagavad Gita. The Kanchi Kamakoti Peetham traces its lineage to Adi Shankaracharya, with its Acharyas serving as guardians of Sanatana Dharma.';
+    },
+  },
+  {
+    id: 'kanchi_pontiff',
+    patterns: [
+      /(current|present|now|36th)\s+(pontiff|acharya|swami|jagadguru)/i,
+      /who\s+is\s+(the\s+)?(current|present)\s+(head|pontiff|acharya)/i,
+      /(sri\s+)?shankara\s+vijayendra\s+saraswati/i,
+      /(current|present)\s+(kanchi\s+)?(kamakoti\s+)?(peetam|mutt)\s+(head|pontiff|acharya)/i,
+    ],
+    response: () => {
+      return 'The current (36th) Jagadguru of the Sri Kanchi Kamakoti Peetham is **Jagadguru Sri Shankara Vijayendra Saraswathi Shankaracharya Swamigal**. He is the 36th Acharya in the illustrious parampara (lineage) of the Peetham.';
+    },
+  },
+  {
+    id: 'kanchi_previous_pontiff',
+    patterns: [
+      /(previous|former|before|past|35th)\s+(pontiff|acharya|swami|jagadguru)/i,
+      /(sri\s+)?jayendra\s+saraswati/i,
+      /who\s+was\s+(the\s+)?(previous|former)\s+(head|pontiff|acharya)/i,
+    ],
+    response: () => {
+      return 'The previous (35th) Jagadguru was **Jagadguru Sri Jayendra Saraswathi Shankaracharya Swamigal** (also known as the 70th Sankaracharya of Kanchi Kamakoti Peetham). He served as the head of the Peetham for many decades and was instrumental in guiding the spiritual and charitable activities of the mutt.';
+    },
+  },
+  {
+    id: 'kanchi_next_pontiff',
+    patterns: [
+      /(next|future|upcoming|successor|after)\s+(pontiff|acharya|swami|jagadguru)/i,
+      /who\s+(will\s+be|is)\s+(the\s+)?(next|future)\s+(head|pontiff|acharya)/i,
+    ],
+    response: () => {
+      return 'The next (37th) pontiff designate is **Jagadguru Sri Vidhusekara Jayendra Saraswathi Shankaracharya Swamigal**, who was formally anointed as the junior pontiff (Yuvaraja) and is being trained to succeed the current Acharya in due course.';
+    },
+  },
+  {
+    id: 'school_address_contact',
+    patterns: [
+      /(school\s+)?(address|location|where)/i,
+      /(contact|reach|find)\s+(the\s+)?school/i,
+      /school\s+(phone|email|timing|hours)/i,
+      /what\s+(is\s+)?the\s+(address|phone|email)/i,
+      /school\s+(open|close|working)\s+(time|hours)/i,
+    ],
+    response: () => {
+      return SCHOOL.name + ' is located in **Boduppal, Hyderabad**. For the complete address, phone number, email, and school timings, please visit the **Contact** page from the navigation menu. You can also find a Google Maps link there for directions.';
+    },
+  },
+  {
+    id: 'staff_directory',
+    patterns: [
+      /(staff|teachers?|faculty|people)\s+(info|details|list|directory)/i,
+      /(how\s+(many|much)|list)\s+(staff|teachers?|faculty)/i,
+      /who\s+(works?|teaches?)\s+(at|in)\s+school/i,
+      /staff\s+strength/i,
+      /who\s+teaches\s+(\w+)/i,
+      /tell\s+(me\s+)?about\s+(the\s+)?staff/i,
+    ],
+    response: (ctx) => {
+      const text = ctx.userMessage.toLowerCase();
+
+      const teachMatch = text.match(/who\s+teaches\s+(\w+)/i);
+      if (teachMatch) {
+        const subjectQuery = teachMatch[1].toLowerCase();
+        const found = STAFF_DATA.staff.filter(s =>
+          s.subject && s.subject.toLowerCase().includes(subjectQuery)
+        );
+        if (found.length) {
+          return found.map(t =>
+            `${t.salutation} ${t.name} (${t.alias ? t.alias + ', ' : ''}${t.designation}) teaches ${t.subject}`
+          ).join('\n');
+        }
+      }
+
+      const total = STAFF_DATA.staff.length;
+      return `${SCHOOL.name} has a total of ${total} teaching staff members, ${STAFF_DATA.adminTeam.length} admin staff, plus the Principal, Correspondent, and Director.\n\n${STAFF_CONTEXT}`;
+    },
+  },
+  {
+    id: 'school_history',
+    patterns: [
+      /(school\s+)?(history|found(ed|ation)|establish(ed|ment)|since|started|founded)/i,
+      /when\s+(was|is)\s+(the\s+)?school\s+(established|founded|started)/i,
+      /how\s+old\s+is\s+(the\s+)?school/i,
+    ],
+    response: () => {
+      return SCHOOL.name + ' is a prestigious institution affiliated to the CBSE board, functioning under the guidance and blessings of the Sri Kanchi Kamakoti Peetham. For detailed historical information about the school\'s founding year and milestones, please contact the school administration or visit the About page.';
     },
   },
   {
@@ -182,7 +307,7 @@ const INTENTS = [
       /(your\s+)?(capabilities|features|skills)/i,
       /help\s+me/i,
     ],
-    response: () => 'I can help you with:\n\n\u2022 Information about ' + SCHOOL.name + '\n\u2022 Navigating through the app\n\u2022 Steps to take assessments and quizzes\n\u2022 Grading system and results\n\u2022 Finding staff and contact info\n\u2022 Viewing holiday homework\n\u2022 Submitting feedback\n\nJust ask me anything!',
+    response: () => 'I can help you with:\n\n\u2022 Information about ' + SCHOOL.name + '\n\u2022 About Adi Shankaracharya and Kanchi Kamakoti Peetham\n\u2022 The current, previous, and next pontiffs\n\u2022 Navigating through the app\n\u2022 Steps to take assessments and quizzes\n\u2022 Grading system and results\n\u2022 Finding staff and contact info\n\u2022 Viewing holiday homework\n\u2022 Submitting feedback\n\nJust ask me anything!',
   },
   {
     id: 'who_made',
@@ -246,24 +371,38 @@ Key information about the school:
 - Correspondent: ${SCHOOL.correspondence.salutation} ${SCHOOL.correspondence.name}
 - Director: ${SCHOOL.director.salutation} ${SCHOOL.director.name}
 
+About Adi Shankaracharya:
+Adi Shankaracharya (c. 788–820 CE) was a revered philosopher who consolidated Advaita Vedanta (non-duality). He established four mathas across India (Sringeri, Dwarka, Puri, Joshimath) and wrote commentaries on the Brahma Sutras, Upanishads, and Bhagavad Gita. The Kanchi Kamakoti Peetham traces its lineage to him.
+
+Kanchi Kamakoti Peetham Pontiffs:
+- Current (36th): Jagadguru Sri Shankara Vijayendra Saraswathi Shankaracharya Swamigal
+- Previous (35th): Jagadguru Sri Jayendra Saraswathi Shankaracharya Swamigal
+- Pontiff-designate (37th): Jagadguru Sri Vidhusekara Jayendra Saraswathi Shankaracharya Swamigal (Yuvaraja)
+
 Your role:
 - Help users navigate the app and find what they need
-- Answer questions about the school
+- Answer questions about the school, Adi Shankaracharya, and the Kanchi Kamakoti Peetham
 - Guide students through taking assessments
 - Explain features of the app
 - Be concise, friendly, and helpful
 
 The app has these sections:
-- Home (/) - Landing page
-- Assessments (/assessments) - Take exams and quizzes
-- Holiday Homework (/holiday-homework) - View assignments
-- Staff Directory (/people) - Browse faculty
-- Gallery (/gallery) - View photos
-- Contact (/contact) - School contact info
-- Feedback (/feedback) - Submit feedback
-- Timed Assessments (/timed-assessments) - Time-bound exams
+- Home (/) - Landing page with image carousel and school stats
+- Assessments (/assessments) - Take exams and quizzes (select exam type → class → subject)
+- Holiday Homework (/holiday-homework) - View assignments by holiday/class/subject
+- Staff Directory (/people) - Browse faculty and staff
+- Gallery (/gallery) - View school photos and event images
+- Contact (/contact) - School address, phone, email, Google Maps link
+- Feedback (/feedback) - Submit suggestions, issues, or appreciation
+- Timed Assessments (/timed-assessments) - Time-bound exams (MCQ or project)
+- Reports (/reports) - View result reports (teacher/staff only)
 
-Keep responses under 150 words. Be warm but professional. Use simple language suitable for students and parents.`;
+Keep responses under 150 words. Be warm but professional. Use simple language suitable for students and parents. When asked about the Kanchi Mutt or pontiffs, answer with reverence and accuracy.
+
+Staff Directory (full list of all staff members):
+${STAFF_CONTEXT}
+
+If a user asks about a specific staff member, teacher, or subject, use this list to give accurate details. If they ask "who teaches X", match the subject and return the relevant teacher's name and details.`;
 
   const messages = [
     { role: 'system', content: systemPrompt },

@@ -7,7 +7,8 @@
     "alias": "MKP",
     "designation": "Correspondent",
     "subject": null,
-    "qualifications": null
+    "qualifications": null,
+    "career": "Oversees the overall administration and management of the school as the Correspondent."
   },
   "principal": {
     "id": "principal-1",
@@ -17,7 +18,8 @@
     "alias": "PG",
     "designation": "Principal",
     "subject": null,
-    "qualifications": "X AISSCE, XII AISSE, BSc (OU), B.Ed (Annamalai University), MA English (OU), MA Economics (IGNOU)"
+    "qualifications": "X AISSCE, XII AISSE, BSc (OU), B.Ed (Annamalai University), MA English (OU), MA Economics (IGNOU)",
+    "career": "Experienced educator and academic leader. Holds dual Master's degrees in English and Economics. Qualified with B.Ed from Annamalai University. Currently serving as the Principal of SKKSV."
   },
   "director": {
     "id": "director-1",
@@ -27,7 +29,8 @@
     "alias": null,
     "designation": "Director",
     "subject": null,
-    "qualifications": "M.Sc., MBA"
+    "qualifications": "M.Sc., MBA",
+    "career": "Holds a Master's in Science and an MBA. Serves as the Director, guiding the strategic direction and academic vision of the institution."
   },
   "adminTeam": [
     {
@@ -38,7 +41,8 @@
       "alias": null,
       "designation": "Admin",
       "subject": null,
-      "qualifications": "MBA"
+      "qualifications": "MBA",
+      "career": "Handles school administration and management tasks. Holds an MBA degree."
     },
     {
       "id": "admin-2",
@@ -48,7 +52,8 @@
       "alias": null,
       "designation": "Admin",
       "subject": null,
-      "qualifications": "SSC (2018), Intermediate (2019-2020), Graduation (2020-2023)"
+      "qualifications": "SSC (2018), Intermediate (2019-2020), Graduation (2020-2023)",
+      "career": "Completed her schooling in 2018, intermediate in 2019-2020, and graduation in 2020-2023. Works in school administration."
     },
     {
       "id": "admin-3",
@@ -58,7 +63,8 @@
       "alias": null,
       "designation": "Admin",
       "subject": null,
-      "qualifications": "10th (Govt Boys High School, Podili), Diploma (Bellamkonda College)"
+      "qualifications": "10th (Govt Boys High School, Podili), Diploma (Bellamkonda College)",
+      "career": "Completed 10th at Govt Boys High School, Podili and a Diploma from Bellamkonda College. Works in the school's administrative team."
     }
   ],
   "staff": [
@@ -70,7 +76,8 @@
       "alias": "VLK",
       "designation": "Teacher",
       "subject": "Mathematics, Physics",
-      "qualifications": "MSc Physics (1994, HCU), PhD Physics (2010, HCU)"
+      "qualifications": "MSc Physics (1994, HCU), PhD Physics (2010, HCU)",
+      "career": "Highly qualified with an MSc in Physics from HCU (1994) and a PhD in Physics from HCU (2010). Has over two decades of academic experience. Teaches Mathematics and Physics at SKKSV."
     },
     {
       "id": "staff-2",
@@ -80,7 +87,8 @@
       "alias": "AH",
       "designation": "Teacher",
       "subject": "Mathematics, EVS, English",
-      "qualifications": "SSLC (J.G.G.H.S.S, Nanganallur), HSC (J.G.G.H.S.S, Nanganallur), B.Sc. (Ideal College), B.Ed. (Mohan College)"
+      "qualifications": "SSLC (J.G.G.H.S.S, Nanganallur), HSC (J.G.G.H.S.S, Nanganallur), B.Sc. (Ideal College), B.Ed. (Mohan College)",
+      "career": "Completed her schooling at J.G.G.H.S.S, Nanganallur, followed by B.Sc. from Ideal College and B.Ed. from Mohan College. Teaches Mathematics, EVS, and English at SKKSV."
     },
     {
       "id": "staff-3",
@@ -90,7 +98,8 @@
       "alias": "BGY",
       "designation": "Teacher",
       "subject": "Mathematics",
-      "qualifications": "B.Tech Geo Informatics, Intermediate M.P.C, X Class (S.F.S High School)"
+      "qualifications": "B.Tech Geo Informatics, Intermediate M.P.C, X Class (S.F.S High School)",
+      "career": "Has a B.Tech in Geo Informatics with a background in Mathematics (MPC in Intermediate). Teaches Mathematics at SKKSV."
     },
     {
       "id": "staff-4",
@@ -101,7 +110,7 @@
       "designation": "Teacher",
       "subject": "Chemistry",
       "qualifications": "SSC, Intermediate, B.Sc.",
-      "onLeave": true
+      "career": "Has a B.Sc. degree. Teaches Chemistry at SKKSV. Currently on leave."
     },
     {
       "id": "staff-5",
@@ -111,7 +120,8 @@
       "alias": "VNR",
       "designation": "Teacher",
       "subject": "Biology, General Science",
-      "qualifications": "SSC, Intermediate (Bi.P.C), B.Sc. (B.Z.C)"
+      "qualifications": "SSC, Intermediate (Bi.P.C), B.Sc. (B.Z.C)",
+      "career": "Has a B.Sc. in B.Z.C (Botany, Zoology, Chemistry) with a Bi.P.C background in Intermediate. Teaches Biology and General Science at SKKSV."
     },
     {
       "id": "staff-6",
@@ -121,7 +131,8 @@
       "alias": "AG",
       "designation": "Teacher",
       "subject": "English",
-      "qualifications": "MA English, B.Ed."
+      "qualifications": "MA English, B.Ed.",
+      "career": "Holds a Master's in English (MA) and a B.Ed. Teaches English at SKKSV."
     },
     {
       "id": "staff-7",
@@ -131,7 +142,8 @@
       "alias": "GK",
       "designation": "Teacher",
       "subject": "Hindi",
-      "qualifications": "SSC, Hindi Vidwan, B.A. (Telugu)"
+      "qualifications": "SSC, Hindi Vidwan, B.A. (Telugu)",
+      "career": "Qualified with Hindi Vidwan and a B.A. in Telugu. Teaches Hindi at SKKSV."
     },
     {
       "id": "staff-8",
@@ -141,7 +153,8 @@
       "alias": "GR",
       "designation": "Teacher",
       "subject": "Hindi",
-      "qualifications": "Intermediate, Degree, BA, MA (Hindi), B.Ed., HPT, PGDCA"
+      "qualifications": "Intermediate, Degree, BA, MA (Hindi), B.Ed., HPT, PGDCA",
+      "career": "Highly qualified with an MA in Hindi, B.Ed., HPT (Hindi Pandit Training), and PGDCA. Teaches Hindi at SKKSV."
     },
     {
       "id": "staff-9",
@@ -151,7 +164,8 @@
       "alias": "SN",
       "designation": "Teacher",
       "subject": "Telugu",
-      "qualifications": "MASTER OF ARTS (TELUGU), B.Ed., TPT"
+      "qualifications": "MASTER OF ARTS (TELUGU), B.Ed., TPT",
+      "career": "Has a Master of Arts in Telugu, B.Ed., and TPT (Telugu Pandit Training). Teaches Telugu at SKKSV."
     },
     {
       "id": "staff-10",
@@ -161,7 +175,8 @@
       "alias": "AP",
       "designation": "Teacher",
       "subject": "Sanskrit",
-      "qualifications": "B.Ed"
+      "qualifications": "B.Ed",
+      "career": "Has a B.Ed qualification. Teaches Sanskrit at SKKSV."
     },
     {
       "id": "staff-11",
@@ -171,7 +186,8 @@
       "alias": "MNR",
       "designation": "Teacher",
       "subject": "Social Science",
-      "qualifications": "BA, B.Ed"
+      "qualifications": "BA, B.Ed",
+      "career": "Has a BA and B.Ed. Teaches Social Science at SKKSV."
     },
     {
       "id": "staff-12",
@@ -181,7 +197,8 @@
       "alias": "JVG",
       "designation": "Teacher",
       "subject": "Social Science",
-      "qualifications": "MA, B.Ed."
+      "qualifications": "MA, B.Ed.",
+      "career": "Holds a Master's degree (MA) and B.Ed. Teaches Social Science at SKKSV."
     },
     {
       "id": "staff-13",
@@ -191,7 +208,8 @@
       "alias": "VV",
       "designation": "Computer Teacher",
       "subject": "Computers",
-      "qualifications": "MCA (Master of Computer Applications), B.Voc (Software Development)"
+      "qualifications": "MCA (Master of Computer Applications), B.Voc (Software Development)",
+      "career": "Holds an MCA and B.Voc in Software Development. Also the developer of this digital platform. Teaches Computers at SKKSV."
     },
     {
       "id": "staff-14",
@@ -201,7 +219,8 @@
       "alias": "KSK",
       "designation": "Computer Teacher",
       "subject": "Computers",
-      "qualifications": "BCA"
+      "qualifications": "BCA",
+      "career": "Holds a BCA degree. Teaches Computers at SKKSV."
     },
     {
       "id": "staff-15",
@@ -211,7 +230,8 @@
       "alias": "TN",
       "designation": "Librarian",
       "subject": "Library",
-      "qualifications": "10th Class (MH School, Nandyal), Intermediate (MPC), B.A. (PPS), B.L.I.Sc., M.A. (Public Admin), PGD LAN, M.L.Sc."
+      "qualifications": "10th Class (MH School, Nandyal), Intermediate (MPC), B.A. (PPS), B.L.I.Sc., M.A. (Public Admin), PGD LAN, M.L.Sc.",
+      "career": "Highly qualified with a B.L.I.Sc., M.A. in Public Administration, M.L.Sc., and PGD LAN. Serves as the Librarian at SKKSV, managing the school library and resources."
     },
     {
       "id": "staff-16",
@@ -221,7 +241,8 @@
       "alias": "CM",
       "designation": "Physical Training Instructor",
       "subject": "Physical Education",
-      "qualifications": "10th, Intermediate, Degree"
+      "qualifications": "10th, Intermediate, Degree",
+      "career": "Has a Degree qualification. Serves as a Physical Training Instructor, handling Physical Education at SKKSV."
     },
     {
       "id": "staff-17",
@@ -231,7 +252,8 @@
       "alias": "RN",
       "designation": "Physical Training Instructor",
       "subject": "Physical Education",
-      "qualifications": null
+      "qualifications": null,
+      "career": "Serves as a Physical Training Instructor, handling Physical Education at SKKSV."
     }
   ]
 }

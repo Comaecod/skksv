@@ -17,7 +17,7 @@ const Footer = ({ pageViewCount }) => {
       <div className="max-w-7xl mx-auto px-4 flex items-center justify-center">
         <p className="flex items-center justify-center gap-2 sm:gap-4 flex-wrap text-xs sm:text-sm" style={{ color: 'var(--text-muted)' }}>
           <span>
-            Built with <span className="text-red-400">❤</span> by <a href="https://comaecod.github.io/portfolio" target="_blank" rel="noopener noreferrer" className="font-medium" style={{ color: 'var(--accent)' }}>Vishnu</a>
+            Built with <span className="text-red-400">❤</span> by <a href="https://vishnu-portfolio-nu.vercel.app/" target="_blank" rel="noopener noreferrer" className="font-medium" style={{ color: 'var(--accent)' }}>Vishnu</a>
           </span>
           {formattedCount !== null && (
             <span style={{ color: 'var(--text-muted)' }}>
