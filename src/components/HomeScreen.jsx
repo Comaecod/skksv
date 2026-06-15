@@ -199,7 +199,7 @@ const HomeScreen = () => {
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-2">
             Sri Kanchi Kamakoti
           </h1>
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent mb-5">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent mb-5 pb-1 leading-[1.3]">
             Sankara Vidyalaya
           </h2>
           <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base italic">
