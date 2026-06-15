@@ -28,6 +28,13 @@ export default {
         'scale-in': 'scaleIn 0.3s ease-out',
         'fade-in': 'fadeIn 0.3s ease-out',
         'bounce-slow': 'bounce 1.5s ease-in-out infinite',
+        'marquee': 'marquee 30s linear infinite',
+      },
+      keyframes: {
+        marquee: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
+        },
       },
       spacing: {
         'safe-bottom': 'env(safe-area-inset-bottom)',

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { SCHOOL_CONFIG } from '../config/schoolConfig';
 import { getImagesByCategory } from '../services/imageService';
 import ImageModal from './ImageModal';
+import PanchangamMarquee from './PanchangamMarquee';
 
 const StatItem = ({ icon, value, label }) => (
     <div className="flex items-center gap-2 bg-black/5 dark:bg-white/5 rounded-lg px-3 py-2">
@@ -165,6 +166,7 @@ const HomeScreen = () => {
 
   return (
     <div className="w-full min-h-screen">
+      <PanchangamMarquee />
       <div className="max-w-7xl mx-auto px-4 py-8">
         {isAuthenticated && !loading && (
           <div className="mb-6 p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20">
@@ -194,7 +196,7 @@ const HomeScreen = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-8 sm:mb-10 mt-8"
+          className="text-center mt-8"
         >
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-2">
             Sri Kanchi Kamakoti
@@ -202,7 +204,7 @@ const HomeScreen = () => {
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent mb-5 pb-1 leading-[1.3]">
             Sankara Vidyalaya
           </h2>
-          <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base italic">
+          <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base italic mb-5">
             Sanatana Dharma Seva Gramam
           </p>
 
