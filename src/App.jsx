@@ -22,6 +22,7 @@ const GalleryScreen = lazy(() => import('./components/GalleryScreen'));
 const HolidayHomeworkScreen = lazy(() => import('./components/HolidayHomeworkScreen'));
 const AboutShankaracharya = lazy(() => import('./components/AboutShankaracharya'));
 const AboutSchool = lazy(() => import('./components/AboutSchool'));
+const AcademicCalendar = lazy(() => import('./components/AcademicCalendar'));
 const PanchangamScreen = lazy(() => import('./components/PanchangamScreen'));
 const ContactScreen = lazy(() => import('./components/ContactScreen'));
 const FeedbackScreen = lazy(() => import('./components/FeedbackScreen'));
@@ -92,6 +93,7 @@ function App() {
           <Route path="/panchangam" element={withLayout(PanchangamScreen)} />
           <Route path="/about-shankaracharya" element={withLayout(AboutShankaracharya)} />
           <Route path="/about-school" element={withLayout(AboutSchool)} />
+          <Route path="/academic-calendar" element={withLayout(AcademicCalendar)} />
           <Route path="/feedback" element={withLayout(FeedbackScreen)} />
 
           {/* Auth Routes */}

@@ -1,0 +1,85 @@
+{
+  "specialEvents": [
+    ["Jun 5, 2026", "🏫 School Reopens — New Session Begins"],
+    ["Jun 20, 2026", "🧘 International Yoga Day"],
+    ["Jun 27, 2026", "📘 Bridge Course Ends"],
+    ["Jun 29, 2026", "📖 Regular Syllabus Begins"],
+    ["Jul 10, 2026", "🙏 Guru Poornima / Vyasa Puja · Sri Jayendra Saraswati's 92nd Jayanthi · Investiture Ceremony"],
+    ["Jul 17, 2026", "🌞 Dakshinayana Starts"],
+    ["Aug 1, 2026", "🌳 Vana Mahotsavam"],
+    ["Aug 15, 2026", "🚩 Independence Day"],
+    ["Aug 29, 2026", "📜 Telugu Bhasha Dinotsavam"],
+    ["Sep 5, 2026", "👩‍🏫 Teacher's Day"],
+    ["Sep 16, 2026", "🗣️ Hindi Diwas"],
+    ["Oct 2, 2026", "🕊️ Lal Bahadur Shastri Jayanti / Gandhi Jayanti"],
+    ["Oct 10, 2026", "🌑 Mahalaya Amavasya"],
+    ["Oct 11, 2026", "🙏 Navaratri Begins"],
+    ["Oct 17, 2026", "📚 Saraswati Puja"],
+    ["Oct 19, 2026", "🛡️ Durgashtami · Maha Navami"],
+    ["Oct 20, 2026", "🏆 Vijaya Dashami"],
+    ["Oct 21, 2026", "🏫 School Reopens after Dusshera Vacation"],
+    ["Nov 1, 2026", "🌍 Andhra Pradesh Avatarana"],
+    ["Nov 9, 2026", "🪔 Deepawali"],
+    ["Nov 24, 2026", "🪷 Kartika Pournami"],
+    ["Dec 16, 2026", "🕉️ Mahaswami's 32nd Aradhana"],
+    ["Dec 20, 2026", "📐 Gita Jayanthi · Maths Day (Srinivasa Ramanujan Day) · Maths / Science Exhibition"],
+    ["Dec 27, 2026", "⚽ Sports Day"],
+    ["Jan 26, 2026", "🇮🇳 Republic Day"],
+    ["Feb 13, 2026", "🌅 Ratha Saptami"],
+    ["Mar 6, 2026", "🔱 Maha Shivaratri"],
+    ["Apr 7, 2026", "🌺 Ugadi"]
+  ],
+  "holidays": [
+    ["Aug 21, 2026", "🙏 Varalakshmi Vratham"],
+    ["Aug 28, 2026", "📿 Rig / Yajur Upakarma"],
+    ["Sep 4, 2026", "🎉 Krishnashtami"],
+    ["Sep 14, 2026", "🐘 Vinayaka Chaturthi"],
+    ["Oct 10, 2026", "🌑 Mahalaya Amavasya — Dusshera Vacation Starts"],
+    ["Oct 11, 2026", "🙏 Navaratri Begins"],
+    ["Oct 20, 2026", "🏫 Dusshera Vacation Ends"],
+    ["Nov 9, 2026", "🪔 Deepavali"],
+    ["Nov 24, 2026", "🪷 Kartika Pournami · Guru Nanak Jayanthi"],
+    ["Dec 15, 2026", "🗡️ Subrahmanyam Shashti"],
+    ["Dec 20, 2026", "🕊️ Vaikunta Ekadashi"],
+    ["Mar 22, 2027", "🎨 Holi"],
+    ["Mar 26, 2027", "🙏 Shri Ram Navami"],
+    ["Apr 14, 2027", "📜 Dr. B.R. Ambedkar Jayanthi"],
+    ["Apr 23, 2027", "🏫 Last Working Day before Summer Vacation"]
+  ],
+  "vacations": [
+    ["Oct 10, 2026 to Oct 20, 2026", "🏖️ Dusshera Vacation"],
+    ["Jan 11, 2027 to Jan 17, 2027", "🪁 Sankranti Vacation"],
+    ["Apr 24, 2027", "☀️ Summer Vacation Begins"]
+  ],
+  "exams": [
+    ["Jul 20, 2026 to Jul 25, 2026", "📝 UT – 1"],
+    ["Sep 21, 2026 to Oct 1, 2026", "📚 Half – Yearly"],
+    ["Dec 4, 2026 to Dec 11, 2026", "📝 UT – 2"],
+    ["Feb, 2027", "🎯 Final Exam"]
+  ],
+  "ptms": [
+    ["Jul 26, 2026", "🤝 PTM 1"],
+    ["Oct 9, 2026", "🤝 PTM 2"],
+    ["Dec 6, 2026", "🤝 PTM 3"],
+    ["Feb 24, 2026", "🤝 PTM 4"]
+  ],
+  "competitions": [
+    ["Jul 4, 2026", "✍️ English / Hindi / Telugu Calligraphy Competition"],
+    ["Jul 18, 2026", "✏️ Essay Writing Competition"],
+    ["Jul 25, 2026", "🎨 Painting Competition"],
+    ["Aug 1, 2026", "🗣️ Telugu Elocution · Telugu JAM"],
+    ["Aug 22, 2026", "🗣️ Hindi Elocution · Hindi JAM"],
+    ["Nov 16, 2026", "♻️ Best Out of Waste"],
+    ["Nov 17, 2026", "🎤 Extempore Competition"],
+    ["Nov 18, 2026", "📖 Story Telling Competition"],
+    ["Nov 19, 2026", "🗺️ Map Pointing Competition"],
+    ["Nov 20, 2026", "⚖️ Debate Competition"],
+    ["Nov 21, 2026", "🧠 Quiz Competition"],
+    ["Dec 20, 2026", "📿 Bhagavad Gita Shloka Competition"]
+  ],
+  "competitiveExams": [
+    ["LogIQids", "Mental Aptitude Olympiad, Logical Reasoning (Free of Cost)"],
+    ["Silver Zone", "Maths, Science Olympiads (Paid)"],
+    ["Dakshin Bharat Hindi Prachar Sabha", "(Paid)"]
+  ]
+}

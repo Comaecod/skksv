@@ -1,6 +1,7 @@
 import { SCHOOL_CONFIG, GRADING_SYSTEM } from '../config/schoolConfig';
 import STAFF_DATA from '../data/staffDirectory.json';
 import EXECUTIVE_COMMITTEE from '../data/executiveCommittee.json';
+import ACADEMIC_CALENDAR from '../data/academicCalendar.json';
 
 const SCHOOL = SCHOOL_CONFIG;
 
@@ -366,6 +367,27 @@ function localQuery(userMessage, context) {
   return { text: fallbacks[Math.floor(Math.random() * fallbacks.length)], source: 'local' };
 }
 
+function buildCalendarContext() {
+  const lines = ['Academic Calendar 2026-27:'];
+  const sections = [
+    { emoji: '📅', label: 'Special Events', key: 'specialEvents' },
+    { emoji: '🎊', label: 'Holidays', key: 'holidays' },
+    { emoji: '🏖️', label: 'Vacations', key: 'vacations' },
+    { emoji: '📝', label: 'Exams', key: 'exams' },
+    { emoji: '🤝', label: 'PTMs', key: 'ptms' },
+    { emoji: '🏆', label: 'Competitions', key: 'competitions' },
+  ];
+  for (const { emoji, label, key } of sections) {
+    const entries = ACADEMIC_CALENDAR[key].map(([date, event]) => `${date}: ${event}`).join(' | ');
+    lines.push(`${emoji} ${label} - ${entries}`);
+  }
+  const ce = ACADEMIC_CALENDAR.competitiveExams.map(([name, desc]) => `${name} (${desc})`).join(', ');
+  lines.push(`📚 Competitive Exams (dates TBD): ${ce}`);
+  return lines.join('\n');
+}
+
+const CALENDAR_CONTEXT = buildCalendarContext();
+
 async function groqQuery(userMessage, context) {
   const apiKey = import.meta.env.VITE_GROQ_API_KEY;
   const systemPrompt = `You are Sankara, a friendly and knowledgeable AI assistant for ${SCHOOL.name} (${SCHOOL.shortName}). 
@@ -408,7 +430,11 @@ Keep responses under 150 words. Be warm but professional. Use simple language su
 Staff Directory (full list of all staff members):
 ${STAFF_CONTEXT}
 
-If a user asks about a specific staff member, teacher, or subject, use this list to give accurate details. If they ask "who teaches X", match the subject and return the relevant teacher's name and details.`;
+If a user asks about a specific staff member, teacher, or subject, use this list to give accurate details. If they ask "who teaches X", match the subject and return the relevant teacher's name and details.
+
+${CALENDAR_CONTEXT}
+
+If a user asks about upcoming events, holidays, exam schedules, or competitions, answer from this calendar.`;
 
   const messages = [
     { role: 'system', content: systemPrompt },
