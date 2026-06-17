@@ -36,11 +36,15 @@ function getSamvatsara(year) {
 // Derive ayana from month (1=Chaitra)
 function getAyana(monthIndex) {
   // Chaitra (1) to Bhadrapada (6) = Dakshinayana, Ashvina (7) to Phalguna (12) = Uttarayana
-  // Actually: Makara Sankranti to Mesha Sankranti = Uttarayana (Jan-Jun)
-  // Mesha Sankranti to Karka Sankranti = Dakshinayana (Jul-Dec)
-  // Simplified: Jan-Jun = Uttarayana, Jul-Dec = Dakshinayana
-  const m = new Date().getMonth() + 1;
-  return m >= 1 && m <= 6 ? { name: 'Uttarayana', index: 1 } : { name: 'Dakshinayana', index: 2 };
+  // Actually: Makara Sankranti to Mesha Sankranti = Uttarayana (Jan-Jun = 10-12,1-3)
+  // Mesha Sankranti to Karka Sankranti = Dakshinayana (Jul-Dec = 4-9)
+  // By lunar masa: masa 1-3 (Chaitra-Jyeshtha) ~ Mar-May = part of Uttarayana
+  // masa 4-9 (Ashadha-Margashirsha) ~ Jun-Nov = Dakshinayana
+  // masa 10-12 (Pausha-Phalguna) ~ Dec-Feb = Uttarayana
+  const m = monthIndex || (new Date().getMonth() + 1);
+  return m >= 4 && m <= 9
+    ? { name: 'Dakshinayana', index: 2 }
+    : { name: 'Uttarayana', index: 1 };
 }
 
 function getRutu(monthIndex) {
@@ -53,8 +57,10 @@ function getRutu(monthIndex) {
 
 // Map English month names to lunar month index
 const lunarMonthIndex = {
-  'chaitra': 1, 'vaisakha': 2, 'vaishakha': 2, 'jyeshtha': 3, 'ashadha': 4,
-  'shravana': 5, 'bhadrapada': 6, 'ashvina': 7, 'kartika': 8,
+  'chaitra': 1, 'vaisakha': 2, 'vaishakha': 2, 'jyeshtha': 3,
+  'ashadha': 4, 'aashaadha': 4,
+  'shravana': 5, 'bhadrapada': 6, 'ashvina': 7, 'aashvina': 7,
+  'kartika': 8,
   'margashirsha': 9, 'pausha': 10, 'magha': 11, 'phalguna': 12,
 };
 

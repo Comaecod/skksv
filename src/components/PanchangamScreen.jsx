@@ -60,7 +60,8 @@ const weekdayToIndex = {
 // Map common masa names to indices
 const masaNameToIndex = {
   'chaitra': '1', 'vaisakha': '2', 'vaishakha': '2', 'jyeshtha': '3',
-  'ashadha': '4', 'shravana': '5', 'bhadrapada': '6', 'ashvina': '7',
+  'ashadha': '4', 'aashaadha': '4',
+  'shravana': '5', 'bhadrapada': '6', 'ashvina': '7', 'aashvina': '7',
   'kartika': '8', 'margashirsha': '9', 'pausha': '10', 'magha': '11',
   'phalguna': '12',
 };
