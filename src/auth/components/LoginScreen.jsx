@@ -76,9 +76,12 @@ export default function LoginScreen() {
             <p className="text-gray-500 dark:text-gray-400 mb-2">
               A sign-in link has been sent to <strong>{email}</strong>
             </p>
-            <p className="text-gray-400 dark:text-gray-500 text-sm mb-6">
+            <p className="text-gray-400 dark:text-gray-500 text-sm mb-2">
               Click the link in the email to sign in instantly. No password needed.
             </p>
+            <div className="mb-6 p-3 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 text-sm text-amber-700 dark:text-amber-400">
+              📬 Didn't see it? Check your <strong>Spam</strong> or <strong>Promotions</strong> folder and mark it as "Not Spam" so future emails land in your inbox.
+            </div>
             <button
               onClick={() => setLinkSent(false)}
               className="text-sm text-primary dark:text-primary-light hover:underline"

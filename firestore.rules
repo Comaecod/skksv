@@ -143,8 +143,8 @@ service cloud.firestore {
     }
 
     match /analytics/{docId} {
-      allow read: if isAuthenticated();
-      allow write: if isAuthenticated();
+      allow read: if true;
+      allow write: if true;
     }
 
     // Default deny
