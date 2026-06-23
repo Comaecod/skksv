@@ -20,10 +20,8 @@ const ExecutiveMembersScreen = lazy(() => import('./components/ExecutiveMembersS
 const AssessmentsScreen = lazy(() => import('./components/AssessmentsScreen'));
 const GalleryScreen = lazy(() => import('./components/GalleryScreen'));
 const HolidayHomeworkScreen = lazy(() => import('./components/HolidayHomeworkScreen'));
-const AboutShankaracharya = lazy(() => import('./components/AboutShankaracharya'));
 const AboutSchool = lazy(() => import('./components/AboutSchool'));
 const AcademicCalendar = lazy(() => import('./components/AcademicCalendar'));
-const PanchangamScreen = lazy(() => import('./components/PanchangamScreen'));
 const ContactScreen = lazy(() => import('./components/ContactScreen'));
 const FeedbackScreen = lazy(() => import('./components/FeedbackScreen'));
 const FeedbackReportsScreen = lazy(() => import('./components/FeedbackReportsScreen'));
@@ -90,8 +88,6 @@ function App() {
           <Route path="/people/executive" element={withLayout(ExecutiveMembersScreen)} />
           <Route path="/gallery" element={withLayout(GalleryScreen)} />
           <Route path="/contact" element={withLayout(ContactScreen)} />
-          <Route path="/panchangam" element={withLayout(PanchangamScreen)} />
-          <Route path="/about-shankaracharya" element={withLayout(AboutShankaracharya)} />
           <Route path="/about-school" element={withLayout(AboutSchool)} />
           <Route path="/academic-calendar" element={withLayout(AcademicCalendar)} />
           <Route path="/feedback" element={withLayout(FeedbackScreen)} />

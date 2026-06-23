@@ -12,8 +12,6 @@ const PUBLIC_NAV_ITEMS = [
     label: 'Learn',
     icon: '📖',
     children: [
-      { to: '/panchangam', icon: '📅', label: 'Panchangam' },
-      { to: '/about-shankaracharya', icon: '🕉️', label: 'About Shankaracharya' },
       { to: '/about-school', icon: '🏫', label: 'About Our School' },
       { to: '/academic-calendar', icon: '📅', label: 'Academic Calendar' },
     ]

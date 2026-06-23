@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { SCHOOL_CONFIG } from '../config/schoolConfig';
 import { getImagesByCategory } from '../services/imageService';
 import ImageModal from './ImageModal';
-import PanchangamMarquee from './PanchangamMarquee';
 
 const StatItem = ({ icon, value, label }) => (
     <div className="flex items-center gap-2 bg-black/5 dark:bg-white/5 rounded-lg px-3 py-2">
@@ -166,7 +165,6 @@ const HomeScreen = () => {
 
   return (
     <div className="w-full min-h-screen">
-      <PanchangamMarquee />
       <div className="max-w-7xl mx-auto px-4 py-8">
         {isAuthenticated && !loading && (
           <div className="mb-6 p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20">
