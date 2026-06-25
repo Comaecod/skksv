@@ -24,13 +24,13 @@ const CLASS_OPTIONS = [
 const RESIDENCE_OPTIONS = [
   { value: '1', label: 'Day Scholar' },
   { value: '2', label: 'Veda Hostel' },
-  { value: '3', label: 'Brahmin Hostel' },
+  { value: '3', label: 'General Hostel' },
 ];
 
 const RESIDENCE_LABELS = {
   '1': 'Day Scholar',
   '2': 'Veda Hostel',
-  '3': 'Brahmin Hostel',
+  '3': 'General Hostel',
 };
 
 const BLOOD_GROUP_OPTIONS = [
