@@ -111,6 +111,12 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // SKKSV images collection
+    match /skksv-images/{imageId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // Exam types collection
     match /examTypes/{typeId} {
       allow read: if isAuthenticated();

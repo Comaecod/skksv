@@ -19,10 +19,19 @@ const CLASS_OPTIONS = [
   { value: '10', label: 'Class 10' },
 ];
 
+// Residence enum: 1=Day Scholar, 2=Veda Hostel, 3=Brahmin Hostel
+// Stored as numeric string so labels can be changed later without migration.
 const RESIDENCE_OPTIONS = [
-  { value: 'day_scholar', label: 'Day Scholar' },
-  { value: 'hostel', label: 'Hostel' },
+  { value: '1', label: 'Day Scholar' },
+  { value: '2', label: 'Veda Hostel' },
+  { value: '3', label: 'Brahmin Hostel' },
 ];
+
+const RESIDENCE_LABELS = {
+  '1': 'Day Scholar',
+  '2': 'Veda Hostel',
+  '3': 'Brahmin Hostel',
+};
 
 const BLOOD_GROUP_OPTIONS = [
   { value: 'A+', label: 'A+' },
@@ -340,7 +349,7 @@ export default function StudentManagement() {
                   <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{s.email}</td>
                   <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{s.admissionNo || '—'}</td>
                   <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
-                    {s.dayScholarOrHostel === 'day_scholar' ? 'Day Scholar' : s.dayScholarOrHostel === 'hostel' ? 'Hostel' : '—'}
+                    {RESIDENCE_LABELS[s.dayScholarOrHostel] || '—'}
                   </td>
                   <td className="px-4 py-3">
                     <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${

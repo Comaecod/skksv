@@ -25,19 +25,13 @@ const createUserDocument = async (uid, userData) => {
 
   const userDoc = {
     id: uid,
+    ...userData,
     email: userData.email || '',
-    displayName: userData.displayName || '',
     role: userData.role || ROLES.STUDENT,
-    roleSubtype: userData.roleSubtype || null,
-    phone: userData.phone || '',
     status: userData.status || USER_STATUS.ACTIVE,
-    profileImage: userData.profileImage || '',
-    customFields: userData.customFields || {},
-    createdBy: userData.createdBy || null,
     createdAt: now,
     updatedAt: now,
     lastLoginAt: null,
-    forcePasswordChange: userData.forcePasswordChange ?? false,
   };
 
   await setDoc(userRef, userDoc);

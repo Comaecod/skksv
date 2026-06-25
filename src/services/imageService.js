@@ -1,7 +1,7 @@
 import { db } from '../firebase';
 import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, where, limit, startAfter, serverTimestamp } from 'firebase/firestore';
 
-const COLLECTION = 'images';
+const COLLECTION = 'skksv-images';
 
 export const addImage = async ({ url, publicId, title, description, categories, subCategory }) => {
   const cats = categories?.length ? categories : ['uncategorized'];
