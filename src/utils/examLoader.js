@@ -22,10 +22,10 @@ export const getExamTypes = async () => {
       const data = d.data();
       if (data.examType) types.add(data.examType);
     });
-    return [...types, 'Timed Assessment'].filter(Boolean);
+    return [...types].filter(Boolean);
   } catch (error) {
     console.error('Error fetching exam types:', error.message);
-    return ['Timed Assessment'];
+    return [];
   }
 };
 
@@ -33,7 +33,7 @@ export const getExamTypesForClass = async (classNum) => {
   try {
     const q = query(
       collection(db, 'examConfigs'),
-      where('classNum', '==', classNum)
+      where('classNum', '==', String(classNum))
     );
     const snapshot = await getDocs(q);
     const types = new Set();
@@ -41,7 +41,7 @@ export const getExamTypesForClass = async (classNum) => {
       const data = d.data();
       if (data.examType) types.add(data.examType);
     });
-    return [...types, 'Timed Assessment'];
+    return [...types];
   } catch (error) {
     console.error('Error fetching exam types for class:', error.message);
     return [];
@@ -72,7 +72,7 @@ export const getSubjectsForClass = async (examType, classNum) => {
     const q = query(
       collection(db, 'examConfigs'),
       where('examType', '==', examType),
-      where('classNum', '==', classNum)
+      where('classNum', '==', String(classNum))
     );
     const snapshot = await getDocs(q);
     const subjects = [];
@@ -87,6 +87,33 @@ export const getSubjectsForClass = async (examType, classNum) => {
   }
 };
 
+const mapExamData = (exam) => ({
+  examType: exam.examType,
+  className: exam.classNum,
+  examTitle: exam.title,
+  classNum: exam.classNum,
+  subject: exam.subject,
+  teacher: exam.teacher || '',
+  invigilator: exam.invigilator || '',
+  preassessmentsecretkey: exam.preassessmentsecretkey || '',
+  secretKey: exam.secretKey || '',
+  teacherSecretKey: exam.teacherSecretKey || '',
+  schoolName: 'Sri Kanchi Kamakoti Sankara Vidyalaya',
+  sections: exam.sections || [],
+  totalQuestions: exam.totalQuestions,
+  totalMarks: exam.totalMarks,
+  marksPerQuestion: (exam.sections || []).map(s => ({ range: s.range, marks: s.marks })),
+  wrongAnswerPenaltyFraction: exam.wrongAnswerPenaltyFraction ?? 0,
+  timeLimitMinutes: exam.timeLimitMinutes || 0,
+  questions: exam.questions || [],
+  isEnabled: exam.enabled !== false,
+  assessmentFormat: exam.assessmentFormat || 'mcq',
+  isHolidayHomework: exam.examType === 'Holiday Homework',
+  holidayType: exam.holidayType || '',
+  content: exam.content || null,
+  coding: exam.coding || null
+});
+
 export const getExamConfig = async (examType, classNum, subject) => {
   const key = `${examType}_${classNum}_${subject}`;
 
@@ -94,40 +121,20 @@ export const getExamConfig = async (examType, classNum, subject) => {
     const docRef = doc(db, 'examConfigs', key);
     const docSnap = await getDoc(docRef);
 
-    if (!docSnap.exists()) {
-      return null;
+    if (docSnap.exists()) {
+      return mapExamData(docSnap.data());
     }
 
-    const exam = docSnap.data();
+    const q = query(
+      collection(db, 'examConfigs'),
+      where('examType', '==', examType),
+      where('classNum', '==', String(classNum)),
+      where('subject', '==', subject)
+    );
+    const snapshot = await getDocs(q);
+    if (snapshot.empty) return null;
 
-    const config = {
-      examType: exam.examType,
-      className: exam.classNum,
-      examTitle: exam.title,
-      classNum: exam.classNum,
-      subject: exam.subject,
-      teacher: exam.teacher || '',
-      invigilator: exam.invigilator || '',
-      preassessmentsecretkey: exam.preassessmentsecretkey || '',
-      secretKey: exam.secretKey || '',
-      teacherSecretKey: exam.teacherSecretKey || '',
-      schoolName: 'Sri Kanchi Kamakoti Sankara Vidyalaya',
-      sections: exam.sections || [],
-      totalQuestions: exam.totalQuestions,
-      totalMarks: exam.totalMarks,
-      marksPerQuestion: (exam.sections || []).map(s => ({ range: s.range, marks: s.marks })),
-      wrongAnswerPenaltyFraction: exam.wrongAnswerPenaltyFraction ?? 0,
-      timeLimitMinutes: exam.timeLimitMinutes || 0,
-      questions: exam.questions || [],
-      isEnabled: exam.enabled !== false,
-      assessmentFormat: exam.assessmentFormat || 'mcq',
-      isHolidayHomework: exam.examType === 'Holiday Homework',
-      holidayType: exam.holidayType || '',
-      content: exam.content || null,
-      coding: exam.coding || null
-    };
-
-    return config;
+    return mapExamData(snapshot.docs[0].data());
   } catch (error) {
     console.error('Error fetching exam config:', error.message);
     return null;

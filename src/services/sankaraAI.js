@@ -219,7 +219,7 @@ const INTENTS = [
         { keywords: ['gallery', 'photo', 'image', 'picture'], path: '/gallery', name: 'Gallery' },
         { keywords: ['contact', 'address', 'reach', 'location', 'map'], path: '/contact', name: 'Contact' },
         { keywords: ['feedback', 'suggestion'], path: '/feedback', name: 'Feedback' },
-        { keywords: ['timed', 'time'], path: '/timed-assessments', name: 'Timed Assessments' },
+        { keywords: ['timed', 'time'], path: '/assessments', name: 'Timed Assessments' },
       ];
 
       for (const page of pageMap) {
@@ -422,7 +422,7 @@ The app has these sections:
 - Gallery (/gallery) - View school photos and event images
 - Contact (/contact) - School address, phone, email, Google Maps link
 - Feedback (/feedback) - Submit suggestions, issues, or appreciation
-- Timed Assessments (/timed-assessments) - Time-bound exams (MCQ or project)
+- Timed Assessments (/assessments) - Time-bound exams (MCQ or project)
 - Reports (/reports) - View result reports (teacher/staff only)
 
 Keep responses under 150 words. Be warm but professional. Use simple language suitable for students and parents. When asked about the Kanchi Mutt or pontiffs, answer with reverence and accuracy.

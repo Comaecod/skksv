@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { formatName } from '../utils/format';
 import { getPerformanceMessage, getGradeInfo } from '../utils/scoring';
 import { SCHOOL_CONFIG } from '../config/schoolConfig';
+import { validateAnswerReveal } from '../utils/auth';
 
 const CertificateCard = ({ studentInfo, assessment, results }) => {
   const date = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' });
-  const teacherName = assessment?.teacher || SCHOOL_CONFIG.computerTeacher?.name || 'Venkata Vishnu';
+  const teacherName = assessment?.teacher || 'Assessment Creator';
   const gradeInfo = getGradeInfo(results.percentage);
   const subject = assessment?.subject || 'General';
   const title = assessment?.title || 'Assessment';
@@ -48,9 +49,9 @@ const CertificateCard = ({ studentInfo, assessment, results }) => {
           </h2>
         </div>
 
-        <p className="text-center text-slate-400 text-sm mb-6">
-          Class {assessment?.classNum || 'N/A'} • Roll No: {studentInfo?.rollNumber || '-'}
-        </p>
+          <p className="text-center text-slate-400 text-sm mb-6">
+            Class {assessment?.classNum || 'N/A'}
+          </p>
 
         <p className="text-center text-slate-400 text-sm mb-3">has successfully completed</p>
 
@@ -94,8 +95,32 @@ const CertificateCard = ({ studentInfo, assessment, results }) => {
 };
 
 const TimedAssessmentResultScreen = ({ questions, answers, studentInfo, assessment, results, timeTaken, projectResult, onRestart }) => {
-  const isMcq = assessment?.assessmentType === 'mcq' && results;
+  const isMcq = assessment?.assessmentFormat === 'mcq' && results;
   const [showCertificate, setShowCertificate] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [secretKey, setSecretKey] = useState('');
+  const [keyError, setKeyError] = useState(false);
+  const keyInputRef = useRef(null);
+
+  const hasSecretKey = assessment?.secretKey?.length > 0;
+
+  const handleKeySubmit = (e) => {
+    e.preventDefault();
+    if (validateAnswerReveal(secretKey, assessment)) {
+      setIsUnlocked(true);
+      setKeyError(false);
+    } else {
+      setKeyError(true);
+      if (keyInputRef.current) {
+        keyInputRef.current.focus();
+      }
+    }
+  };
+
+  const handleKeyChange = (e) => {
+    setSecretKey(e.target.value);
+    if (keyError) setKeyError(false);
+  };
 
   const formatTime = (seconds) => {
     if (!seconds && seconds !== 0) return '-';
@@ -180,58 +205,87 @@ const TimedAssessmentResultScreen = ({ questions, answers, studentInfo, assessme
           </div>
         </div>
 
-        {/* Question Analysis - always visible, no key required */}
-        <div className="mb-4 sm:mb-6">
-          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-4">📊 Question Analysis</h3>
-          <div className="overflow-x-auto rounded-xl bg-gray-100 dark:bg-black/20">
-            <table className="w-full min-w-[500px]">
-              <thead>
-                <tr className="border-b border-gray-200 dark:border-white/10">
-                  <th className="px-3 sm:px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300 w-12">#</th>
-                  <th className="px-3 sm:px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">Question</th>
-                  <th className="px-3 sm:px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300 w-32">Correct</th>
-                  <th className="px-3 sm:px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300 w-32">Your Answer</th>
-                  <th className="px-3 sm:px-4 py-3 text-center text-sm font-semibold text-gray-600 dark:text-gray-300 w-12">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {questions.map((question, index) => {
-                  const result = results.questionResults[index];
-                  const correctIdx = Array.isArray(question.isCorrect) ? question.isCorrect : [question.isCorrect];
-                  const correctText = correctIdx.map(i => question.options[i]?.text).filter(Boolean).join(', ') || '-';
-
-                  const studentIdx = answers[question.id];
-                  let studentText = '-';
-                  let statusIcon = '⏭️';
-                  let statusLabel = 'Skipped';
-                  let statusClass = 'text-yellow-400';
-
-                  if (studentIdx !== undefined) {
-                    const idx = Array.isArray(studentIdx) ? studentIdx : [studentIdx];
-                    if (idx.length > 0) {
-                      studentText = idx.map(i => question.options[i]?.text).filter(Boolean).join(', ') || '-';
-                      statusClass = result.isCorrect ? 'text-green-400' : 'text-red-400';
-                      statusIcon = result.isCorrect ? '✅' : '❌';
-                      statusLabel = result.isCorrect ? 'Correct' : 'Wrong';
-                    }
-                  }
-
-                  const truncated = question.text.length > 40 ? question.text.substring(0, 40) + '...' : question.text;
-
-                  return (
-                    <tr key={question.id} className="border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5">
-                      <td className="px-3 sm:px-4 py-3 text-sm">Q{question.questionNumber}</td>
-                      <td className="px-3 sm:px-4 py-3 text-sm" title={question.text}>{truncated}</td>
-                      <td className="px-3 sm:px-4 py-3 text-sm text-green-400">{correctText}</td>
-                      <td className={`px-3 sm:px-4 py-3 text-sm ${statusClass}`}>{studentText}</td>
-                      <td className="px-3 sm:px-4 py-3 text-center" aria-label={statusLabel}>{statusIcon}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+        {/* Question Analysis - key-locked */}
+        {hasSecretKey && !isUnlocked ? (
+          <div className="text-center py-6 sm:py-8">
+            <div className="text-4xl sm:text-5xl mb-4">🔒</div>
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-2">Answers Hidden</h3>
+            <p className="text-gray-500 dark:text-gray-400 mb-6">Enter the secret key to view question analysis</p>
+            <form onSubmit={handleKeySubmit} className="max-w-sm mx-auto space-y-4">
+              <div>
+                <label htmlFor="secret-key" className="sr-only">Secret Key</label>
+                <input
+                  ref={keyInputRef}
+                  id="secret-key"
+                  type="password"
+                  className={`w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 outline-none ${keyError ? 'border-red-500' : 'border-gray-200 dark:border-white/10 focus:border-primary/50'}`}
+                  placeholder="Enter secret key"
+                  value={secretKey}
+                  onChange={handleKeyChange}
+                  autoFocus
+                />
+              </div>
+              {keyError && (
+                <p className="text-red-400 text-sm">⚠️ Incorrect secret key</p>
+              )}
+              <button type="submit" className="w-full px-6 py-3 rounded-xl font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90">
+                Unlock Answers 🔓
+              </button>
+            </form>
           </div>
-        </div>
+        ) : (
+          <div className="mb-4 sm:mb-6">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-4">📊 Question Analysis</h3>
+            <div className="overflow-x-auto rounded-xl bg-gray-100 dark:bg-black/20">
+              <table className="w-full min-w-[500px]">
+                <thead>
+                  <tr className="border-b border-gray-200 dark:border-white/10">
+                    <th className="px-3 sm:px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300 w-12">#</th>
+                    <th className="px-3 sm:px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">Question</th>
+                    <th className="px-3 sm:px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300 w-32">Correct</th>
+                    <th className="px-3 sm:px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300 w-32">Your Answer</th>
+                    <th className="px-3 sm:px-4 py-3 text-center text-sm font-semibold text-gray-600 dark:text-gray-300 w-12">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {questions.map((question, index) => {
+                    const result = results.questionResults[index];
+                    const correctIdx = Array.isArray(question.isCorrect) ? question.isCorrect : [question.isCorrect];
+                    const correctText = correctIdx.map(i => question.options[i]?.text).filter(Boolean).join(', ') || '-';
+
+                    const studentIdx = answers[question.id];
+                    let studentText = '-';
+                    let statusIcon = '⏭️';
+                    let statusLabel = 'Skipped';
+                    let statusClass = 'text-yellow-400';
+
+                    if (studentIdx !== undefined) {
+                      const idx = Array.isArray(studentIdx) ? studentIdx : [studentIdx];
+                      if (idx.length > 0) {
+                        studentText = idx.map(i => question.options[i]?.text).filter(Boolean).join(', ') || '-';
+                        statusClass = result.isCorrect ? 'text-green-400' : 'text-red-400';
+                        statusIcon = result.isCorrect ? '✅' : '❌';
+                        statusLabel = result.isCorrect ? 'Correct' : 'Wrong';
+                      }
+                    }
+
+                    const truncated = question.text.length > 40 ? question.text.substring(0, 40) + '...' : question.text;
+
+                    return (
+                      <tr key={question.id} className="border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5">
+                        <td className="px-3 sm:px-4 py-3 text-sm">Q{question.questionNumber}</td>
+                        <td className="px-3 sm:px-4 py-3 text-sm" title={question.text}>{truncated}</td>
+                        <td className="px-3 sm:px-4 py-3 text-sm text-green-400">{correctText}</td>
+                        <td className={`px-3 sm:px-4 py-3 text-sm ${statusClass}`}>{studentText}</td>
+                        <td className="px-3 sm:px-4 py-3 text-center" aria-label={statusLabel}>{statusIcon}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
 
         {/* Certificate toggle */}
         <div className="mb-4 sm:mb-6">

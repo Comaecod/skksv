@@ -4,23 +4,30 @@ import { useAuth } from '../auth/contexts/AuthContext';
 import { useLayout } from '../context/LayoutContext';
 import { useSankara } from '../context/SankaraContext';
 import { getExamTypes, getExamTypesForClass, getSubjectsForClass, getExamConfig } from '../utils/examLoader';
-import { getClassesWithActive } from '../services/timedAssessmentService';
+import { getClassesWithActive, getAssessmentsForClassSubject, getAssessmentById, submitMcqAttempt, submitProject, toDate, getStudentSubmission } from '../services/timedAssessmentService';
 import { getQuizQuestions } from '../utils/shuffle';
-import { checkExistingQuizResult, checkExistingCodingSubmission } from '../services/firebaseService';
+import { calculateTotalScore } from '../utils/scoring';
+import { checkExistingSubmission } from '../services/firebaseService';
 import ExamTypeScreen from './ExamTypeScreen';
 import SubjectSelectionScreen from './SubjectSelectionScreen';
 import IntroScreen from './IntroScreen';
 import PreAssessmentScreen from './PreAssessmentScreen';
-
 import QuizScreen from './QuizScreen';
 import CodingScreen from './CodingScreen';
 import ResultScreen from './ResultScreen';
+import HolidayHomeworkContent from './HolidayHomeworkContent';
 import EmptyState from './EmptyState';
+import TimedAssessmentCardsScreen from './TimedAssessmentCardsScreen';
+
+import TimedMcqScreen from './TimedMcqScreen';
+import TimedProjectScreen from './TimedProjectScreen';
+import TimedAssessmentResultScreen from './TimedAssessmentResultScreen';
+import ReportsScreen from './ReportsScreen';
 
 const AssessmentsScreen = () => {
   const navigate = useNavigate();
   const { userProfile: authUser } = useAuth();
-  
+
   const [examConfig, setExamConfig] = useState(null);
   const [studentInfo, setStudentInfo] = useState(null);
   const [quizQuestions, setQuizQuestions] = useState([]);
@@ -30,12 +37,20 @@ const AssessmentsScreen = () => {
   const [subjectsLoading, setSubjectsLoading] = useState(false);
   const [configLoading, setConfigLoading] = useState(false);
   const [loading, setLoading] = useState(true);
-  
+
   const [selectedExamType, setSelectedExamType] = useState(null);
   const [classNum, setClassNum] = useState(null);
   const [subject, setSubject] = useState(null);
   const [screen, setScreen] = useState('exam-type');
   const [alreadyTaken, setAlreadyTaken] = useState(false);
+
+  // Timed assessment state
+  const [timedAssessments, setTimedAssessments] = useState([]);
+  const [timedAssessmentsLoading, setTimedAssessmentsLoading] = useState(false);
+  const [selectedTimedAssessment, setSelectedTimedAssessment] = useState(null);
+  const [timedResults, setTimedResults] = useState(null);
+  const [timedTimeTaken, setTimedTimeTaken] = useState(0);
+  const [timedProjectResult, setTimedProjectResult] = useState(null);
 
   useEffect(() => {
     const loadExamTypes = async () => {
@@ -76,6 +91,10 @@ const AssessmentsScreen = () => {
   }, [classNum, selectedExamType]);
 
   useEffect(() => {
+    if (selectedExamType === 'Timed Assessment') {
+      setExamConfig(null);
+      return;
+    }
     const loadConfig = async () => {
       if (!subject) {
         setExamConfig(null);
@@ -94,23 +113,41 @@ const AssessmentsScreen = () => {
     loadConfig();
   }, [subject, classNum, selectedExamType]);
 
-  const { setHideHeader, setHideFooter } = useLayout();
-  const { setSankaraVisible, setNotificationVisible } = useSankara();
-
   useEffect(() => {
-    const hide = ['preassessment', 'student', 'quiz', 'coding', 'result'].includes(screen);
-    setHideHeader(hide);
-    setHideFooter(hide);
-    setSankaraVisible(!hide);
-    setNotificationVisible(!hide);
-    return () => { setHideHeader(false); setHideFooter(false); setSankaraVisible(true); setNotificationVisible(true); };
-  }, [screen, setHideHeader, setHideFooter, setSankaraVisible, setNotificationVisible]);
-
-  const handleSelectExamType = (type) => {
-    if (type === 'Timed Assessment') {
-      navigate('/timed-assessments');
+    if (selectedExamType !== 'Timed Assessment' || !subject) {
+      setTimedAssessments([]);
       return;
     }
+    const loadTimed = async () => {
+      setTimedAssessmentsLoading(true);
+      const asms = await getAssessmentsForClassSubject(classNum, subject);
+      setTimedAssessments(asms);
+      setTimedAssessmentsLoading(false);
+    };
+    loadTimed();
+  }, [subject, classNum, selectedExamType]);
+
+  const { setHideHeader, setHideFooter, setHideSidebar } = useLayout();
+  const { setSankaraVisible, setNotificationVisible } = useSankara();
+
+  const HIDE_SCREENS = ['preassessment', 'quiz', 'coding', 'result', 'timed-mcq', 'timed-project', 'timed-result', 'timed-preassessment'];
+
+  useEffect(() => {
+    const hide = HIDE_SCREENS.includes(screen);
+    setHideHeader(hide);
+    setHideFooter(hide);
+    setHideSidebar(hide);
+    setSankaraVisible(!hide);
+    setNotificationVisible(!hide);
+    if (hide && !document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else if (!hide && document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {});
+    }
+    return () => { setHideHeader(false); setHideFooter(false); setHideSidebar(false); setSankaraVisible(true); setNotificationVisible(true); };
+  }, [screen, setHideHeader, setHideFooter, setHideSidebar, setSankaraVisible, setNotificationVisible]);
+
+  const handleSelectExamType = (type) => {
     setSelectedExamType(type);
     setSubject(null);
     setClassNum(authUser?.studentClass || 1);
@@ -119,7 +156,88 @@ const AssessmentsScreen = () => {
 
   const handleSelectSubject = (subj) => {
     setSubject(subj);
-    setScreen('intro');
+    if (selectedExamType === 'Timed Assessment') {
+      setScreen('timed-assessments');
+    } else {
+      setScreen('intro');
+    }
+  };
+
+  const handleSelectTimedAssessment = async (id) => {
+    const asm = timedAssessments.find(a => a.id === id);
+    if (!asm) return;
+    setSelectedTimedAssessment(asm);
+    const info = buildStudentInfo();
+    setStudentInfo(info);
+    const existing = await getStudentSubmission(id, info.userId);
+    if (existing) {
+      setQuizQuestions(existing.answers ? asm.questions || [] : []);
+      setAnswers(existing.answers || {});
+      setTimedResults(existing.results || null);
+      setTimedTimeTaken(existing.timeTaken || 0);
+      setScreen('timed-result');
+      return;
+    }
+    setQuizQuestions([]);
+    setAnswers({});
+    setTimedResults(null);
+    setTimedTimeTaken(0);
+    if (asm.preassessmentsecretkey?.length > 0) {
+      setScreen('timed-preassessment');
+    } else if (asm.assessmentFormat === 'mcq') {
+      const prepared = getQuizQuestions(asm.questions || [], asm.sections || []);
+      setQuizQuestions(prepared);
+      setScreen('timed-mcq');
+    } else {
+      setScreen('timed-project');
+    }
+  };
+
+  const handleTimedEntrySubmit = async (info) => {
+    setStudentInfo(info);
+    if (!selectedTimedAssessment) return;
+    const asm = selectedTimedAssessment;
+    if (asm.preassessmentsecretkey?.length > 0) {
+      setScreen('timed-preassessment');
+    } else if (asm.assessmentFormat === 'mcq') {
+      const prepared = getQuizQuestions(asm.questions || [], asm.sections || []);
+      setQuizQuestions(prepared);
+      setAnswers({});
+      setScreen('timed-mcq');
+    } else {
+      setScreen('timed-project');
+    }
+  };
+
+  const handleTimedPreAssessmentSuccess = () => {
+    const asm = selectedTimedAssessment;
+    if (!asm) return;
+    if (asm.assessmentFormat === 'mcq') {
+      const prepared = getQuizQuestions(asm.questions || [], asm.sections || []);
+      setQuizQuestions(prepared);
+      setAnswers({});
+      setScreen('timed-mcq');
+    } else {
+      setScreen('timed-project');
+    }
+  };
+
+  const handleTimedMcqComplete = async (finalAnswers, taken) => {
+    setAnswers(finalAnswers);
+    setTimedTimeTaken(taken);
+    const scraped = calculateTotalScore(quizQuestions, finalAnswers, selectedTimedAssessment?.wrongAnswerPenaltyFraction || 0);
+    setTimedResults(scraped);
+    try {
+      await submitMcqAttempt(selectedTimedAssessment.id, studentInfo, finalAnswers, scraped, taken);
+    } catch (err) {
+      console.error('Failed to save result:', err);
+    }
+    setScreen('timed-result');
+  };
+
+  const handleTimedProjectComplete = async (projectData, file, onProgress) => {
+    const result = await submitProject(selectedTimedAssessment.id, studentInfo, projectData, file, onProgress);
+    setTimedProjectResult(result);
   };
 
   const buildStudentInfo = () => {
@@ -149,10 +267,7 @@ const AssessmentsScreen = () => {
   const handlePreAssessmentSuccess = async () => {
     const info = buildStudentInfo();
     const examKey = `${examConfig.examType}_${examConfig.classNum}_${examConfig.subject}`;
-    const checkFn = examConfig?.assessmentFormat === 'coding'
-      ? checkExistingCodingSubmission
-      : checkExistingQuizResult;
-    const exists = await checkFn(info.userId, examKey);
+    const exists = await checkExistingSubmission(info.userId, examKey);
     if (exists) {
       setAlreadyTaken(true);
       return;
@@ -174,8 +289,11 @@ const AssessmentsScreen = () => {
     }
     if (screen === 'intro') { setScreen('subject'); return; }
     if (screen === 'preassessment') { setScreen('intro'); return; }
+    if (screen === 'timed-preassessment') { setScreen('timed-assessments'); return; }
     if (screen === 'quiz') { setScreen('preassessment'); return; }
     if (screen === 'coding') { setScreen('preassessment'); return; }
+    if (screen === 'timed-assessments') { setScreen('subject'); return; }
+    if (screen === 'timed-mcq' || screen === 'timed-project' || screen === 'timed-reports') { setScreen('timed-assessments'); return; }
     navigate('/');
   }, [screen, navigate]);
 
@@ -184,8 +302,15 @@ const AssessmentsScreen = () => {
     setSelectedExamType(null);
     setClassNum(null);
     setSubject(null);
+    setSelectedTimedAssessment(null);
+    setTimedResults(null);
+    setTimedProjectResult(null);
     setScreen('exam-type');
   }, []);
+
+  const handleTimedRestart = useCallback(() => {
+    handleBackToHome();
+  }, [handleBackToHome]);
 
   const handleOpenReports = useCallback(() => {
     if (authUser?.role && authUser.role !== 'student') {
@@ -194,6 +319,7 @@ const AssessmentsScreen = () => {
       navigate('/reports', { state: { config: examConfig } });
     }
   }, [navigate, examConfig, authUser]);
+
 
   if (loading && !examTypes.length) {
     return (
@@ -206,7 +332,7 @@ const AssessmentsScreen = () => {
     );
   }
 
-  if (!loading && screen === 'exam-type' && examTypes.every(t => t === 'Holiday Homework' || t === 'Timed Assessment')) {
+  if (!loading && screen === 'exam-type' && examTypes.length === 0) {
     return (
       <div className="w-full flex items-center justify-center px-4 py-8">
         <div className="glass-card p-8 text-center w-full max-w-md animate-slideUp">
@@ -236,10 +362,10 @@ const AssessmentsScreen = () => {
     case 'exam-type':
       return (
         <div className="w-full flex items-center justify-center px-4 py-8">
-          <ExamTypeScreen 
-            examTypes={examTypes} 
-            onSelect={handleSelectExamType} 
-            onBack={handleBackToHome} 
+          <ExamTypeScreen
+            examTypes={examTypes}
+            onSelect={handleSelectExamType}
+            onBack={handleBackToHome}
           />
         </div>
       );
@@ -247,13 +373,13 @@ const AssessmentsScreen = () => {
     case 'subject':
       return (
         <div className="w-full flex items-center justify-center px-4 py-8">
-          <SubjectSelectionScreen 
-            examType={selectedExamType} 
-            classNum={classNum} 
-            subjects={subjects} 
-            isLoading={subjectsLoading} 
-            onSelect={handleSelectSubject} 
-            onBack={goBack} 
+          <SubjectSelectionScreen
+            examType={selectedExamType}
+            classNum={classNum}
+            subjects={subjects}
+            isLoading={subjectsLoading}
+            onSelect={handleSelectSubject}
+            onBack={goBack}
           />
         </div>
       );
@@ -267,15 +393,17 @@ const AssessmentsScreen = () => {
           </div>
         </div>
       ) : examConfig ? (
-        <div className="w-full flex items-center justify-center px-4 py-8">
-          <IntroScreen 
-            config={examConfig} 
-            onStart={() => setScreen('preassessment')} 
+        examConfig.isHolidayHomework ? (
+          <HolidayHomeworkContent config={examConfig} onBack={goBack} />
+        ) : (
+          <IntroScreen
+            config={examConfig}
+            onStart={() => setScreen('preassessment')}
             onReports={handleOpenReports}
             onBack={goBack}
             userRole={authUser?.role}
           />
-        </div>
+        )
       ) : (
         <div className="w-full flex items-center justify-center px-4 py-8">
           <EmptyState />
@@ -285,10 +413,25 @@ const AssessmentsScreen = () => {
     case 'preassessment':
       return examConfig ? (
         <div className="w-full flex items-center justify-center px-4 py-8">
-          <PreAssessmentScreen 
-            config={examConfig} 
+          <PreAssessmentScreen
+            config={examConfig}
             onSuccess={handlePreAssessmentSuccess}
-            onBack={goBack} 
+            onBack={goBack}
+          />
+        </div>
+      ) : (
+        <div className="w-full flex items-center justify-center px-4 py-8">
+          <EmptyState />
+        </div>
+      );
+
+    case 'timed-preassessment':
+      return selectedTimedAssessment ? (
+        <div className="w-full flex items-center justify-center px-4 py-8">
+          <PreAssessmentScreen
+            config={selectedTimedAssessment}
+            onSuccess={handleTimedPreAssessmentSuccess}
+            onBack={goBack}
           />
         </div>
       ) : (
@@ -300,12 +443,12 @@ const AssessmentsScreen = () => {
     case 'quiz':
       return (
         <div className="">
-          <QuizScreen 
-            questions={quizQuestions} 
-            studentInfo={studentInfo} 
-            timeLimitMinutes={examConfig?.timeLimitMinutes || 0} 
-            wrongAnswerPenaltyFraction={examConfig?.wrongAnswerPenaltyFraction || 0} 
-            onQuizComplete={handleQuizComplete} 
+          <QuizScreen
+            questions={quizQuestions}
+            studentInfo={studentInfo}
+            timeLimitMinutes={examConfig?.timeLimitMinutes || 0}
+            wrongAnswerPenaltyFraction={examConfig?.wrongAnswerPenaltyFraction || 0}
+            onQuizComplete={handleQuizComplete}
           />
         </div>
       );
@@ -322,12 +465,77 @@ const AssessmentsScreen = () => {
     case 'result':
       return (
         <div className="w-full flex items-center justify-center px-4 py-8">
-          <ResultScreen 
-            questions={quizQuestions} 
-            answers={answers} 
-            studentInfo={studentInfo} 
-            config={examConfig} 
-            onRestart={() => navigate('/')} 
+          <ResultScreen
+            questions={quizQuestions}
+            answers={answers}
+            studentInfo={studentInfo}
+            config={examConfig}
+            onRestart={() => navigate('/')}
+          />
+        </div>
+      );
+
+    // Timed Assessment screens
+    case 'timed-assessments':
+      return (
+        <div className="w-full flex items-center justify-center px-4 py-8">
+          <TimedAssessmentCardsScreen
+            classNum={classNum}
+            subject={subject}
+            assessments={timedAssessments}
+            isLoading={timedAssessmentsLoading}
+            onSelect={handleSelectTimedAssessment}
+            onBack={goBack}
+          />
+        </div>
+      );
+
+    case 'timed-mcq':
+      return (
+        <div className="">
+          <TimedMcqScreen
+            questions={quizQuestions}
+            studentInfo={studentInfo}
+            assessment={selectedTimedAssessment}
+            onComplete={handleTimedMcqComplete}
+          />
+        </div>
+      );
+
+    case 'timed-project':
+      return (
+        <div className="w-full flex items-center justify-center px-4 py-8">
+          <TimedProjectScreen
+            assessment={selectedTimedAssessment}
+            onComplete={handleTimedProjectComplete}
+            onBack={goBack}
+          />
+        </div>
+      );
+
+    case 'timed-result':
+      return (
+        <div className="w-full flex items-center justify-center px-4 py-8">
+          <TimedAssessmentResultScreen
+            questions={quizQuestions}
+            answers={answers}
+            studentInfo={studentInfo}
+            assessment={selectedTimedAssessment}
+            results={timedResults}
+            timeTaken={timedTimeTaken}
+            projectResult={timedProjectResult}
+            onRestart={handleTimedRestart}
+          />
+        </div>
+      );
+
+    case 'timed-reports':
+      return (
+        <div className="w-full flex items-center justify-center px-4 py-8">
+          <ReportsScreen
+            assessmentId={selectedTimedAssessment?.id}
+            assessment={selectedTimedAssessment}
+            onBack={goBack}
           />
         </div>
       );
@@ -335,10 +543,10 @@ const AssessmentsScreen = () => {
     default:
       return (
         <div className="w-full flex items-center justify-center px-4 py-8">
-          <ExamTypeScreen 
-            examTypes={examTypes} 
-            onSelect={handleSelectExamType} 
-            onBack={handleBackToHome} 
+          <ExamTypeScreen
+            examTypes={examTypes}
+            onSelect={handleSelectExamType}
+            onBack={handleBackToHome}
           />
         </div>
       );

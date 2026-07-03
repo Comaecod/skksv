@@ -73,22 +73,22 @@ export const getPageViewCount = async () => {
 export const saveQuizResult = async (studentInfo, config, results) => {
   try {
     const examKey = `${config.examType}_${config.classNum}_${config.subject}`;
-    const docRef = await addDoc(collection(db, 'quizResults'), {
-      timestamp: serverTimestamp(),
+    const docRef = await addDoc(collection(db, 'submissions'), {
+      type: 'mcq',
       examKey,
-      userId: studentInfo.userId || null,
-      
-      studentInfo: {
-        firstName: studentInfo.firstName,
-        lastName: studentInfo.lastName,
-        rollNumber: Number(studentInfo.rollNumber) || studentInfo.rollNumber
-      },
-      
-      className: config.className,
+      assessmentId: config.id || '',
+      examType: config.examType,
+      assessmentFormat: config.assessmentFormat || 'mcq',
+      classNum: String(config.classNum),
       subject: config.subject,
-      examTitle: config.examTitle,
+      title: config.examTitle || config.title,
       teacher: config.teacher || '',
-      invigilator: config.invigilator || '',
+      
+      student: {
+        userId: studentInfo.userId || null,
+        name: `${studentInfo.firstName || ''} ${studentInfo.lastName || ''}`.trim(),
+        rollNumber: String(studentInfo.rollNumber || '')
+      },
       
       results: {
         totalMarks: results.totalMarks,
@@ -100,10 +100,11 @@ export const saveQuizResult = async (studentInfo, config, results) => {
         skippedCount: results.skippedCount
       },
       
-      timeLimit: config.timeLimitMinutes,
+      timeTaken: results.timeTaken || 0,
+      timeLimit: config.timeLimitMinutes || 0,
+      submittedAt: serverTimestamp(),
     });
     
-    console.log('Result saved:', docRef.id);
     return docRef.id;
   } catch (error) {
     console.error('Error saving result:', error);
@@ -111,22 +112,7 @@ export const saveQuizResult = async (studentInfo, config, results) => {
   }
 };
 
-export const checkExistingQuizResult = async (userId, examKey) => {
-  if (!userId || !examKey) return false;
-  try {
-    const q = query(
-      collection(db, 'quizResults'),
-      where('examKey', '==', examKey),
-      where('userId', '==', userId)
-    );
-    const snapshot = await getDocs(q);
-    return snapshot.docs.length > 0;
-  } catch {
-    return false;
-  }
-};
-
-export const checkExistingCodingSubmission = async (userId, examKey) => {
+export const checkExistingSubmission = async (userId, examKey) => {
   if (!userId || !examKey) return false;
   try {
     const q = query(

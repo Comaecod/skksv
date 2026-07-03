@@ -121,7 +121,6 @@ export default function AdminResults() {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [typeFilter, setTypeFilter] = useState('all');
   const [classFilter, setClassFilter] = useState('all');
   const [subjectFilter, setSubjectFilter] = useState('all');
   const [examTypeFilter, setExamTypeFilter] = useState('all');
@@ -135,47 +134,25 @@ export default function AdminResults() {
         const { db } = await import('../../firebase');
         const { collection, getDocs, query, orderBy } = await import('firebase/firestore');
 
-        const [quizSnap, codingSnap, timedSnap] = await Promise.allSettled([
-          getDocs(query(collection(db, 'quizResults'), orderBy('timestamp', 'desc'))),
-          getDocs(query(collection(db, 'submissions'), orderBy('submittedAt', 'desc'))),
-          getDocs(query(collection(db, 'timedSubmissions'), orderBy('submittedAt', 'desc'))),
-        ]);
+        const snap = await getDocs(query(collection(db, 'submissions'), orderBy('submittedAt', 'desc')));
 
         const out = [];
 
-        if (quizSnap.status === 'fulfilled') {
-          quizSnap.value.docs.forEach(doc => {
-            const d = doc.data();
-            out.push({
-              id: doc.id,
-              type: 'quiz',
-              _raw: d,
-              studentName: `${d.studentInfo?.firstName || ''} ${d.studentInfo?.lastName || ''}`.trim() || 'N/A',
-              rollNumber: String(d.studentInfo?.rollNumber || ''),
-              className: d.className || '',
-              subject: d.subject || '',
-              examTitle: d.examTitle || 'Untitled',
-              examType: d.examType || '',
-              score: d.results?.correctCount || 0,
-              total: (d.results?.correctCount || 0) + (d.results?.wrongCount || 0) + (d.results?.skippedCount || 0),
-              percentage: parseFloat(d.results?.percentage) || 0,
-              grade: d.results?.grade || '-',
-              timestamp: d.timestamp?.toDate?.() || new Date(0),
-            });
-          });
-        }
+        snap.docs.forEach(doc => {
+          const d = doc.data();
+          const student = d.student || d.studentInfo || {};
+          const studentName = student.name || `${student.firstName || ''} ${student.lastName || ''}`.trim() || 'N/A';
+          const rollNumber = String(student.rollNumber || '');
+          const type = d.type || 'mcq';
 
-        if (codingSnap.status === 'fulfilled') {
-          codingSnap.value.docs.forEach(doc => {
-            const d = doc.data();
-            if (d.type !== 'coding') return;
+          if (type === 'coding') {
             out.push({
               id: doc.id,
               type: 'coding',
               _raw: d,
-              studentName: d.student?.name || `${d.studentInfo?.firstName || ''} ${d.studentInfo?.lastName || ''}`.trim() || d.student?.userId || 'Unknown',
-              rollNumber: String(d.student?.rollNumber || ''),
-              className: d.examKey?.split('_')[1] || '',
+              studentName,
+              rollNumber,
+              className: d.classNum || d.examKey?.split('_')[1] || '',
               subject: d.subject || '',
               examTitle: d.title || 'Coding Assessment',
               examType: d.examType || '',
@@ -185,30 +162,26 @@ export default function AdminResults() {
               grade: '-',
               timestamp: d.submittedAt?.toDate?.() || new Date(0),
             });
-          });
-        }
-
-        if (timedSnap.status === 'fulfilled') {
-          timedSnap.value.docs.forEach(doc => {
-            const d = doc.data();
+          } else {
+            const results = d.results || {};
             out.push({
               id: doc.id,
-              type: 'timed',
+              type,
               _raw: d,
-              studentName: `${d.studentInfo?.firstName || ''} ${d.studentInfo?.lastName || ''}`.trim() || 'N/A',
-              rollNumber: String(d.studentInfo?.rollNumber || ''),
+              studentName,
+              rollNumber,
               className: d.classNum || '',
               subject: d.subject || '',
-              examTitle: d.title || 'Timed Assessment',
-              examType: d.assessmentType === 'project' ? 'Project' : 'Timed MCQ',
-              score: d.results?.score || d.results?.correctCount || 0,
-              total: d.results?.total || (d.results?.correctCount || 0) + (d.results?.wrongCount || 0) || 0,
-              percentage: parseFloat(d.results?.percentage) || 0,
-              grade: d.results?.grade || '-',
+              examTitle: d.title || 'Untitled',
+              examType: d.examType || '',
+              score: results.correctCount || results.score || 0,
+              total: (results.correctCount || 0) + (results.wrongCount || 0) + (results.skippedCount || 0) || results.total || 0,
+              percentage: parseFloat(results.percentage) || 0,
+              grade: results.grade || '-',
               timestamp: d.submittedAt?.toDate?.() || new Date(0),
             });
-          });
-        }
+          }
+        });
 
         setResults(out);
       } catch (err) {
@@ -267,7 +240,6 @@ export default function AdminResults() {
 
   const filtered = useMemo(() => {
     let data = results.filter(r => {
-      if (typeFilter !== 'all' && r.type !== typeFilter) return false;
       if (classFilter !== 'all' && r.className !== classFilter) return false;
       if (subjectFilter !== 'all' && r.subject !== subjectFilter) return false;
       if (examTypeFilter !== 'all' && r.examType !== examTypeFilter) return false;
@@ -300,7 +272,7 @@ export default function AdminResults() {
     });
 
     return data;
-  }, [results, search, typeFilter, classFilter, subjectFilter, examTypeFilter, sortKey, sortDir]);
+  }, [results, search, classFilter, subjectFilter, examTypeFilter, sortKey, sortDir]);
 
   if (loading) {
     return (
@@ -326,13 +298,6 @@ export default function AdminResults() {
             />
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           </div>
-          <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)}
-            className="px-3 py-2.5 rounded-xl bg-[#282843] border border-white/10 text-white text-sm focus:outline-none focus:border-primary/50">
-            <option value="all">All Types</option>
-            <option value="quiz">Quiz</option>
-            <option value="coding">Coding</option>
-            <option value="timed">Timed</option>
-          </select>
           <select value={classFilter} onChange={e => setClassFilter(e.target.value)}
             className="px-3 py-2.5 rounded-xl bg-[#282843] border border-white/10 text-white text-sm focus:outline-none focus:border-primary/50">
             <option value="all">All Classes</option>

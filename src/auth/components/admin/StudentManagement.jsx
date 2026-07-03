@@ -5,11 +5,6 @@ import { ROLES, USER_STATUS } from '../../types/roles';
 import CustomSelect from '../../../components/CustomSelect';
 
 const CLASS_OPTIONS = [
-  { value: 'LKG', label: 'LKG' },
-  { value: 'UKG', label: 'UKG' },
-  { value: '1', label: 'Class 1' },
-  { value: '2', label: 'Class 2' },
-  { value: '3', label: 'Class 3' },
   { value: '4', label: 'Class 4' },
   { value: '5', label: 'Class 5' },
   { value: '6', label: 'Class 6' },

@@ -72,7 +72,7 @@ const AssessmentTypeBadge = ({ type }) => {
   );
 };
 
-const TimedAssessmentCardsScreen = ({ classNum, subject, assessments, isLoading, onSelect, onReports, onBack }) => {
+const TimedAssessmentCardsScreen = ({ classNum, subject, assessments, isLoading, onSelect, onBack }) => {
   return (
     <div className="glass-card w-full max-w-2xl animate-slideUp">
       <div className="text-center mb-8">
@@ -107,9 +107,9 @@ const TimedAssessmentCardsScreen = ({ classNum, subject, assessments, isLoading,
               </div>
 
               <div className="flex items-center gap-3 flex-wrap mb-4">
-                <AssessmentTypeBadge type={asm.assessmentType} />
+                <AssessmentTypeBadge type={asm.assessmentFormat} />
                 <CountdownTimer endDateTime={asm.endDateTime} />
-                {asm.assessmentType === 'mcq' && asm.totalQuestions && (
+                {asm.assessmentFormat === 'mcq' && asm.totalQuestions && (
                   <span className="text-xs text-gray-500 dark:text-gray-400">{asm.totalQuestions} questions</span>
                 )}
               </div>
@@ -119,17 +119,9 @@ const TimedAssessmentCardsScreen = ({ classNum, subject, assessments, isLoading,
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => onSelect(asm.id)}
-                  className="flex-1 px-4 py-2.5 rounded-xl font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-xl font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 transition-all text-sm"
                 >
                   Start Assessment →
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => onReports(asm.id)}
-                  className="px-4 py-2.5 rounded-xl font-medium bg-black/5 dark:bg-white/10 border border-gray-300 dark:border-white/20 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20 transition-all text-sm"
-                >
-                  📊 Reports
                 </motion.button>
               </div>
             </div>

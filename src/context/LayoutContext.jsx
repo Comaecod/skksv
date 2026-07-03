@@ -1,13 +1,14 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState } from 'react';
 
 const LayoutContext = createContext(null);
 
 export function LayoutProvider({ children }) {
   const [hideHeader, setHideHeader] = useState(false);
   const [hideFooter, setHideFooter] = useState(false);
+  const [hideSidebar, setHideSidebar] = useState(false);
 
   return (
-    <LayoutContext.Provider value={{ hideHeader, setHideHeader, hideFooter, setHideFooter }}>
+    <LayoutContext.Provider value={{ hideHeader, setHideHeader, hideFooter, setHideFooter, hideSidebar, setHideSidebar }}>
       {children}
     </LayoutContext.Provider>
   );

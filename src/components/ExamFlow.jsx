@@ -15,7 +15,7 @@ import QuizScreen from './QuizScreen';
 import ResultScreen from './ResultScreen';
 import ReportsScreen from './ReportsScreen';
 import EmptyState from './EmptyState';
-import HolidayHomeworkScreen from './HolidayHomeworkScreen';
+import HolidayHomeworkContent from './HolidayHomeworkContent';
 
 export const useExamFlow = () => {
   const navigate = useNavigate();
@@ -320,7 +320,7 @@ export const useExamFlow = () => {
 
       case 'content':
         return examConfig && examConfig.isHolidayHomework ? (
-          <HolidayHomeworkScreen config={examConfig} onBack={goBack} />
+          <HolidayHomeworkContent config={examConfig} onBack={goBack} />
         ) : <EmptyState />;
 
       default:

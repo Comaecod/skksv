@@ -117,6 +117,26 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Notifications collection
+    match /notifications/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isAdmin();
+      allow update, delete: if isAdmin();
+    }
+
+    // Timed assessments collection
+    match /timedAssessments/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || isStaff();
+    }
+
+    // Timed submissions collection
+    match /timedSubmissions/{docId} {
+      allow read: if isAdmin() || isStaff();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAdmin();
+    }
+
     // Exam types collection
     match /examTypes/{typeId} {
       allow read: if isAuthenticated();

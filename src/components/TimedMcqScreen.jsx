@@ -5,8 +5,13 @@ const TimedMcqScreen = ({ questions, studentInfo, assessment, onComplete }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [visitedQuestions, setVisitedQuestions] = useState(new Set([0]));
+  const [endTime, setEndTime] = useState(null);
   const startTime = useRef(Date.now());
   const mainRef = useRef(null);
+
+  useEffect(() => {
+    setEndTime(getEndTime());
+  }, []);
 
   const currentQuestion = questions[currentIndex];
   const totalQuestions = questions.length;
@@ -35,9 +40,15 @@ const TimedMcqScreen = ({ questions, studentInfo, assessment, onComplete }) => {
   }, [currentIndex, totalQuestions]);
 
   const getEndTime = () => {
-    if (!assessment?.endDateTime) return null;
-    if (typeof assessment.endDateTime?.toDate === 'function') return assessment.endDateTime.toDate();
-    return new Date(assessment.endDateTime);
+    if (!assessment?.timeLimitMinutes) return null;
+    const deadline = new Date(startTime.current + assessment.timeLimitMinutes * 60 * 1000);
+    if (assessment?.endDateTime) {
+      const absEnd = typeof assessment.endDateTime?.toDate === 'function'
+        ? assessment.endDateTime.toDate()
+        : new Date(assessment.endDateTime);
+      if (absEnd < deadline) return absEnd;
+    }
+    return deadline;
   };
 
   const handleTimeUp = useCallback(() => {
@@ -75,8 +86,6 @@ const TimedMcqScreen = ({ questions, studentInfo, assessment, onComplete }) => {
   }).length;
   const skippedCount = visitedQuestions.size - answeredCount;
   const remainingCount = totalQuestions - visitedQuestions.size;
-
-  const endTime = getEndTime();
 
   return (
     <div
@@ -127,9 +136,8 @@ const TimedMcqScreen = ({ questions, studentInfo, assessment, onComplete }) => {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             <div>
               <div className="text-base font-semibold text-gray-900 dark:text-white">{studentInfo.firstName} {studentInfo.lastName}</div>
-              <div className="text-gray-500 dark:text-gray-400 text-sm">Roll: {studentInfo.rollNumber}</div>
             </div>
-            {/* {endTime && <TimerDisplay endTime={endTime} />} */}
+            {endTime && <TimerDisplay endTime={endTime} />}
           </div>
         </div>
 

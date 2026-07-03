@@ -210,7 +210,6 @@ const QuizScreen = ({
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             <div>
               <div className="text-base font-semibold text-gray-900 dark:text-white">{studentInfo.firstName} {studentInfo.lastName}</div>
-              <div className="text-gray-500 dark:text-gray-400 text-sm">Roll: {studentInfo.rollNumber}</div>
             </div>
             <Timer minutes={timeLimitMinutes} onTimeUp={handleTimeUp} />
           </div>

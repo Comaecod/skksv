@@ -19,7 +19,7 @@ const StaffDirectoryScreen = lazy(() => import('./components/StaffDirectoryScree
 const ExecutiveMembersScreen = lazy(() => import('./components/ExecutiveMembersScreen'));
 const AssessmentsScreen = lazy(() => import('./components/AssessmentsScreen'));
 const GalleryScreen = lazy(() => import('./components/GalleryScreen'));
-const HolidayHomeworkScreen = lazy(() => import('./components/HolidayHomeworkScreen'));
+
 const AboutSchool = lazy(() => import('./components/AboutSchool'));
 const AcademicCalendar = lazy(() => import('./components/AcademicCalendar'));
 const ContactScreen = lazy(() => import('./components/ContactScreen'));
@@ -28,7 +28,7 @@ const FeedbackReportsScreen = lazy(() => import('./components/FeedbackReportsScr
 const ReportsScreen = lazy(() => import('./components/ReportsScreen'));
 const StudentResults = lazy(() => import('./components/StudentResults'));
 const MakeNotification = lazy(() => import('./components/MakeNotification'));
-const TimedAssessmentScreen = lazy(() => import('./components/TimedAssessmentScreen'));
+
 const MakeAssessment = lazy(() => import('./components/MakeAssessment'));
 const ShowAssessments = lazy(() => import('./components/ShowAssessments'));
 const AdminImages = lazy(() => import('./components/admin/AdminImages'));
@@ -144,15 +144,6 @@ function App() {
               </DashboardLayout>
             </ProtectedRoute>
           } />
-          <Route path="/holiday-homework" element={
-            <ProtectedRoute>
-              <DashboardLayout>
-                <Suspense fallback={<AuthFallback />}>
-                  <HolidayHomeworkScreen />
-                </Suspense>
-              </DashboardLayout>
-            </ProtectedRoute>
-          } />
           <Route path="/reports" element={
             <ProtectedRoute>
               <DashboardLayout>
@@ -162,16 +153,6 @@ function App() {
               </DashboardLayout>
             </ProtectedRoute>
           } />
-          <Route path="/timed-assessments" element={
-            <ProtectedRoute>
-              <DashboardLayout>
-                <Suspense fallback={<AuthFallback />}>
-                  <TimedAssessmentScreen />
-                </Suspense>
-              </DashboardLayout>
-            </ProtectedRoute>
-          } />
-
           {/* Dashboard Panel Routes */}
           <Route path="/dashboard" element={
             <ProtectedRoute>

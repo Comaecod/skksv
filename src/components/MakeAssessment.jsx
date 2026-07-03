@@ -1,8 +1,10 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../auth/contexts/AuthContext';
 import { isMasterKey } from '../utils/auth';
-import { createAssessment as createTimedAssessment } from '../services/timedAssessmentService';
+import { createAssessment } from '../services/timedAssessmentService';
 import CustomSelect from './CustomSelect';
+import ScrollableArea from './ui/ScrollableArea';
 
 const ASSESSMENT_TYPES = [
   'Slip Test',
@@ -71,9 +73,7 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
   const [formMode, setFormMode] = useState('form');
 
   const CLASS_OPTIONS = [
-    { value: 'LKG', label: 'LKG' }, { value: 'UKG', label: 'UKG' },
-    { value: '1', label: 'Class 1' }, { value: '2', label: 'Class 2' },
-    { value: '3', label: 'Class 3' }, { value: '4', label: 'Class 4' },
+    { value: '4', label: 'Class 4' },
     { value: '5', label: 'Class 5' }, { value: '6', label: 'Class 6' },
     { value: '7', label: 'Class 7' }, { value: '8', label: 'Class 8' },
     { value: '9', label: 'Class 9' }, { value: '10', label: 'Class 10' },
@@ -82,8 +82,9 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
   const [assessmentType, setAssessmentType] = useState('Timed Assessment');
   const [title, setTitle] = useState('');
   const [subject, setSubject] = useState('Computers');
-  const [classNum, setClassNum] = useState('');
-  const [teacher, setTeacher] = useState('Venkata Vishnu');
+  const [classNum, setClassNum] = useState('4');
+  const { userProfile } = useAuth();
+  const [teacher, setTeacher] = useState(userProfile?.displayName || 'Unknown');
   const [invigilator, setInvigilator] = useState('');
   const [description, setDescription] = useState('');
   const [enabled, setEnabled] = useState(true);
@@ -92,11 +93,9 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
   const [endDateTime, setEndDateTime] = useState('');
   const [timeLimitMinutes, setTimeLimitMinutes] = useState(30);
   const [totalQuestions, setTotalQuestions] = useState(10);
-  const [totalMarks, setTotalMarks] = useState(10);
   const [wrongAnswerPenaltyFraction, setWrongAnswerPenaltyFraction] = useState(0);
   const [preassessmentSecretKey, setPreassessmentSecretKey] = useState('');
   const [secretKey, setSecretKey] = useState('');
-  const [teacherSecretKey, setTeacherSecretKey] = useState('');
 
   const [assessmentFormat, setAssessmentFormat] = useState('mcq');
   const [allowFileUpload, setAllowFileUpload] = useState(true);
@@ -116,7 +115,7 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
   const [sectionsJson, setSectionsJson] = useState('[]');
   const [jsonContent, setJsonContent] = useState('');
 
-  const [showJsonPreview, setShowJsonPreview] = useState(false);
+  const [showJsonPreview, setShowJsonPreview] = useState(true);
 
   const isTimed = assessmentType === 'Timed Assessment';
   const isHoliday = assessmentType === 'Holiday Homework';
@@ -140,41 +139,31 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
       if (assessmentType === 'Timed Assessment') {
         const mod = await import('../data/Exams/Timed Assessments/Class 4/Computers/timed-assessment-sample.json');
         sample = mod.default;
-        setTitle(sample.title || '');
-        setSubject(sample.subject || 'Computers');
-        setClassNum(sample.classNum || '4');
-        setTeacher(sample.teacher || '');
-        setDescription(sample.description || '');
-        setStartDateTime(formatDateForInput(sample.startDateTime));
-        setEndDateTime(formatDateForInput(sample.endDateTime));
-        setTimeLimitMinutes(sample.timeLimitMinutes || 30);
-        setTotalQuestions(sample.totalQuestions || 10);
-        setTotalMarks(sample.totalMarks || 10);
-        setWrongAnswerPenaltyFraction(sample.wrongAnswerPenaltyFraction ?? 0);
-        setAssessmentFormat(sample.assessmentFormat || 'mcq');
-        setQuestionsJson(JSON.stringify(sample.questions || [], null, 2));
-        setSectionsJson(JSON.stringify(sample.sections || [], null, 2));
-      } else if (subject === 'Computers' && !isTimed && !isHoliday) {
+      } else if (!isHoliday) {
         const mod = await import('../data/Exams/Coding/add-two-numbers.json');
         sample = mod.default;
-        setTitle(sample.title || '');
-        setSubject(sample.subject || 'Computers');
-        setClassNum(sample.classNum || '8');
-        setTeacher(sample.teacher || '');
-        setTimeLimitMinutes(sample.timeLimitMinutes || 15);
-        setTotalQuestions(sample.totalQuestions || 3);
-        setTotalMarks(sample.totalMarks || 3);
-        setWrongAnswerPenaltyFraction(sample.wrongAnswerPenaltyFraction ?? 0);
-        setAssessmentFormat(sample.assessmentFormat || 'coding');
-        setProblemStatement(sample.coding?.problemStatement || '');
-        setCodingExamples(sample.coding?.examples || '');
-        setStarterCode(sample.coding?.starterCode || '');
-        setFunctionName(sample.coding?.functionName || 'solution');
-        setTestCasesJson(JSON.stringify(sample.coding?.testCases || [], null, 2));
       } else {
         setStatus(`Sample for "${assessmentType}" - paste your JSON or use form fields`);
         return;
       }
+      setTitle(sample.title || '');
+      setSubject(sample.subject || 'Computers');
+      setClassNum(sample.classNum || '4');
+      setTeacher(sample.teacher || '');
+      setDescription(sample.description || '');
+      setStartDateTime(formatDateForInput(sample.startDateTime));
+      setEndDateTime(formatDateForInput(sample.endDateTime));
+      setTimeLimitMinutes(sample.timeLimitMinutes || 30);
+      setTotalQuestions(sample.totalQuestions || 10);
+      setWrongAnswerPenaltyFraction(sample.wrongAnswerPenaltyFraction ?? 0);
+      setAssessmentFormat(sample.assessmentFormat || 'mcq');
+      setQuestionsJson(JSON.stringify(sample.questions || [], null, 2));
+      setSectionsJson(JSON.stringify(sample.sections || [], null, 2));
+      setProblemStatement(sample.coding?.problemStatement || '');
+      setCodingExamples(sample.coding?.examples || '');
+      setStarterCode(sample.coding?.starterCode || '');
+      setFunctionName(sample.coding?.functionName || 'solution');
+      setTestCasesJson(JSON.stringify(sample.coding?.testCases || [], null, 2));
       setJsonContent(JSON.stringify(sample, null, 2));
       setStatus(`Sample loaded for ${assessmentType}`);
     } catch (err) {
@@ -191,7 +180,7 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
   };
 
   const buildPayload = () => {
-    const base = {
+    return {
       examType: assessmentType,
       subject,
       classNum,
@@ -200,86 +189,33 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
       invigilator: invigilator || teacher,
       enabled,
       totalQuestions: Number(totalQuestions),
-      totalMarks: Number(totalMarks),
+      totalMarks: (() => { const qs = tryParseJson(questionsJson, []); return qs.reduce((sum, q) => sum + (Number(q.marks) || 1), 0); })(),
       wrongAnswerPenaltyFraction: Number(wrongAnswerPenaltyFraction),
       assessmentFormat,
-    };
-
-    if (isTimed) {
-      return {
-        ...base,
-        startDateTime: startDateTime ? new Date(startDateTime).toISOString() : '',
-        endDateTime: endDateTime ? new Date(endDateTime).toISOString() : '',
-        description,
-        timeLimitMinutes: Number(timeLimitMinutes),
-        preassessmentsecretkey: preassessmentSecretKey,
-        secretKey,
-        teacherSecretKey,
-        sections: tryParseJson(sectionsJson, []),
-        questions: tryParseJson(questionsJson, []),
-        ...(isProject ? {
-          allowFileUpload,
-          allowedFileTypes: allowedFileTypes.split(',').map(s => s.trim()).filter(Boolean),
-          maxFileSizeMB: Number(maxFileSizeMB),
-          projectTitle,
-          projectDescription,
-          studentInputs: { topic: true, description: true }
-        } : {}),
-        ...(isCoding ? {
-          coding: {
-            problemStatement,
-            examples: codingExamples,
-            starterCode,
-            functionName,
-            testCases: tryParseJson(testCasesJson, [])
-          }
-        } : {})
-      };
-    }
-
-    if (isHoliday) {
-      return {
-        ...base,
-        holidayType,
-        content: tryParseJson(jsonContent, {})
-      };
-    }
-
-    if (isCoding) {
-      return {
-        ...base,
-        timeLimitMinutes: Number(timeLimitMinutes),
-        preassessmentsecretkey: preassessmentSecretKey,
-        secretKey,
-        teacherSecretKey,
-        schoolName: 'Sri Kanchi Kamakoti Sankara Vidyalaya',
-        coding: {
-          problemStatement,
-          examples: codingExamples,
-          starterCode,
-          functionName,
-          testCases: tryParseJson(testCasesJson, [])
-        }
-      };
-    }
-
-    return {
-      ...base,
+      createdBy: userProfile?.id || null,
       timeLimitMinutes: Number(timeLimitMinutes),
+      description,
+      startDateTime: startDateTime ? new Date(startDateTime).toISOString() : '',
+      endDateTime: endDateTime ? new Date(endDateTime).toISOString() : '',
       preassessmentsecretkey: preassessmentSecretKey,
       secretKey,
-      teacherSecretKey,
+      holidayType,
       sections: tryParseJson(sectionsJson, []),
       questions: tryParseJson(questionsJson, []),
-      schoolName: 'Sri Kanchi Kamakoti Sankara Vidyalaya',
-      ...(isProject ? {
-        allowFileUpload,
-        allowedFileTypes: allowedFileTypes.split(',').map(s => s.trim()).filter(Boolean),
-        maxFileSizeMB: Number(maxFileSizeMB),
-        projectTitle,
-        projectDescription,
-        studentInputs: { topic: true, description: true }
-      } : {})
+      content: tryParseJson(jsonContent, {}),
+      allowFileUpload,
+      allowedFileTypes: allowedFileTypes.split(',').map(s => s.trim()).filter(Boolean),
+      maxFileSizeMB: Number(maxFileSizeMB),
+      projectTitle,
+      projectDescription,
+      studentInputs: { topic: true, description: true },
+      coding: isCoding ? {
+        problemStatement,
+        examples: codingExamples,
+        starterCode,
+        functionName,
+        testCases: tryParseJson(testCasesJson, [])
+      } : null,
     };
   };
 
@@ -291,49 +227,30 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
     if (!title.trim()) return 'Title is required';
     if (!subject.trim()) return 'Subject is required';
     if (!classNum) return 'Class is required';
+
     if (isTimed) {
       if (!startDateTime) return 'Start date/time is required for timed assessments';
       if (!endDateTime) return 'End date/time is required for timed assessments';
       if (new Date(endDateTime) <= new Date(startDateTime)) return 'End time must be after start time';
-      if (assessmentFormat === 'mcq') {
-        try {
-          const qs = JSON.parse(questionsJson);
-          if (!Array.isArray(qs) || qs.length === 0) return 'At least one question is required';
-        } catch {
-          return 'Invalid questions JSON format';
-        }
-      }
-      if (isCoding) {
-        if (!problemStatement.trim()) return 'Problem statement is required';
-        if (!functionName.trim()) return 'Function name is required';
-        try {
-          const tcs = JSON.parse(testCasesJson);
-          if (!Array.isArray(tcs) || tcs.length === 0) return 'At least one test case is required';
-        } catch {
-          return 'Invalid test cases JSON format';
-        }
-      }
     }
-    if (!isTimed && !isHoliday) {
-      if (isCoding) {
-        if (!problemStatement.trim()) return 'Problem statement is required';
-        if (!functionName.trim()) return 'Function name is required';
-        try {
-          const tcs = JSON.parse(testCasesJson);
-          if (!Array.isArray(tcs) || tcs.length === 0) return 'At least one test case is required';
-        } catch {
-          return 'Invalid test cases JSON format';
-        }
-      } else {
-        if (timeLimitMinutes < 0) return 'Time limit cannot be negative';
-        if (Number(totalQuestions) < 1) return 'At least 1 question required';
-        if (Number(totalMarks) < 1) return 'Total marks must be at least 1';
-        try {
-          const qs = JSON.parse(questionsJson);
-          if (!Array.isArray(qs) || qs.length === 0) return 'At least one question is required';
-        } catch {
-          return 'Invalid questions JSON format';
-        }
+
+    if (isCoding) {
+      if (!problemStatement.trim()) return 'Problem statement is required';
+      if (!functionName.trim()) return 'Function name is required';
+      try {
+        const tcs = JSON.parse(testCasesJson);
+        if (!Array.isArray(tcs) || tcs.length === 0) return 'At least one test case is required';
+      } catch {
+        return 'Invalid test cases JSON format';
+      }
+    } else if (!isHoliday) {
+      if (timeLimitMinutes < 0) return 'Time limit cannot be negative';
+      if (Number(totalQuestions) < 1) return 'At least 1 question required';
+      try {
+        const qs = JSON.parse(questionsJson);
+        if (!Array.isArray(qs) || qs.length === 0) return 'At least one question is required';
+      } catch {
+        return 'Invalid questions JSON format';
       }
     }
     return null;
@@ -351,11 +268,9 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
     setEndDateTime('');
     setTimeLimitMinutes(30);
     setTotalQuestions(10);
-    setTotalMarks(10);
     setWrongAnswerPenaltyFraction(0);
     setPreassessmentSecretKey('');
     setSecretKey('');
-    setTeacherSecretKey('');
     setAssessmentFormat('mcq');
     setAllowFileUpload(true);
     setAllowedFileTypes('pdf, docx, jpg, png');
@@ -381,20 +296,7 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
     setStatus('Creating assessment...');
     try {
       const payload = buildPayload();
-      let id;
-
-      if (isTimed) {
-        id = await createTimedAssessment(payload);
-      } else {
-        const { db } = await import('../firebase');
-        const { doc, setDoc } = await import('firebase/firestore');
-        const key = `${assessmentType}_${classNum}_${subject}`;
-        await setDoc(doc(db, 'examConfigs', key), {
-          ...payload,
-          createdAt: new Date().toISOString()
-        });
-        id = key;
-      }
+      const id = await createAssessment(payload);
 
       setDialog({ show: true, type: 'success', message: `"${title}" created successfully!`, id });
       clearForm();
@@ -488,7 +390,7 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Teacher</label>
-                  <input type="text" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 text-sm" value={teacher} onChange={e => setTeacher(e.target.value)} />
+                  <input type="text" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 text-sm cursor-not-allowed opacity-70" value={teacher} disabled />
                 </div>
                 {!isHoliday && (
                   <div>
@@ -542,10 +444,6 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
                     <input type="number" min="1" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white outline-none focus:border-primary/50 text-sm" value={totalQuestions} onChange={e => setTotalQuestions(Number(e.target.value))} />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Total Marks</label>
-                    <input type="number" min="1" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white outline-none focus:border-primary/50 text-sm" value={totalMarks} onChange={e => setTotalMarks(Number(e.target.value))} />
-                  </div>
-                  <div>
                     <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Negative Marking (%)</label>
                     <input type="number" min="0" max="100" step="25" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white outline-none focus:border-primary/50 text-sm" value={wrongAnswerPenaltyFraction * 100} onChange={e => setWrongAnswerPenaltyFraction(Number(e.target.value) / 100)} />
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{wrongAnswerPenaltyFraction * 100}% deducted for wrong answers</p>
@@ -568,11 +466,7 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
                     <input type="text" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 text-sm" placeholder="To view correct answers" value={secretKey} onChange={e => setSecretKey(e.target.value)} />
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">(Not required in Timed Assessments)</p>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Teacher Secret Key</label>
-                    <input type="text" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 text-sm" placeholder="For accessing reports" value={teacherSecretKey} onChange={e => setTeacherSecretKey(e.target.value)} />
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Required to view student reports</p>
-                  </div>
+
                 </div>
               </div>
             )}
@@ -624,7 +518,7 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
                     <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Examples</label>
                     <textarea className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 text-sm resize-none font-mono" rows={3} placeholder={`Input: a=2, b=3 → Output: 5\nInput: a=10, b=20 → Output: 30`} value={codingExamples} onChange={e => setCodingExamples(e.target.value)} />
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Function Name *</label>
                       <input type="text" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 font-mono text-sm" placeholder="e.g. add" value={functionName} onChange={e => setFunctionName(e.target.value)} />
@@ -632,10 +526,6 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
                     <div>
                       <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Total Test Cases</label>
                       <input type="number" min="1" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white outline-none focus:border-primary/50 text-sm" value={totalQuestions} onChange={e => setTotalQuestions(Number(e.target.value))} />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Total Marks</label>
-                      <input type="number" min="1" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white outline-none focus:border-primary/50 text-sm" value={totalMarks} onChange={e => setTotalMarks(Number(e.target.value))} />
                     </div>
                   </div>
                   <div>
@@ -660,11 +550,24 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
               <div className="p-5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10">
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-4">❓ Questions (JSON format)</h3>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">Each question needs: id, text, type (single/multiple), options array with text, isCorrect (index or array of indices)</p>
-                <textarea className="w-full h-48 px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 font-mono text-xs resize-none" value={questionsJson} onChange={e => setQuestionsJson(e.target.value)} />
+                <textarea className="w-full h-48 px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 font-mono text-xs resize-none scrollable-area-custom" value={questionsJson} onChange={e => setQuestionsJson(e.target.value)} />
                 <div className="mt-3">
                   <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Sections (optional JSON)</label>
                   <textarea className="w-full h-20 px-4 py-2 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 font-mono text-xs resize-none" value={sectionsJson} onChange={e => setSectionsJson(e.target.value)} />
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{'Format: [{"range": [1, 5], "count": 3, "marks": 1}]'}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Divide questions into sections. Each section picks random questions from a range of question IDs. Example: pick 3 random questions from Q1 to Q5, each worth 1 mark.</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 font-mono">{'Format: [{"range": [1, 5], "count": 3, "marks": 1}]'}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Add multiple objects for multiple sections. Leave empty to use all questions as one section.</p>
+                    <div className="mt-2">
+                      <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Calculated Total Marks</label>
+                      <input type="text" disabled className="w-24 px-3 py-1.5 rounded-lg bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white font-medium text-sm" value={(() => {
+                        const secs = tryParseJson(sectionsJson, []);
+                        if (secs.length > 0 && secs.every(s => s.range && s.count && s.marks != null)) {
+                          return secs.reduce((sum, s) => sum + Number(s.count) * Number(s.marks), 0);
+                        }
+                        const qs = tryParseJson(questionsJson, []);
+                        return qs.reduce((sum, q) => sum + (Number(q.marks) || 1), 0);
+                      })()} />
+                    </div>
                 </div>
               </div>
             )}
@@ -687,7 +590,9 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
 
             {showJsonPreview && (
               <div className="p-4 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10">
-                <pre className="text-xs text-gray-900 dark:text-white overflow-auto max-h-60 font-mono whitespace-pre-wrap">{JSON.stringify(buildPayload(), null, 2)}</pre>
+                <ScrollableArea className="max-h-60">
+                  <pre className="text-xs text-gray-900 dark:text-white font-mono whitespace-pre-wrap">{JSON.stringify(buildPayload(), null, 2)}</pre>
+                </ScrollableArea>
               </div>
             )}
           </div>

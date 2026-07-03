@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import ScrollableArea from './ui/ScrollableArea';
 
 const sizeClasses = {
   sm: 'px-3 py-1.5 text-xs',
@@ -33,23 +34,25 @@ const CustomSelect = ({ value, onChange, options, className = '', size = 'md', m
         </svg>
       </button>
       {open && (
-        <div className={`absolute z-[100] w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-800 shadow-lg max-h-60 overflow-y-auto ${
+        <div className={`absolute z-[100] w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-800 shadow-lg ${
           menuPosition === 'top' ? 'bottom-full mb-1' : 'mt-1'
         }`}>
-          {options.map(opt => (
-            <button
-              key={opt.value}
-              type="button"
-              onClick={() => { onChange(opt.value); setOpen(false); }}
-              className={`w-full px-4 py-2.5 text-left text-sm transition-colors ${
-                opt.value === value
-                  ? 'bg-primary/10 text-primary dark:text-primary'
-                  : 'text-gray-900 dark:text-white hover:bg-black/5 dark:hover:bg-white/5'
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
+          <ScrollableArea className="max-h-60">
+            {options.map(opt => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => { onChange(opt.value); setOpen(false); }}
+                className={`w-full px-4 py-2.5 text-left text-sm transition-colors ${
+                  opt.value === value
+                    ? 'bg-primary/10 text-primary dark:text-primary'
+                    : 'text-gray-900 dark:text-white hover:bg-black/5 dark:hover:bg-white/5'
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </ScrollableArea>
         </div>
       )}
     </div>

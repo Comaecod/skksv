@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/contexts/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
-import { LayoutProvider } from '../../context/LayoutContext';
+import { LayoutProvider, useLayout } from '../../context/LayoutContext';
 import ScrollableArea from '../ui/ScrollableArea';
 import { ROLES } from '../../auth/types/roles';
 
@@ -44,44 +44,11 @@ const ALL_NAV_ITEMS = {
   ],
 };
 
-const DashboardLayout = ({ children }) => {
-  const { isAuthenticated, userProfile, logout, loading: authLoading } = useAuth();
-  const [collapsed, setCollapsed] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { theme, toggleTheme } = useTheme();
-
-  const role = userProfile?.role;
-  const navItems = ALL_NAV_ITEMS[role] || ALL_NAV_ITEMS.student;
-
-  useEffect(() => {
-    if (authLoading) return;
-    if (!isAuthenticated) {
-      navigate('/login', { replace: true });
-    }
-  }, [isAuthenticated, authLoading, navigate]);
-
-  if (authLoading || !isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  const handleLogout = async () => {
-    await logout();
-    navigate('/');
-  };
-
-  const isActive = (path) => {
-    if (path === '/dashboard') return location.pathname === '/dashboard';
-    return location.pathname.startsWith(path);
-  };
-
+const DashboardLayoutInner = ({ children, collapsed, setCollapsed, mobileOpen, setMobileOpen, handleLogout, isActive, navItems }) => {
+  const { hideSidebar } = useLayout();
   const sidebarWidth = collapsed ? 'w-16' : 'w-64';
   const sidebarPadding = collapsed ? 'px-2' : 'px-3';
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
@@ -107,7 +74,7 @@ const DashboardLayout = ({ children }) => {
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed top-0 left-0 z-40 h-full ${sidebarWidth} bg-white/95 dark:bg-slate-900/95 border-r border-gray-200 dark:border-white/10 transform transition-all duration-200 ease-in-out flex flex-col ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
+      <aside className={`fixed top-0 left-0 z-40 h-full ${sidebarWidth} bg-white/95 dark:bg-slate-900/95 border-r border-gray-200 dark:border-white/10 transform transition-all duration-200 ease-in-out flex flex-col ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 ${hideSidebar ? 'lg:-translate-x-full lg:opacity-0 lg:pointer-events-none' : ''}`}>
         <div className={`flex items-center ${collapsed ? 'justify-center' : 'justify-between'} px-4 py-5 border-b border-gray-200 dark:border-white/10 shrink-0`}>
           {!collapsed && (
             <Link to="/dashboard" className="flex items-center gap-3" onClick={() => setMobileOpen(false)}>
@@ -179,14 +146,64 @@ const DashboardLayout = ({ children }) => {
       </aside>
 
       {/* Main content */}
-      <div className={`${collapsed ? 'lg:pl-16' : 'lg:pl-64'} pt-14 lg:pt-0 transition-all duration-200`}>
+      <div className={`${hideSidebar ? 'lg:pl-0' : (collapsed ? 'lg:pl-16' : 'lg:pl-64')} pt-14 lg:pt-0 transition-all duration-200`}>
         <main className="p-4 sm:p-6 lg:p-8">
-          <LayoutProvider>
-            {children}
-          </LayoutProvider>
+          {children}
         </main>
       </div>
     </div>
+  );
+};
+
+const DashboardLayout = ({ children }) => {
+  const { isAuthenticated, userProfile, logout, loading: authLoading } = useAuth();
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const role = userProfile?.role;
+  const navItems = ALL_NAV_ITEMS[role] || ALL_NAV_ITEMS.student;
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (!isAuthenticated) {
+      navigate('/login', { replace: true });
+    }
+  }, [isAuthenticated, authLoading, navigate]);
+
+  if (authLoading || !isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
+  };
+
+  const isActive = (path) => {
+    if (path === '/dashboard') return location.pathname === '/dashboard';
+    return location.pathname.startsWith(path);
+  };
+
+  return (
+    <LayoutProvider>
+      <DashboardLayoutInner
+        collapsed={collapsed}
+        setCollapsed={setCollapsed}
+        mobileOpen={mobileOpen}
+        setMobileOpen={setMobileOpen}
+        handleLogout={handleLogout}
+        isActive={isActive}
+        navItems={navItems}
+      >
+        {children}
+      </DashboardLayoutInner>
+    </LayoutProvider>
   );
 };
 

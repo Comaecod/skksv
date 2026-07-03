@@ -1,92 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../auth/contexts/AuthContext';
 
-function DetailModal({ result, onClose }) {
-  if (!result) return null;
-  const isCoding = result.type === 'coding';
-  const ts = result.timestamp?.toDate?.() || new Date();
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" onClick={onClose}>
-      <div className="bg-[#1e1e38] border border-white/10 rounded-2xl w-full max-w-3xl max-h-[85vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-        {/* Header */}
-        <div className="sticky top-0 bg-[#1e1e38] border-b border-white/10 p-5 flex items-center justify-between">
-          <div>
-            <h3 className="text-lg font-bold text-white">{result.examTitle || 'Untitled'}</h3>
-            <p className="text-sm text-gray-400">
-              {result.className && `Class ${result.className}`}{result.subject ? ` — ${result.subject}` : ''}
-              {result.examType ? ` — ${result.examType}` : ''}
-              {isCoding && ' — CODING'}
-            </p>
-          </div>
-          <button onClick={onClose} className="p-2 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-all text-xl leading-none">&times;</button>
-        </div>
-
-        <div className="p-5 space-y-5">
-          {/* Score summary */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="bg-[#282843] rounded-xl p-4 text-center">
-              <p className="text-2xl font-bold text-white">{result.results?.percentage?.toFixed(1) || '0'}%</p>
-              <p className="text-xs text-gray-400 mt-1">Percentage</p>
-            </div>
-            <div className="bg-[#282843] rounded-xl p-4 text-center">
-              <p className="text-2xl font-bold text-emerald-400">{result.results?.correctCount || 0}</p>
-              <p className="text-xs text-gray-400 mt-1">Correct</p>
-            </div>
-            <div className="bg-[#282843] rounded-xl p-4 text-center">
-              <p className="text-2xl font-bold text-red-400">{result.results?.wrongCount || 0}</p>
-              <p className="text-xs text-gray-400 mt-1">Wrong</p>
-            </div>
-            <div className="bg-[#282843] rounded-xl p-4 text-center">
-              <p className="text-2xl font-bold text-gray-400">{result.results?.skippedCount || 0}</p>
-              <p className="text-xs text-gray-400 mt-1">Skipped</p>
-            </div>
-          </div>
-
-          <div className="text-xs text-gray-500 text-center">
-            Submitted: {ts.toLocaleDateString()} {ts.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-            {result.results?.grade && <span> &middot; Grade: {result.results.grade}</span>}
-          </div>
-
-          {/* Coding detail */}
-          {isCoding && result._raw?.code && (
-            <>
-              <div>
-                <h4 className="text-sm font-semibold text-white mb-2">Code Submitted</h4>
-                <pre className="bg-[#0d0d1f] rounded-xl p-4 text-sm text-gray-300 overflow-x-auto font-mono whitespace-pre-wrap max-h-80 overflow-y-auto border border-white/5">{result._raw.code}</pre>
-              </div>
-              {result._raw.testResults?.length > 0 && (
-                <div>
-                  <h4 className="text-sm font-semibold text-white mb-2">Test Results ({result.results?.correctCount || 0}/{result._raw.testResults.length} passed)</h4>
-                  <div className="space-y-2">
-                    {result._raw.testResults.map((tr, i) => (
-                      <div key={i} className={`rounded-xl p-3 flex items-center gap-3 border ${tr.passed ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-red-500/10 border-red-500/20'}`}>
-                        <span className={`text-lg ${tr.passed ? 'text-emerald-400' : 'text-red-400'}`}>{tr.passed ? '✓' : '✗'}</span>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm text-white truncate">{tr.name || `Test Case ${i + 1}`}</p>
-                          {tr.input !== undefined && <p className="text-xs text-gray-400 truncate">Input: {String(tr.input).substring(0, 80)}</p>}
-                          {tr.expected !== undefined && <p className="text-xs text-gray-400 truncate">Expected: {String(tr.expected).substring(0, 80)}</p>}
-                          {tr.output !== undefined && <p className="text-xs text-gray-400 truncate">Output: {String(tr.output).substring(0, 80)}</p>}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
+const FILTER_KEYS = ['All', 'Timed Assessment', 'Unit Test', 'Mid Term', 'Final Exam', 'Weekly Test', 'Holiday Homework'];
+const SUBJECTS = ['All', 'Computers', 'English', 'Hindi', 'Maths', 'Science', 'Social', 'Telugu', 'GK', 'General'];
 
 export default function StudentResults() {
   const { userProfile: authUser } = useAuth();
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [examTypeFilter, setExamTypeFilter] = useState('All');
+  const [subjectFilter, setSubjectFilter] = useState('All');
   const [search, setSearch] = useState('');
-  const [selected, setSelected] = useState(null);
+  const [sortConfig, setSortConfig] = useState({ key: 'submittedAt', direction: 'desc' });
 
   const userId = authUser?.id || authUser?.uid;
 
@@ -95,58 +20,45 @@ export default function StudentResults() {
     const fetchResults = async () => {
       try {
         const { db } = await import('../firebase');
-        const { collection, getDocs, query, where, orderBy } = await import('firebase/firestore');
+        const { collection, getDocs, query, where } = await import('firebase/firestore');
+        const snapshot = await getDocs(query(
+          collection(db, 'submissions'),
+          where('student.userId', '==', userId)
+        ));
 
-        const quizQ = query(
-          collection(db, 'quizResults'),
-          where('userId', '==', userId),
-          orderBy('timestamp', 'desc')
-        );
-        const [quizSnap, codingSnap] = await Promise.all([
-          getDocs(quizQ),
-          getDocs(query(
-            collection(db, 'submissions'),
-            where('type', '==', 'coding'),
-            where('student.userId', '==', userId),
-            orderBy('submittedAt', 'desc')
-          ))
-        ]);
-
-        const quizData = quizSnap.docs.map(doc => ({
-          id: doc.id,
-          type: 'quiz',
-          ...doc.data()
-        }));
-        const codingData = codingSnap.docs.map(doc => {
+        const data = snapshot.docs.map(doc => {
           const d = doc.data();
-          const score = d.score || 0;
-          const total = d.total || 0;
+          const student = d.student || d.studentInfo || {};
+          const r = d.results || {};
           return {
             id: doc.id,
-            type: 'coding',
-            _raw: d,
-            userId: d.student?.userId,
-            examTitle: d.title || 'Coding Assessment',
-            className: d.examKey?.split('_')[1] || '',
-            subject: d.subject || '',
+            type: d.type || 'mcq',
             examType: d.examType || '',
-            timestamp: d.submittedAt,
-            results: {
-              percentage: total > 0 ? (score / total) * 100 : 0,
-              correctCount: score,
-              wrongCount: total - score,
-              skippedCount: 0,
-              grade: '',
-            },
+            subject: d.subject || '',
+            classNum: d.classNum || '',
+            title: d.title || 'Untitled',
+            teacher: d.teacher || '',
+            assessmentId: d.assessmentId || '',
+            name: student.name || `${student.firstName || ''} ${student.lastName || ''}`.trim() || '',
+            rollNumber: String(student.rollNumber || ''),
+            correct: r.correctCount || 0,
+            wrong: r.wrongCount || 0,
+            skipped: r.skippedCount || 0,
+            totalMarks: r.totalMarks || 0,
+            marks: r.totalEarned || 0,
+            percentage: parseFloat(r.percentage) || 0,
+            grade: r.grade || '-',
+            timeTaken: d.timeTaken || 0,
+            submittedAt: d.submittedAt,
           };
         });
 
-        const merged = [...quizData, ...codingData].sort((a, b) => {
-          const ta = a.timestamp?.toDate?.() || new Date(0);
-          const tb = b.timestamp?.toDate?.() || new Date(0);
+        data.sort((a, b) => {
+          const ta = a.submittedAt?.toDate?.() || new Date(0);
+          const tb = b.submittedAt?.toDate?.() || new Date(0);
           return tb - ta;
         });
-        setResults(merged);
+        setResults(data);
       } catch (err) {
         console.error('Error fetching results:', err);
       }
@@ -155,14 +67,51 @@ export default function StudentResults() {
     fetchResults();
   }, [userId]);
 
-  const filtered = results.filter(r => {
-    if (!search) return true;
-    const q = search.toLowerCase();
-    return (r.examTitle || '').toLowerCase().includes(q)
-      || (r.subject || '').toLowerCase().includes(q)
-      || (r.examType || '').toLowerCase().includes(q)
-      || (r.className || '').toLowerCase().includes(q);
-  });
+  const filtered = useMemo(() => {
+    let items = [...results];
+    if (examTypeFilter !== 'All') items = items.filter(r => r.examType === examTypeFilter);
+    if (subjectFilter !== 'All') items = items.filter(r => r.subject === subjectFilter);
+    if (search) {
+      const q = search.toLowerCase();
+      items = items.filter(r =>
+        r.title.toLowerCase().includes(q) ||
+        r.subject.toLowerCase().includes(q) ||
+        r.examType.toLowerCase().includes(q)
+      );
+    }
+    items.sort((a, b) => {
+      const aVal = a[sortConfig.key];
+      const bVal = b[sortConfig.key];
+      if (typeof aVal === 'string') {
+        return sortConfig.direction === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+      }
+      if (sortConfig.key === 'submittedAt') {
+        const ta = aVal?.toDate?.() || new Date(0);
+        const tb = bVal?.toDate?.() || new Date(0);
+        return sortConfig.direction === 'asc' ? ta - tb : tb - ta;
+      }
+      return sortConfig.direction === 'asc' ? (aVal || 0) - (bVal || 0) : (bVal || 0) - (aVal || 0);
+    });
+    return items;
+  }, [results, examTypeFilter, subjectFilter, search, sortConfig]);
+
+  const handleSort = (key) => {
+    setSortConfig(prev => ({ key, direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc' }));
+  };
+
+  const SortIcon = ({ columnKey }) => (
+    <span className="opacity-50 ml-1">{sortConfig.key === columnKey ? (sortConfig.direction === 'asc' ? '↑' : '↓') : '↕'}</span>
+  );
+
+  const subjects = useMemo(() => {
+    const set = new Set(results.map(r => r.subject).filter(Boolean));
+    return ['All', ...Array.from(set).sort()];
+  }, [results]);
+
+  const examTypes = useMemo(() => {
+    const set = new Set(results.map(r => r.examType).filter(Boolean));
+    return ['All', ...Array.from(set).sort()];
+  }, [results]);
 
   if (loading) {
     return (
@@ -172,75 +121,107 @@ export default function StudentResults() {
     );
   }
 
-  return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h2 className="text-xl font-bold text-white mb-4">My Results</h2>
-
-      {results.length > 0 && (
-        <div className="relative mb-4">
-          <input
-            type="text"
-            placeholder="Search by title, subject, exam type..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="w-full px-4 py-2.5 pl-10 rounded-xl bg-[#282843] border border-white/10 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all"
-          />
-          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          {search && (
-            <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-all text-sm">&times;</button>
-          )}
-        </div>
-      )}
-
-      {results.length === 0 ? (
+  if (results.length === 0) {
+    return (
+      <div className="p-6 max-w-5xl mx-auto">
+        <h2 className="text-xl font-bold text-white mb-4">My Results</h2>
         <div className="text-center py-16 bg-[#282843] rounded-xl border border-white/10">
           <div className="text-5xl mb-4">📭</div>
           <p className="text-gray-400 mb-2">No results yet</p>
           <p className="text-sm text-gray-500">Complete an assessment to see your results here.</p>
         </div>
-      ) : filtered.length === 0 ? (
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-6 max-w-5xl mx-auto">
+      <h2 className="text-xl font-bold text-white mb-4">My Results</h2>
+
+      {/* Filters */}
+      <div className="flex flex-wrap gap-3 mb-4">
+        <div className="flex-1 min-w-[200px] relative">
+          <input
+            type="text"
+            placeholder="Search by title, subject..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="w-full px-4 py-2.5 pl-10 rounded-xl bg-[#282843] border border-white/10 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-primary/50"
+          />
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          {search && (
+            <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white text-sm">&times;</button>
+          )}
+        </div>
+        <select
+          value={subjectFilter}
+          onChange={e => setSubjectFilter(e.target.value)}
+          className="px-4 py-2.5 rounded-xl bg-[#282843] border border-white/10 text-white text-sm focus:outline-none focus:border-primary/50"
+        >
+          {subjects.map(s => <option key={s} value={s}>{s === 'All' ? 'All Subjects' : s}</option>)}
+        </select>
+        <select
+          value={examTypeFilter}
+          onChange={e => setExamTypeFilter(e.target.value)}
+          className="px-4 py-2.5 rounded-xl bg-[#282843] border border-white/10 text-white text-sm focus:outline-none focus:border-primary/50"
+        >
+          {examTypes.map(t => <option key={t} value={t}>{t === 'All' ? 'All Types' : t}</option>)}
+        </select>
+      </div>
+
+      {filtered.length === 0 ? (
         <div className="text-center py-16 bg-[#282843] rounded-xl border border-white/10">
           <div className="text-4xl mb-3">🔍</div>
-          <p className="text-gray-400">No results match your search</p>
+          <p className="text-gray-400">No results match your filters</p>
         </div>
       ) : (
-        <div className="space-y-3">
-          {filtered.map(r => {
-            const ts = r.timestamp?.toDate?.() || new Date();
-            const isCoding = r.type === 'coding';
-            return (
-              <button
-                key={`${r.type}-${r.id}`}
-                onClick={() => setSelected(r)}
-                className="w-full text-left bg-[#282843] border border-white/10 rounded-xl p-5 flex items-center justify-between gap-4 hover:border-primary/40 hover:bg-[#2e2e4a] transition-all cursor-pointer"
-              >
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-semibold text-white truncate">{r.examTitle || 'Untitled'}</p>
-                    {isCoding && <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 font-medium shrink-0">CODING</span>}
-                  </div>
-                  <p className="text-xs text-gray-400 mt-0.5">
-                    {r.className && `Class ${r.className}`}{r.subject ? ` — ${r.subject}` : ''}
-                    {r.examType ? ` — ${r.examType}` : ''}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">{ts.toLocaleDateString()} {ts.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                </div>
-                <div className="text-right shrink-0">
-                  <p className={`text-lg font-bold ${(r.results?.percentage || 0) >= 40 ? 'text-emerald-400' : 'text-red-400'}`}>
-                    {r.results?.percentage?.toFixed(1) || '0'}%
-                  </p>
-                  <p className="text-xs text-gray-400">{r.results?.correctCount || 0}/{r.results?.correctCount + r.results?.wrongCount + r.results?.skippedCount || 0} correct</p>
-                  {r.results?.grade && <p className="text-xs text-gray-500 mt-0.5">Grade: {r.results.grade}</p>}
-                </div>
-              </button>
-            );
-          })}
+        <div className="overflow-x-auto rounded-xl bg-[#1e1e38] border border-white/10">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-white/10">
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-300 cursor-pointer hover:text-white" onClick={() => handleSort('title')}>Title <SortIcon columnKey="title" /></th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-300 cursor-pointer hover:text-white" onClick={() => handleSort('subject')}>Subject <SortIcon columnKey="subject" /></th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-300 cursor-pointer hover:text-white" onClick={() => handleSort('examType')}>Type <SortIcon columnKey="examType" /></th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-300">Class</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-300 cursor-pointer hover:text-white" onClick={() => handleSort('correct')}>Correct <SortIcon columnKey="correct" /></th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-300 cursor-pointer hover:text-white" onClick={() => handleSort('wrong')}>Wrong <SortIcon columnKey="wrong" /></th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-300 cursor-pointer hover:text-white" onClick={() => handleSort('marks')}>Marks <SortIcon columnKey="marks" /></th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-300 cursor-pointer hover:text-white" onClick={() => handleSort('percentage')}>% <SortIcon columnKey="percentage" /></th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-300">Grade</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-300 cursor-pointer hover:text-white" onClick={() => handleSort('submittedAt')}>Submitted <SortIcon columnKey="submittedAt" /></th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map(row => {
+                const ts = row.submittedAt?.toDate?.() || new Date(0);
+                const isCoding = row.type === 'coding';
+                return (
+                  <tr key={row.id} className="border-b border-white/5 hover:bg-white/5">
+                    <td className="px-4 py-3 text-sm text-white">{row.title}</td>
+                    <td className="px-4 py-3 text-sm text-gray-400">{row.subject || '-'}</td>
+                    <td className="px-4 py-3 text-sm">
+                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                        isCoding ? 'bg-blue-500/20 text-blue-300' :
+                        row.examType === 'Timed Assessment' ? 'bg-purple-500/20 text-purple-300' :
+                        'bg-gray-500/20 text-gray-300'
+                      }`}>{row.examType || (isCoding ? 'Coding' : 'MCQ')}</span>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-400">{row.classNum || '-'}</td>
+                    <td className="px-4 py-3 text-sm text-emerald-400">{row.correct}</td>
+                    <td className="px-4 py-3 text-sm text-red-400">{row.wrong}</td>
+                    <td className="px-4 py-3 text-sm text-white">{row.marks?.toFixed?.(1) || row.marks || 0}/{row.totalMarks || '-'}</td>
+                    <td className="px-4 py-3 text-sm"><span className={row.percentage >= 40 ? 'text-emerald-400' : 'text-red-400'}>{row.percentage}%</span></td>
+                    <td className="px-4 py-3 text-sm text-gray-400">{row.grade || '-'}</td>
+                    <td className="px-4 py-3 text-sm text-gray-500">{ts.toLocaleDateString()} {ts.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       )}
-
-      {selected && <DetailModal result={selected} onClose={() => setSelected(null)} />}
     </div>
   );
 }

@@ -31,8 +31,7 @@ const ShowAssessments = ({ skipInitialAuth } = {}) => {
   const [isAuthorized, setIsAuthorized] = useState(skipInitialAuth || false);
   const [passwordError, setPasswordError] = useState(false);
 
-  const [traditionalExams, setTraditionalExams] = useState([]);
-  const [timedAssessments, setTimedAssessments] = useState([]);
+  const [assessments, setAssessments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [expandedId, setExpandedId] = useState(null);
@@ -62,21 +61,10 @@ const ShowAssessments = ({ skipInitialAuth } = {}) => {
       const { db } = await import('../firebase');
       const { collection, getDocs } = await import('firebase/firestore');
 
-      const [tradSnap, timedSnap] = await Promise.allSettled([
-        getDocs(collection(db, 'examConfigs')),
-        getDocs(collection(db, 'timedAssessments'))
-      ]);
+      const snap = await getDocs(collection(db, 'examConfigs'));
+      const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-      const traditional = tradSnap.status === 'fulfilled'
-        ? tradSnap.value.docs.map(d => ({ id: d.id, ...d.data(), _source: 'examConfigs' }))
-        : [];
-
-      const timed = timedSnap.status === 'fulfilled'
-        ? timedSnap.value.docs.map(d => ({ id: d.id, ...d.data(), _source: 'timedAssessments' }))
-        : [];
-
-      setTraditionalExams(traditional);
-      setTimedAssessments(timed);
+      setAssessments(items);
     } catch (err) {
       setError(err.message);
     }
@@ -92,10 +80,7 @@ const ShowAssessments = ({ skipInitialAuth } = {}) => {
   const grouped = getAllGrouped();
 
   function getAllGrouped() {
-    const all = [
-      ...traditionalExams.map(e => ({ ...e, category: e.examType || 'Unknown' })),
-      ...timedAssessments.map(e => ({ ...e, category: 'Timed Assessment' }))
-    ];
+    const all = assessments.map(e => ({ ...e, category: e.examType || 'Unknown' }));
     const grouped = {};
     all.forEach(item => {
       const cat = item.category || 'Other';
@@ -118,8 +103,7 @@ const ShowAssessments = ({ skipInitialAuth } = {}) => {
     try {
       const { db } = await import('../firebase');
       const { doc, deleteDoc } = await import('firebase/firestore');
-      const col = item._source === 'timedAssessments' ? 'timedAssessments' : 'examConfigs';
-      await deleteDoc(doc(db, col, item.id));
+      await deleteDoc(doc(db, 'examConfigs', item.id));
       setStatus(`Deleted "${item.title || item.id}"`);
       fetchAll();
     } catch (err) {
@@ -139,8 +123,7 @@ const ShowAssessments = ({ skipInitialAuth } = {}) => {
       const parsed = JSON.parse(editContent);
       const { db } = await import('../firebase');
       const { doc, setDoc } = await import('firebase/firestore');
-      const col = item._source === 'timedAssessments' ? 'timedAssessments' : 'examConfigs';
-      await setDoc(doc(db, col, item.id), parsed);
+      await setDoc(doc(db, 'examConfigs', item.id), parsed);
       setStatus(`Updated "${parsed.title || item.id}"`);
       setEditMode(null);
       fetchAll();
@@ -260,7 +243,7 @@ const ShowAssessments = ({ skipInitialAuth } = {}) => {
                         const isExpanded = expandedId === item.id;
                         const isEditing = editMode === item.id;
                         const isConfirmingDelete = confirmDelete === item.id;
-                        const key = `${item._source}_${item.id}`;
+                        const key = item.id;
 
                         return (
                           <div key={key} className="rounded-xl border border-gray-200 dark:border-white/10 bg-black/5 dark:bg-white/5 overflow-hidden transition-all">
@@ -271,9 +254,11 @@ const ShowAssessments = ({ skipInitialAuth } = {}) => {
                                   <div className="flex gap-3 mt-1 text-xs text-gray-500 dark:text-gray-400 flex-wrap">
                                     {item.subject && <span>{item.subject}</span>}
                                     {item.teacher && <span>Teacher: {item.teacher}</span>}
-                                    <span className={`px-1.5 py-0.5 rounded text-xs ${item._source === 'timedAssessments' ? 'bg-cyan-500/20 text-cyan-400' : 'bg-gray-500/20 text-gray-400'}`}>
-                                      {item._source === 'timedAssessments' ? '⏱️ Timed' : '📋 Standard'}
-                                    </span>
+                                    {item.examType && (
+                                      <span className={`px-1.5 py-0.5 rounded text-xs ${item.examType === 'Timed Assessment' ? 'bg-cyan-500/20 text-cyan-400' : 'bg-gray-500/20 text-gray-400'}`}>
+                                        {item.examType === 'Timed Assessment' ? '⏱️ Timed' : '📋 Standard'}
+                                      </span>
+                                    )}
                                     {item.assessmentFormat && (
                                       <span className={`px-1.5 py-0.5 rounded text-xs ${
                                         item.assessmentFormat === 'mcq' ? 'bg-purple-500/20 text-purple-400' :

@@ -2,9 +2,10 @@ import puter from '@heyputer/puter.js';
 import { db } from '../firebase';
 import { collection, doc, getDoc, getDocs, addDoc, query, where, orderBy, serverTimestamp, Timestamp } from 'firebase/firestore';
 
-const ASSESSMENTS_COL = 'timedAssessments';
-const SUBMISSIONS_COL = 'timedSubmissions';
+const ASSESSMENTS_COL = 'examConfigs';
+const SUBMISSIONS_COL = 'submissions';
 const NOW = () => new Date();
+const TIMED_EXAM_TYPE = 'Timed Assessment';
 
 export const toDate = (ts) => {
   if (!ts) return new Date(0);
@@ -18,13 +19,14 @@ export const getActiveAssessments = async () => {
   try {
     const q = query(
       collection(db, ASSESSMENTS_COL),
+      where('examType', '==', TIMED_EXAM_TYPE),
       where('enabled', '==', true)
     );
     const snapshot = await getDocs(q);
     const now = new Date();
     return snapshot.docs
       .map(d => ({ id: d.id, ...d.data() }))
-      .filter(a => toDate(a.endDateTime) > now);
+      .filter(a => !a.endDateTime || toDate(a.endDateTime) > now);
   } catch (err) {
     console.error('Error fetching active assessments:', err.message);
     return [];
@@ -47,7 +49,7 @@ export const getAssessmentsForClassSubject = async (classNum, subject) => {
   try {
     const q = query(
       collection(db, ASSESSMENTS_COL),
-      where('enabled', '==', true),
+      where('examType', '==', TIMED_EXAM_TYPE),
       where('classNum', '==', String(classNum)),
       where('subject', '==', subject)
     );
@@ -55,7 +57,7 @@ export const getAssessmentsForClassSubject = async (classNum, subject) => {
     const now = new Date();
     return snapshot.docs
       .map(d => ({ id: d.id, ...d.data() }))
-      .filter(a => toDate(a.endDateTime) > now);
+      .filter(a => a.enabled !== false && (!a.endDateTime || toDate(a.endDateTime) > now));
   } catch (err) {
     console.error('Error fetching assessments:', err.message);
     return [];
@@ -75,7 +77,7 @@ export const getAssessmentById = async (id) => {
 
 export const createAssessment = async (data) => {
   try {
-    const docData = { ...data, enabled: true, createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
+    const docData = { ...data, enabled: data.enabled !== false, createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
     if (docData.startDateTime && typeof docData.startDateTime === 'string') {
       docData.startDateTime = Timestamp.fromDate(new Date(docData.startDateTime));
     }
@@ -97,22 +99,27 @@ export const submitMcqAttempt = async (assessmentId, studentInfo, answers, resul
     if (new Date() > toDate(assessment.endDateTime)) {
       throw new Error('Assessment has expired');
     }
+    const examKey = `${assessment.examType}_${assessment.classNum}_${assessment.subject}`;
     const docRef = await addDoc(collection(db, SUBMISSIONS_COL), {
+      type: 'mcq',
+      examKey,
       assessmentId,
-      assessmentType: 'mcq',
-      studentInfo: {
-        firstName: studentInfo.firstName,
-        lastName: studentInfo.lastName,
-        rollNumber: String(studentInfo.rollNumber)
-      },
+      examType: assessment.examType,
+      assessmentFormat: assessment.assessmentFormat || 'mcq',
       classNum: String(assessment.classNum),
       subject: assessment.subject,
       title: assessment.title,
+      teacher: assessment.teacher || '',
+      student: {
+        userId: studentInfo.userId || null,
+        name: `${studentInfo.firstName || ''} ${studentInfo.lastName || ''}`.trim(),
+        rollNumber: String(studentInfo.rollNumber)
+      },
       answers,
       results,
       timeTaken,
+      timeLimit: assessment.timeLimitMinutes || 0,
       submittedAt: serverTimestamp(),
-      isLate: false
     });
     return docRef.id;
   } catch (err) {
@@ -135,23 +142,27 @@ export const submitProject = async (assessmentId, studentInfo, projectData, file
       fileUrl = uploadResult.url;
       fileName = uploadResult.name;
     }
+    const examKey = `${assessment.examType}_${assessment.classNum}_${assessment.subject}`;
     const docRef = await addDoc(collection(db, SUBMISSIONS_COL), {
+      type: 'project',
+      examKey,
       assessmentId,
-      assessmentType: 'project',
-      studentInfo: {
-        firstName: studentInfo.firstName,
-        lastName: studentInfo.lastName,
-        rollNumber: String(studentInfo.rollNumber)
-      },
+      examType: assessment.examType,
+      assessmentFormat: assessment.assessmentFormat || 'project',
       classNum: String(assessment.classNum),
       subject: assessment.subject,
       title: assessment.title,
+      teacher: assessment.teacher || '',
+      student: {
+        userId: studentInfo.userId || null,
+        name: `${studentInfo.firstName || ''} ${studentInfo.lastName || ''}`.trim(),
+        rollNumber: String(studentInfo.rollNumber)
+      },
       topic: projectData.topic || '',
       description: projectData.description || '',
       fileUrl,
       fileName,
       submittedAt: serverTimestamp(),
-      isLate: false
     });
     return { id: docRef.id, fileUrl, fileName };
   } catch (err) {
@@ -188,11 +199,12 @@ export const getSubmissionsForAssessment = async (assessmentId) => {
     return snapshot.docs.map(d => {
       const data = d.data();
       const submittedAt = data.submittedAt?.toDate?.() || (data.submittedAt?.seconds ? new Date(data.submittedAt.seconds * 1000) : null);
+      const student = data.student || data.studentInfo || {};
       return {
         id: d.id,
-        name: `${data.studentInfo?.firstName || ''} ${data.studentInfo?.lastName || ''}`.trim(),
-        rollNumber: data.studentInfo?.rollNumber || '',
-        assessmentType: data.assessmentType,
+        name: student.name || `${student.firstName || ''} ${student.lastName || ''}`.trim() || '',
+        rollNumber: student.rollNumber || '',
+        assessmentType: data.type || data.assessmentType,
         submittedAt,
         submittedTime: submittedAt ? submittedAt.toLocaleString() : '-',
         ...data
@@ -209,11 +221,29 @@ export const checkDuplicateSubmission = async (assessmentId, rollNumber) => {
     const q = query(
       collection(db, SUBMISSIONS_COL),
       where('assessmentId', '==', assessmentId),
-      where('studentInfo.rollNumber', '==', String(rollNumber))
+      where('student.rollNumber', '==', String(rollNumber))
     );
     const snapshot = await getDocs(q);
     return snapshot.docs.length > 0;
   } catch {
     return false;
+  }
+};
+
+export const getStudentSubmission = async (assessmentId, userId) => {
+  try {
+    const q = query(
+      collection(db, SUBMISSIONS_COL),
+      where('assessmentId', '==', assessmentId),
+      where('student.userId', '==', userId)
+    );
+    const snapshot = await getDocs(q);
+    if (snapshot.empty) return null;
+    const doc = snapshot.docs[0];
+    const data = doc.data();
+    return { id: doc.id, ...data };
+  } catch (err) {
+    console.error('Error fetching student submission:', err.message);
+    return null;
   }
 };

@@ -49,6 +49,9 @@ const PersonModal = ({ person, onClose }) => {
             {person.alias && (
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Alias: {person.alias.toUpperCase()}</p>
             )}
+            {isSuperAdmin && person.email && (
+              <a href={`mailto:${person.email}`} className="text-xs text-primary hover:underline mt-1">{person.email}</a>
+            )}
             {person.onLeave && (
               <span className="mt-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-500 border border-amber-500/30">
                 On Leave
