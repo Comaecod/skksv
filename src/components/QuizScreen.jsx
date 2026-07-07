@@ -1,6 +1,8 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import Timer from './Timer';
 import QuestionCard from './QuestionCard';
+import useFullscreenGuard from '../hooks/useFullscreenGuard';
+import FullscreenGuardOverlay from './FullscreenGuardOverlay';
 
 const QuizScreen = ({ 
   questions, 
@@ -12,7 +14,16 @@ const QuizScreen = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [visitedQuestions, setVisitedQuestions] = useState(new Set([0]));
+  const answersRef = useRef(answers);
+  answersRef.current = answers;
   const mainRef = useRef(null);
+
+  const { violation, countdown } = useFullscreenGuard({
+    enabled: true,
+    onViolation: useCallback(() => {
+      onQuizComplete(answersRef.current);
+    }, [onQuizComplete]),
+  });
 
   const currentQuestion = questions[currentIndex];
   const totalQuestions = questions.length;
@@ -150,7 +161,9 @@ const QuizScreen = ({
   }, [currentQuestion, answers, currentIndex, totalQuestions, isLastQuestion, handleAnswerChange, handleNext, handleSubmit, handleQuestionClick]);
 
   return (
-    <div 
+    <>
+      {violation && <FullscreenGuardOverlay countdown={countdown} />}
+      <div 
       className="w-full max-w-6xl mx-auto flex flex-col lg:flex-row gap-4 lg:gap-6 animate-fadeIn min-h-[calc(100vh-140px)]"
       ref={mainRef}
       tabIndex={-1}
@@ -280,6 +293,7 @@ const QuizScreen = ({
         </div>
       </aside>
     </div>
+    </>
   );
 };
 

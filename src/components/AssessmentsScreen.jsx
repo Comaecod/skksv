@@ -43,6 +43,7 @@ const AssessmentsScreen = () => {
   const [subject, setSubject] = useState(null);
   const [screen, setScreen] = useState('exam-type');
   const [alreadyTaken, setAlreadyTaken] = useState(false);
+  const [error, setError] = useState(null);
 
   // Timed assessment state
   const [timedAssessments, setTimedAssessments] = useState([]);
@@ -148,9 +149,14 @@ const AssessmentsScreen = () => {
   }, [screen, setHideHeader, setHideFooter, setHideSidebar, setSankaraVisible, setNotificationVisible]);
 
   const handleSelectExamType = (type) => {
+    setError(null);
     setSelectedExamType(type);
     setSubject(null);
-    setClassNum(authUser?.studentClass || 1);
+    if (!authUser?.studentClass) {
+      setError('Your profile does not have a class assigned. Contact your administrator to set your class.');
+      return;
+    }
+    setClassNum(authUser.studentClass);
     setScreen('subject');
   };
 
@@ -362,6 +368,12 @@ const AssessmentsScreen = () => {
     case 'exam-type':
       return (
         <div className="w-full flex items-center justify-center px-4 py-8">
+          {error && (
+            <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm max-w-lg text-center backdrop-blur-sm">
+              {error}
+              <button onClick={() => setError(null)} className="ml-3 text-red-300 hover:text-red-200">✕</button>
+            </div>
+          )}
           <ExamTypeScreen
             examTypes={examTypes}
             onSelect={handleSelectExamType}

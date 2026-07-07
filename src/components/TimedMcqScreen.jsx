@@ -1,13 +1,24 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import QuestionCard from './QuestionCard';
+import useFullscreenGuard from '../hooks/useFullscreenGuard';
+import FullscreenGuardOverlay from './FullscreenGuardOverlay';
 
 const TimedMcqScreen = ({ questions, studentInfo, assessment, onComplete }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [visitedQuestions, setVisitedQuestions] = useState(new Set([0]));
+  const answersRef = useRef(answers);
+  answersRef.current = answers;
   const [endTime, setEndTime] = useState(null);
   const startTime = useRef(Date.now());
   const mainRef = useRef(null);
+
+  const { violation, countdown } = useFullscreenGuard({
+    enabled: true,
+    onViolation: useCallback(() => {
+      onComplete(answersRef.current, Math.floor((Date.now() - startTime.current) / 1000));
+    }, [onComplete]),
+  });
 
   useEffect(() => {
     setEndTime(getEndTime());
@@ -88,7 +99,9 @@ const TimedMcqScreen = ({ questions, studentInfo, assessment, onComplete }) => {
   const remainingCount = totalQuestions - visitedQuestions.size;
 
   return (
-    <div
+    <>
+      {violation && <FullscreenGuardOverlay countdown={countdown} />}
+      <div
       className="w-full max-w-6xl mx-auto flex flex-col lg:flex-row gap-4 lg:gap-6 animate-fadeIn min-h-[calc(100vh-140px)] px-4"
       ref={mainRef}
       tabIndex={-1}
@@ -175,6 +188,7 @@ const TimedMcqScreen = ({ questions, studentInfo, assessment, onComplete }) => {
         </div>
       </aside>
     </div>
+    </>
   );
 };
 
