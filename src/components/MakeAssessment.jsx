@@ -6,6 +6,8 @@ import { createAssessment, updateAssessment, getAssessmentById } from '../servic
 import CustomSelect from './CustomSelect';
 import ScrollableArea from './ui/ScrollableArea';
 import { resolveSubjectValue } from '../utils/format';
+import { SUBJECTS } from '../config/schoolConfig';
+import { parseQuestions, questionsToMarkdown, parseSections, sectionsToMarkdown } from '../utils/questionParser';
 
 const ASSESSMENT_TYPES = [
   'Slip Test',
@@ -61,6 +63,24 @@ const DEFAULT_QUESTIONS = `[
   }
 ]`;
 
+const DEFAULT_QUESTIONS_MD = `## Sample single-correct question with image hint?
+- Correct Answer *
+- Wrong Option
+- Wrong Option
+- Wrong Option
+marks: 2
+explanation: This explains why the correct answer is right and the others are wrong.
+
+## Sample multiple-correct question (select all that apply)?
+- Correct Answer 1 *
+- Correct Answer 2 *
+- Wrong Option
+- Wrong Option
+marks: 3
+explanation: For multiple-correct questions, mark multiple options with *.`;
+
+const DEFAULT_SECTIONS_MD = `Q1-Q5, pick 3, 1 mark each`;
+
 const MakeAssessment = ({ skipInitialAuth } = {}) => {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
@@ -113,10 +133,14 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
   const [testCasesJson, setTestCasesJson] = useState('[]');
 
   const [questionsJson, setQuestionsJson] = useState(DEFAULT_QUESTIONS);
+  const [questionsMd, setQuestionsMd] = useState(DEFAULT_QUESTIONS_MD);
+  const [questionMode, setQuestionMode] = useState('simple');
   const [sectionsJson, setSectionsJson] = useState('[]');
+  const [sectionsMd, setSectionsMd] = useState('');
   const [jsonContent, setJsonContent] = useState('');
 
   const [showJsonPreview, setShowJsonPreview] = useState(true);
+  const [showInstructions, setShowInstructions] = useState(false);
 
   const { id } = useParams();
   const isEditing = !!id;
@@ -156,7 +180,9 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
         setFunctionName(data.coding?.functionName || 'solution');
         setTestCasesJson(JSON.stringify(data.coding?.testCases || [], null, 2));
         setQuestionsJson(JSON.stringify(data.questions || [], null, 2));
+        setQuestionsMd(questionsToMarkdown(data.questions || []));
         setSectionsJson(JSON.stringify(data.sections || [], null, 2));
+        setSectionsMd(sectionsToMarkdown(data.sections || []));
         setJsonContent(JSON.stringify(data.content || {}, null, 2));
         setStatus('');
       } catch (err) {
@@ -221,7 +247,9 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
       setWrongAnswerPenaltyFraction(sample.wrongAnswerPenaltyFraction ?? 0);
       setAssessmentFormat(sample.assessmentFormat || 'mcq');
       setQuestionsJson(JSON.stringify(sample.questions || [], null, 2));
+      setQuestionsMd(questionsToMarkdown(sample.questions || []));
       setSectionsJson(JSON.stringify(sample.sections || [], null, 2));
+      setSectionsMd(sectionsToMarkdown(sample.sections || []));
       setProblemStatement(sample.coding?.problemStatement || '');
       setCodingExamples(sample.coding?.examples || '');
       setStarterCode(sample.coding?.starterCode || '');
@@ -243,6 +271,9 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
   };
 
   const buildPayload = () => {
+    const questions = questionMode === 'simple' ? parseQuestions(questionsMd) : tryParseJson(questionsJson, []);
+    const sections = questionMode === 'simple' ? parseSections(sectionsMd) : tryParseJson(sectionsJson, []);
+    const hasValidSections = sections.length > 0 && sections.every(s => s.range && s.count && s.marks != null);
     return {
       examType: assessmentType,
       subject,
@@ -251,8 +282,8 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
       teacher,
       invigilator: invigilator || teacher,
       enabled,
-      totalQuestions: Number(totalQuestions),
-      totalMarks: (() => { const qs = tryParseJson(questionsJson, []); return qs.reduce((sum, q) => sum + (Number(q.marks) || 1), 0); })(),
+      totalQuestions: hasValidSections ? sections.reduce((sum, s) => sum + Number(s.count), 0) : questions.length,
+      totalMarks: hasValidSections ? sections.reduce((sum, s) => sum + Number(s.count) * Number(s.marks), 0) : questions.reduce((sum, q) => sum + (Number(q.marks) || 1), 0),
       wrongAnswerPenaltyFraction: Number(wrongAnswerPenaltyFraction),
       assessmentFormat,
       createdBy: userProfile?.id || null,
@@ -263,8 +294,8 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
       preassessmentsecretkey: preassessmentSecretKey,
       secretKey,
       holidayType,
-      sections: tryParseJson(sectionsJson, []),
-      questions: tryParseJson(questionsJson, []),
+      sections,
+      questions,
       content: tryParseJson(jsonContent, {}),
       allowFileUpload,
       allowedFileTypes: allowedFileTypes.split(',').map(s => s.trim()).filter(Boolean),
@@ -309,11 +340,16 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
     } else if (!isHoliday) {
       if (timeLimitMinutes < 0) return 'Time limit cannot be negative';
       if (Number(totalQuestions) < 1) return 'At least 1 question required';
-      try {
-        const qs = JSON.parse(questionsJson);
-        if (!Array.isArray(qs) || qs.length === 0) return 'At least one question is required';
-      } catch {
-        return 'Invalid questions JSON format';
+      if (questionMode === 'simple') {
+        const parsed = parseQuestions(questionsMd);
+        if (parsed.length === 0) return 'At least one question is required';
+      } else {
+        try {
+          const qs = JSON.parse(questionsJson);
+          if (!Array.isArray(qs) || qs.length === 0) return 'At least one question is required';
+        } catch {
+          return 'Invalid questions JSON format';
+        }
       }
     }
     return null;
@@ -347,7 +383,10 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
     setFunctionName('solution');
     setTestCasesJson('[]');
     setQuestionsJson(DEFAULT_QUESTIONS);
+    setQuestionsMd(DEFAULT_QUESTIONS_MD);
+    setQuestionMode('simple');
     setSectionsJson('[]');
+    setSectionsMd('');
     setJsonContent('');
   };
 
@@ -512,10 +551,6 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">0 = no limit</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Total Questions</label>
-                    <input type="number" min="1" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white outline-none focus:border-primary/50 text-sm" value={totalQuestions} onChange={e => setTotalQuestions(Number(e.target.value))} />
-                  </div>
-                  <div>
                     <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Negative Marking (%)</label>
                     <input type="number" min="0" max="100" step="25" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white outline-none focus:border-primary/50 text-sm" value={wrongAnswerPenaltyFraction * 100} onChange={e => setWrongAnswerPenaltyFraction(Number(e.target.value) / 100)} />
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{wrongAnswerPenaltyFraction * 100}% deducted for wrong answers</p>
@@ -620,25 +655,122 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
 
             {!isHoliday && assessmentFormat === 'mcq' && (
               <div className="p-5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10">
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-4">❓ Questions (JSON format)</h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">Each question needs: id, text, type (single/multiple), options array with text, isCorrect (index or array of indices)</p>
-                <textarea className="w-full h-48 px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 font-mono text-xs resize-none scrollable-area-custom" value={questionsJson} onChange={e => setQuestionsJson(e.target.value)} />
-                <div className="mt-3">
-                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Sections (optional JSON)</label>
-                  <textarea className="w-full h-20 px-4 py-2 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 font-mono text-xs resize-none" value={sectionsJson} onChange={e => setSectionsJson(e.target.value)} />
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Divide questions into sections. Each section picks random questions from a range of question IDs. Example: pick 3 random questions from Q1 to Q5, each worth 1 mark.</p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 font-mono">{'Format: [{"range": [1, 5], "count": 3, "marks": 1}]'}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Add multiple objects for multiple sections. Leave empty to use all questions as one section.</p>
-                    <div className="mt-2">
-                      <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Calculated Total Marks</label>
-                      <input type="text" disabled className="w-24 px-3 py-1.5 rounded-lg bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white font-medium text-sm" value={(() => {
-                        const secs = tryParseJson(sectionsJson, []);
-                        if (secs.length > 0 && secs.every(s => s.range && s.count && s.marks != null)) {
-                          return secs.reduce((sum, s) => sum + Number(s.count) * Number(s.marks), 0);
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-semibold text-gray-900 dark:text-white">❓ Questions</h3>
+                  <div className="flex gap-1 bg-black/10 dark:bg-white/10 rounded-lg p-0.5">
+                    <button
+                      type="button"
+                      className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${questionMode === 'simple' ? 'bg-primary text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}
+                      onClick={() => {
+                        if (questionMode === 'json') {
+                          setQuestionsMd(questionsToMarkdown(tryParseJson(questionsJson, [])));
+                          setSectionsMd(sectionsToMarkdown(tryParseJson(sectionsJson, [])));
+                          setQuestionMode('simple');
                         }
-                        const qs = tryParseJson(questionsJson, []);
-                        return qs.reduce((sum, q) => sum + (Number(q.marks) || 1), 0);
-                      })()} />
+                      }}
+                    >Simple</button>
+                    <button
+                      type="button"
+                      className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${questionMode === 'json' ? 'bg-primary text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}
+                      onClick={() => {
+                        if (questionMode === 'simple') {
+                          setQuestionsJson(JSON.stringify(parseQuestions(questionsMd), null, 2));
+                          setSectionsJson(JSON.stringify(parseSections(sectionsMd), null, 2));
+                          setQuestionMode('json');
+                        }
+                      }}
+                    >JSON</button>
+                  </div>
+                </div>
+
+                {questionMode === 'simple' ? (
+                  <>
+                    <button type="button" className="text-xs text-primary underline mb-2 inline-block" onClick={() => setShowInstructions(v => !v)}>
+                      {showInstructions ? '▼ Hide formatting instructions' : '▶ View formatting instructions'}
+                    </button>
+                    {showInstructions && (
+                      <div className="mb-3 p-3 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-xs text-gray-500 dark:text-gray-400 space-y-2">
+                        <p className="font-semibold text-gray-700 dark:text-gray-300">Questions format:</p>
+                        <pre className="bg-black/10 dark:bg-white/10 p-2 rounded text-gray-900 dark:text-white text-xs font-mono whitespace-pre-wrap">{`## What is 2+2?
+- 3
+- 4 *
+- 5
+- 6
+marks: 1
+explanation: 2+2 equals 4.`}</pre>
+                        <ul className="list-disc pl-4 space-y-0.5">
+                          <li><code className="text-primary">##</code> question title</li>
+                          <li><code className="text-primary">-</code> option</li>
+                          <li><code className="text-primary">*</code> anywhere on correct option line</li>
+                          <li><code className="text-primary">marks:</code> points (default 1)</li>
+                          <li><code className="text-primary">explanation:</code> answer explanation</li>
+                          <li>One <code className="text-primary">*</code> = single; multiple = multi-correct</li>
+                          <li>No <code className="text-primary">*</code> = first option correct</li>
+                        </ul>
+                        <p className="font-semibold text-gray-700 dark:text-gray-300 pt-2 border-t border-gray-200 dark:border-white/10 mt-2">Sections format:</p>
+                        <pre className="bg-black/10 dark:bg-white/10 p-2 rounded text-gray-900 dark:text-white text-xs font-mono whitespace-pre-wrap">{`Q1-Q5, pick 3, 1 mark each
+Q6-Q10, pick 4, 2 marks each`}</pre>
+                        <ul className="list-disc pl-4 space-y-0.5">
+                          <li><code className="text-primary">Q1-Q5</code> = question ID range</li>
+                          <li><code className="text-primary">pick 3</code> = randomly select 3 from range</li>
+                          <li><code className="text-primary">1 mark each</code> = marks per picked question</li>
+                        </ul>
+                      </div>
+                    )}
+                    <textarea
+                      className="w-full h-48 px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 font-mono text-sm resize-none scrollable-area-custom"
+                      value={questionsMd}
+                      onChange={e => setQuestionsMd(e.target.value)}
+                      placeholder="## What is 2+2?
+- 3
+- 4 *
+- 5
+- 6
+marks: 1
+explanation: 2+2 equals 4."
+                    />
+                  </>
+                ) : (
+                  <>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">Each question needs: id, text, type (single/multiple), options array with text, isCorrect (index or array of indices)</p>
+                    <textarea className="w-full h-48 px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 font-mono text-xs resize-none scrollable-area-custom" value={questionsJson} onChange={e => setQuestionsJson(e.target.value)} />
+                  </>
+                )}
+                <div className="mt-3">
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Sections (optional)</label>
+                  {questionMode === 'simple' ? (
+                    <textarea className="w-full h-20 px-4 py-2 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 font-mono text-xs resize-none scrollable-area-custom" value={sectionsMd} onChange={e => setSectionsMd(e.target.value)} placeholder="Q1-Q5, pick 3, 1 mark each" />
+                  ) : (
+                    <textarea className="w-full h-20 px-4 py-2 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 font-mono text-xs resize-none scrollable-area-custom" value={sectionsJson} onChange={e => setSectionsJson(e.target.value)} />
+                  )}
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Divide questions into sections. Each section picks random questions from a range of question IDs.</p>
+                  {questionMode === 'json' && (
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 font-mono">{'Format: [{"range": [1, 5], "count": 3, "marks": 1}]'}</p>
+                  )}
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Add multiple lines/objects for multiple sections. Leave empty to use all questions as one section.</p>
+                    <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Total Questions</label>
+                        <input type="text" disabled className="w-full px-5 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white font-semibold text-base" value={(() => {
+                          const secs = questionMode === 'simple' ? parseSections(sectionsMd) : tryParseJson(sectionsJson, []);
+                          if (secs.length > 0 && secs.every(s => s.range && s.count && s.marks != null)) {
+                            return secs.reduce((sum, s) => sum + Number(s.count), 0);
+                          }
+                          const qs = questionMode === 'simple' ? parseQuestions(questionsMd) : tryParseJson(questionsJson, []);
+                          return qs.length;
+                        })()} />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Total Marks</label>
+                        <input type="text" disabled className="w-full px-5 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white font-semibold text-base" value={(() => {
+                          const secs = questionMode === 'simple' ? parseSections(sectionsMd) : tryParseJson(sectionsJson, []);
+                          if (secs.length > 0 && secs.every(s => s.range && s.count && s.marks != null)) {
+                            return secs.reduce((sum, s) => sum + Number(s.count) * Number(s.marks), 0);
+                          }
+                          const qs = questionMode === 'simple' ? parseQuestions(questionsMd) : tryParseJson(questionsJson, []);
+                          return qs.reduce((sum, q) => sum + (Number(q.marks) || 1), 0);
+                        })()} />
+                      </div>
                     </div>
                 </div>
               </div>
