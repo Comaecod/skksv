@@ -320,7 +320,7 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
 
   const validateForm = () => {
     if (!title.trim()) return 'Title is required';
-    if (!subject.trim()) return 'Subject is required';
+    if (subject == null || subject === '') return 'Subject is required';
     if (!classNum) return 'Class is required';
 
     if (isTimed) {
