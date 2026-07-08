@@ -5,7 +5,7 @@ import ACADEMIC_CALENDAR from '../data/academicCalendar.json';
 
 const SCHOOL = SCHOOL_CONFIG;
 
-const APP_DESCRIPTION = `This is the official digital platform of ${SCHOOL.name}. Students can take assessments, view holiday homework, browse staff directory, view gallery, submit feedback, and access timed assessments.`;
+const APP_DESCRIPTION = `This is the official digital platform of ${SCHOOL.name}. Students can take assessments, browse staff directory, view gallery, submit feedback, and access timed assessments.`;
 
 function buildStaffContext() {
   const lines = [];
@@ -214,7 +214,6 @@ const INTENTS = [
       const pageMap = [
         { keywords: ['home', 'main'], path: '/', name: 'Home' },
         { keywords: ['assessment', 'exam', 'test', 'quiz'], path: '/assessments', name: 'Assessments' },
-        { keywords: ['homework', 'holiday'], path: '/holiday-homework', name: 'Holiday Homework' },
         { keywords: ['staff', 'people', 'faculty', 'teacher', 'directory'], path: '/people', name: 'Staff Directory' },
         { keywords: ['gallery', 'photo', 'image', 'picture'], path: '/gallery', name: 'Gallery' },
         { keywords: ['contact', 'address', 'reach', 'location', 'map'], path: '/contact', name: 'Contact' },
@@ -228,7 +227,7 @@ const INTENTS = [
         }
       }
 
-      const pages = ['Home', 'Assessments', 'Holiday Homework', 'Staff Directory', 'Gallery', 'Contact', 'Feedback', 'Timed Assessments'];
+      const pages = ['Home', 'Assessments', 'Staff Directory', 'Gallery', 'Contact', 'Feedback', 'Timed Assessments'];
       return 'Here are the main sections of the app:\n\n' + pages.map(p => '\u2022 **' + p + '**').join('\n') + '\n\nWhich one would you like to visit? You can find them all in the navigation menu at the top of the page.';
     }
   },
@@ -239,7 +238,7 @@ const INTENTS = [
       /(test|exam|assessment|quiz)\s+(steps|guide|help|process)/i,
       /start\s+(a\s+)?(test|exam|assessment|quiz)/i,
     ],
-    response: () => `To take an assessment:\n\n1. Go to **Assessments** from the navigation menu\n2. Select an exam type\n3. Choose your class\n4. Select a subject\n5. Review the introduction screen\n6. Enter the pre-assessment key (if required)\n7. Enter your name and roll number\n8. Answer the questions\n9. Submit to see your result and grade\n\nYou can also access **Timed Assessments** separately from the navigation menu for time-bound exams.`,
+    response: () => `To take an assessment:\n\n1. Go to **Assessments** from the navigation menu\n2. Select your class\n3. Choose a subject\n4. Pick an assessment\n5. Review the introduction screen\n6. Enter the pre-assessment key (if required)\n7. Enter your name and roll number\n8. Answer the questions\n9. Submit to see your result and grade`,
   },
   {
     id: 'contact',
@@ -284,15 +283,6 @@ const INTENTS = [
     response: () => `To submit feedback:\n\n1. Go to **Feedback** from the navigation menu\n2. Fill in your name and email (optional)\n3. Select a category (Suggestion, Issue, Appreciation, or Other)\n4. Write your message\n5. Submit the form\n\nYour feedback helps us improve!`,
   },
   {
-    id: 'holiday_homework_help',
-    patterns: [
-      /(holiday\s+)?homework\s+(help|guide|how|find|view|access)/i,
-      /how\s+(do\s+)?(i\s+)?view\s+homework/i,
-      /where\s+(is\s+)?homework/i,
-    ],
-    response: () => `To view holiday homework:\n\n1. Go to **Holiday Homework** from the navigation menu\n2. Select the holiday type (e.g., Summer Vacation)\n3. Choose your class\n4. Select a subject to view the assignment`,
-  },
-  {
     id: 'timed_help',
     patterns: [
       /(timed|time.?bound)\s+(assessment|exam|test)\s+(help|guide|how)/i,
@@ -314,7 +304,7 @@ const INTENTS = [
       /(your\s+)?(capabilities|features|skills)/i,
       /help\s+me/i,
     ],
-    response: () => 'I can help you with:\n\n\u2022 Information about ' + SCHOOL.name + '\n\u2022 About Adi Shankaracharya and Kanchi Kamakoti Peetham\n\u2022 The current, previous, and next pontiffs\n\u2022 Navigating through the app\n\u2022 Steps to take assessments and quizzes\n\u2022 Grading system and results\n\u2022 Finding staff and contact info\n\u2022 Viewing holiday homework\n\u2022 Submitting feedback\n\nJust ask me anything!',
+    response: () => 'I can help you with:\n\n\u2022 Information about ' + SCHOOL.name + '\n\u2022 About Adi Shankaracharya and Kanchi Kamakoti Peetham\n\u2022 The current, previous, and next pontiffs\n\u2022 Navigating through the app\n\u2022 Steps to take assessments and quizzes\n\u2022 Grading system and results\n\u2022 Finding staff and contact info\n\u2022 Submitting feedback\n\nJust ask me anything!',
   },
   {
     id: 'who_made',
@@ -416,8 +406,7 @@ Your role:
 
 The app has these sections:
 - Home (/) - Landing page with image carousel and school stats
-- Assessments (/assessments) - Take exams and quizzes (select exam type → class → subject)
-- Holiday Homework (/holiday-homework) - View assignments by holiday/class/subject
+- Assessments (/assessments) - Take exams and quizzes (select class → subject → assessment)
 - Staff Directory (/people) - Browse faculty and staff
 - Gallery (/gallery) - View school photos and event images
 - Contact (/contact) - School address, phone, email, Google Maps link

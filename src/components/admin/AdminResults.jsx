@@ -1,4 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
+import { subjectLabel } from '../../utils/format';
+import { useAuth } from '../../auth/contexts/AuthContext';
 
 function DetailModal({ submission, onClose }) {
   if (!submission) return null;
@@ -13,7 +15,6 @@ function DetailModal({ submission, onClose }) {
             <h3 className="text-lg font-bold text-white">{submission.examTitle}</h3>
             <p className="text-sm text-gray-400">
               {submission.className && `Class ${submission.className}`}{submission.subject ? ` — ${submission.subject}` : ''}
-              {submission.examType ? ` — ${submission.examType}` : ''}
               <span className={`ml-2 text-[10px] px-1.5 py-0.5 rounded font-medium ${
                 type === 'quiz' ? 'bg-emerald-500/20 text-emerald-300' :
                 type === 'coding' ? 'bg-blue-500/20 text-blue-300' :
@@ -29,6 +30,7 @@ function DetailModal({ submission, onClose }) {
             <div><span className="text-gray-400">Student:</span> <span className="text-white font-medium">{submission.studentName}</span></div>
             <div><span className="text-gray-400">Roll:</span> <span className="text-white">{submission.rollNumber}</span></div>
             <div><span className="text-gray-400">Date:</span> <span className="text-white">{submission.timestamp.toLocaleDateString()}</span></div>
+            {submission.invigilator && <div><span className="text-gray-400">Invigilator:</span> <span className="text-white">{submission.invigilator}</span></div>}
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -111,19 +113,19 @@ const SORTABLE_COLUMNS = [
   { key: 'className', label: 'Class' },
   { key: 'subject', label: 'Subject' },
   { key: 'examTitle', label: 'Exam' },
-  { key: 'examType', label: 'Type' },
+  { key: 'invigilator', label: 'Invigilator' },
   { key: 'score', label: 'Score' },
   { key: 'percentage', label: '%' },
   { key: 'timestamp', label: 'Date' },
 ];
 
 export default function AdminResults() {
+  const { userProfile } = useAuth();
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [classFilter, setClassFilter] = useState('all');
   const [subjectFilter, setSubjectFilter] = useState('all');
-  const [examTypeFilter, setExamTypeFilter] = useState('all');
   const [sortKey, setSortKey] = useState('timestamp');
   const [sortDir, setSortDir] = useState('desc');
   const [selected, setSelected] = useState(null);
@@ -153,9 +155,11 @@ export default function AdminResults() {
               studentName,
               rollNumber,
               className: d.classNum || d.examKey?.split('_')[1] || '',
-              subject: d.subject || '',
+              subject: subjectLabel(d.subject) || d.subject || '',
               examTitle: d.title || 'Coding Assessment',
               examType: d.examType || '',
+              invigilator: d.invigilator || '',
+              createdBy: d.createdBy || '',
               score: d.score || 0,
               total: d.total || 0,
               percentage: d.total > 0 ? ((d.score || 0) / d.total) * 100 : 0,
@@ -171,9 +175,11 @@ export default function AdminResults() {
               studentName,
               rollNumber,
               className: d.classNum || '',
-              subject: d.subject || '',
+              subject: subjectLabel(d.subject) || d.subject || '',
               examTitle: d.title || 'Untitled',
               examType: d.examType || '',
+              invigilator: d.invigilator || '',
+              createdBy: d.createdBy || '',
               score: results.totalEarned ?? results.correctCount ?? results.score ?? 0,
               total: (results.totalMarks ?? ((results.correctCount || 0) + (results.wrongCount || 0) + (results.skippedCount || 0))) || 0,
               percentage: parseFloat(results.percentage) || 0,
@@ -195,16 +201,13 @@ export default function AdminResults() {
   const filterOptions = useMemo(() => {
     const classes = new Set();
     const subjects = new Set();
-    const examTypes = new Set();
     results.forEach(r => {
       if (r.className) classes.add(r.className);
       if (r.subject) subjects.add(r.subject);
-      if (r.examType) examTypes.add(r.examType);
     });
     return {
       classes: [...classes].sort(),
       subjects: [...subjects].sort(),
-      examTypes: [...examTypes].sort(),
     };
   }, [results]);
 
@@ -215,6 +218,7 @@ export default function AdminResults() {
       'Roll No': r.rollNumber,
       Class: r.className,
       Subject: r.subject,
+      Invigilator: r.invigilator,
       Exam: r.examTitle,
       Type: r.type.toUpperCase(),
       Score: `${r.score}/${r.total}`,
@@ -240,16 +244,17 @@ export default function AdminResults() {
 
   const filtered = useMemo(() => {
     let data = results.filter(r => {
+      if (userProfile && userProfile.role !== 'super_admin' && userProfile.role !== 'admin') {
+        if (r.createdBy && r.createdBy !== userProfile.id) return false;
+      }
       if (classFilter !== 'all' && r.className !== classFilter) return false;
       if (subjectFilter !== 'all' && r.subject !== subjectFilter) return false;
-      if (examTypeFilter !== 'all' && r.examType !== examTypeFilter) return false;
       if (!search) return true;
       const q = search.toLowerCase();
       return r.studentName.toLowerCase().includes(q)
         || r.examTitle.toLowerCase().includes(q)
         || r.subject.toLowerCase().includes(q)
         || r.className.toLowerCase().includes(q)
-        || r.examType.toLowerCase().includes(q)
         || r.rollNumber.includes(q);
     });
 
@@ -272,7 +277,7 @@ export default function AdminResults() {
     });
 
     return data;
-  }, [results, search, classFilter, subjectFilter, examTypeFilter, sortKey, sortDir]);
+  }, [results, search, classFilter, subjectFilter, sortKey, sortDir]);
 
   if (loading) {
     return (
@@ -307,11 +312,6 @@ export default function AdminResults() {
             className="px-3 py-2.5 rounded-xl bg-[#282843] border border-white/10 text-white text-sm focus:outline-none focus:border-primary/50">
             <option value="all">All Subjects</option>
             {filterOptions.subjects.map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
-          <select value={examTypeFilter} onChange={e => setExamTypeFilter(e.target.value)}
-            className="px-3 py-2.5 rounded-xl bg-[#282843] border border-white/10 text-white text-sm focus:outline-none focus:border-primary/50">
-            <option value="all">All Exam Types</option>
-            {filterOptions.examTypes.map(t => <option key={t} value={t}>{t}</option>)}
           </select>
           <button onClick={handleExport} disabled={filtered.length === 0}
             className="px-4 py-2.5 rounded-xl bg-primary/20 border border-primary/30 text-primary text-sm font-medium hover:bg-primary/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap">
@@ -353,6 +353,7 @@ export default function AdminResults() {
                   <td className="px-4 py-3">{r.rollNumber}</td>
                   <td className="px-4 py-3">{r.className}</td>
                   <td className="px-4 py-3">{r.subject}</td>
+                  <td className="px-4 py-3 text-xs text-gray-400">{r.invigilator || '—'}</td>
                   <td className="px-4 py-3 max-w-[200px] truncate" title={r.examTitle}>{r.examTitle}</td>
                   <td className="px-4 py-3">
                     <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${

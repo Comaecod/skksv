@@ -15,64 +15,10 @@ const cachedQuery = async (cacheKey, queryFn, ttl = CACHE_TTL) => {
   return data;
 };
 
-export const getExamTypes = async () => {
-  try {
-    const snapshot = await getDocs(collection(db, 'examConfigs'));
-    const types = new Set();
-    snapshot.forEach(d => {
-      const data = d.data();
-      if (data.examType) types.add(data.examType);
-    });
-    return [...types].filter(Boolean);
-  } catch (error) {
-    console.error('Error fetching exam types:', error.message);
-    return [];
-  }
-};
-
-export const getExamTypesForClass = async (classNum) => {
+export const getSubjectsForClass = async (classNum) => {
   try {
     const q = query(
       collection(db, 'examConfigs'),
-      where('classNum', '==', String(classNum))
-    );
-    const snapshot = await getDocs(q);
-    const types = new Set();
-    snapshot.forEach(d => {
-      const data = d.data();
-      if (data.examType) types.add(data.examType);
-    });
-    return [...types];
-  } catch (error) {
-    console.error('Error fetching exam types for class:', error.message);
-    return [];
-  }
-};
-
-export const getClassesForType = async (examType) => {
-  try {
-    const q = query(
-      collection(db, 'examConfigs'),
-      where('examType', '==', examType)
-    );
-    const snapshot = await getDocs(q);
-    const classes = new Set();
-    snapshot.forEach(d => {
-      const data = d.data();
-      if (data.classNum) classes.add(data.classNum);
-    });
-    return [...classes].sort((a, b) => Number(a) - Number(b));
-  } catch (error) {
-    console.error('Error fetching classes:', error.message);
-    return [];
-  }
-};
-
-export const getSubjectsForClass = async (examType, classNum) => {
-  try {
-    const q = query(
-      collection(db, 'examConfigs'),
-      where('examType', '==', examType),
       where('classNum', '==', String(classNum))
     );
     const snapshot = await getDocs(q);
@@ -96,7 +42,6 @@ export const getSubjectsForClass = async (examType, classNum) => {
 };
 
 const mapExamData = (exam) => ({
-  examType: exam.examType,
   className: exam.classNum,
   examTitle: exam.title,
   classNum: exam.classNum,
@@ -116,14 +61,11 @@ const mapExamData = (exam) => ({
   questions: exam.questions || [],
   isEnabled: exam.enabled !== false,
   assessmentFormat: exam.assessmentFormat || 'mcq',
-  isHolidayHomework: exam.examType === 'Holiday Homework',
-  holidayType: exam.holidayType || '',
-  content: exam.content || null,
   coding: exam.coding || null
 });
 
-export const getExamConfig = async (examType, classNum, subject) => {
-  const key = `${examType}_${classNum}_${subject}`;
+export const getExamConfig = async (classNum, subject) => {
+  const key = `Assessment_${classNum}_${subject}`;
 
   try {
     const docRef = doc(db, 'examConfigs', key);
@@ -135,7 +77,6 @@ export const getExamConfig = async (examType, classNum, subject) => {
 
     const q = query(
       collection(db, 'examConfigs'),
-      where('examType', '==', examType),
       where('classNum', '==', String(classNum)),
       where('subject', '==', subject)
     );

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { toDate } from '../services/timedAssessmentService';
+import { toDate } from '../services/assessmentService';
 import { subjectLabel } from '../utils/format';
 
 const CountdownTimer = ({ endDateTime }) => {

@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/contexts/AuthContext';
 import { validateTeacherKey } from '../utils/auth';
 import { downloadReportAsExcel } from '../utils/excelExport';
-import { getSubmissionsForAssessment } from '../services/timedAssessmentService';
+import { getSubmissionsForAssessment } from '../services/assessmentService';
 
 const ReportsScreen = ({ config: propConfig, assessmentId: propAssessmentId, assessment: propAssessment, onBack: propOnBack }) => {
   const location = useLocation();
@@ -204,7 +204,7 @@ const ReportsScreen = ({ config: propConfig, assessmentId: propAssessmentId, ass
           <div className="text-center mb-8">
             <div className="text-5xl mb-4">📊</div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              {title || (config ? `${config.examType} - Class ${config.classNum}` : 'Reports')}
+              {title || (config ? `Assessment - Class ${config.classNum}` : 'Reports')}
             </h2>
             <p className="text-gray-500 dark:text-gray-400">
               {config ? `${config.subject} | ${config.teacher}` : (reportData[0]?.subject || '')}

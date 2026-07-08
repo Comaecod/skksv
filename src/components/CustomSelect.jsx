@@ -7,7 +7,7 @@ const sizeClasses = {
   lg: 'px-4 py-3 text-sm',
 };
 
-const CustomSelect = ({ value, onChange, options, className = '', size = 'md', menuPosition = 'bottom' }) => {
+const CustomSelect = ({ value, onChange, options, className = '', size = 'md', menuPosition = 'bottom', disabled = false }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
@@ -25,15 +25,15 @@ const CustomSelect = ({ value, onChange, options, className = '', size = 'md', m
     <div ref={ref} className={`relative ${className}`}>
       <button
         type="button"
-        onClick={() => setOpen(!open)}
-        className={`w-full ${sizeClasses[size]} rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white outline-none focus:border-primary/50 text-left flex items-center justify-between gap-2`}
+        onClick={() => !disabled && setOpen(!open)}
+        className={`w-full ${sizeClasses[size]} rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white outline-none text-left flex items-center justify-between gap-2 ${disabled ? 'opacity-60 cursor-not-allowed' : 'focus:border-primary/50'}`}
       >
         <span className="truncate">{selected?.label}</span>
         <svg className={`w-4 h-4 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
-      {open && (
+      {!disabled && open && (
         <div className={`absolute z-[100] w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-800 shadow-lg ${
           menuPosition === 'top' ? 'bottom-full mb-1' : 'mt-1'
         }`}>

@@ -1,35 +1,15 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../auth/contexts/AuthContext';
 import { isMasterKey } from '../utils/auth';
-import { createAssessment, updateAssessment, getAssessmentById } from '../services/timedAssessmentService';
+import { createAssessment, updateAssessment, getAssessmentById } from '../services/assessmentService';
 import CustomSelect from './CustomSelect';
-import ScrollableArea from './ui/ScrollableArea';
 import { resolveSubjectValue } from '../utils/format';
 import { SUBJECTS } from '../config/schoolConfig';
 import { parseQuestions, questionsToMarkdown, parseSections, sectionsToMarkdown } from '../utils/questionParser';
+import staffData from '../data/staffDirectory.json';
 
-const ASSESSMENT_TYPES = [
-  'Slip Test',
-  'Unit Test 1',
-  'Unit Test 2',
-  'Term 1',
-  'Term 2',
-  'Bridge Course',
-  'Timed Assessment',
-  'Holiday Homework'
-];
-
-const TYPE_DESCRIPTIONS = {
-  'Slip Test': 'Short quick assessment tests with MCQs',
-  'Unit Test 1': 'First unit evaluation exam',
-  'Unit Test 2': 'Second unit evaluation exam',
-  'Term 1': 'First term examination',
-  'Term 2': 'Second term examination',
-  'Bridge Course': 'Foundation course assessment',
-  'Timed Assessment': 'Time-bound MCQ tests or project submissions with start/end windows',
-  'Holiday Homework': 'Holiday homework projects and assignments'
-};
+const STAFF_NAMES = (staffData.staff || []).map(s => s.name).filter(Boolean).sort();
 
 const DEFAULT_QUESTIONS = `[
   {
@@ -82,17 +62,14 @@ explanation: For multiple-correct questions, mark multiple options with *.`;
 
 const DEFAULT_SECTIONS_MD = `Q1-Q5, pick 3, 1 mark each`;
 
-const MakeAssessment = ({ skipInitialAuth } = {}) => {
+const MakeAssessment = ({ skipInitialAuth, readOnly } = {}) => {
   const navigate = useNavigate();
-  const fileInputRef = useRef(null);
 
   const [password, setPassword] = useState('');
   const [isAuthorized, setIsAuthorized] = useState(skipInitialAuth || false);
   const [passwordError, setPasswordError] = useState(false);
   const [status, setStatus] = useState('');
   const [creating, setCreating] = useState(false);
-  const [dialog, setDialog] = useState(null);
-  const [formMode, setFormMode] = useState('form');
 
   const CLASS_OPTIONS = [
     { value: '4', label: 'Class 4' },
@@ -101,16 +78,15 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
     { value: '9', label: 'Class 9' }, { value: '10', label: 'Class 10' },
   ];
 
-  const [assessmentType, setAssessmentType] = useState('Timed Assessment');
   const [title, setTitle] = useState('');
   const [subject, setSubject] = useState(15);
   const [classNum, setClassNum] = useState('4');
   const { userProfile } = useAuth();
   const [teacher, setTeacher] = useState(userProfile?.displayName || 'Unknown');
   const [invigilator, setInvigilator] = useState('');
-  const [description, setDescription] = useState('');
   const [enabled, setEnabled] = useState(true);
 
+  const [isTimed, setIsTimed] = useState(true);
   const [startDateTime, setStartDateTime] = useState('');
   const [endDateTime, setEndDateTime] = useState('');
   const [timeLimitMinutes, setTimeLimitMinutes] = useState(30);
@@ -125,7 +101,6 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
   const [maxFileSizeMB, setMaxFileSizeMB] = useState(10);
   const [projectTitle, setProjectTitle] = useState('');
   const [projectDescription, setProjectDescription] = useState('');
-  const [holidayType, setHolidayType] = useState('Summer Vacation');
 
   const [problemStatement, setProblemStatement] = useState('');
   const [codingExamples, setCodingExamples] = useState('');
@@ -138,13 +113,14 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
   const [questionMode, setQuestionMode] = useState('simple');
   const [sectionsJson, setSectionsJson] = useState('[]');
   const [sectionsMd, setSectionsMd] = useState('');
-  const [jsonContent, setJsonContent] = useState('');
 
-  const [showJsonPreview, setShowJsonPreview] = useState(true);
   const [showInstructions, setShowInstructions] = useState(false);
 
   const { id } = useParams();
   const isEditing = !!id;
+
+  const isProject = assessmentFormat === 'project';
+  const isCoding = assessmentFormat === 'coding';
 
   useEffect(() => {
     if (!id) return;
@@ -153,14 +129,13 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
       try {
         const data = await getAssessmentById(id);
         if (!data) { setStatus('Error: Assessment not found'); return; }
-        setAssessmentType(data.examType || 'Timed Assessment');
         setTitle(data.title || '');
         setSubject(resolveSubjectValue(data.subject));
         setClassNum(data.classNum || '4');
         setTeacher(data.teacher || '');
         setInvigilator(data.invigilator || '');
-        setDescription(data.description || '');
         setEnabled(data.enabled !== false);
+        setIsTimed(!!data.startDateTime || !!data.endDateTime);
         setStartDateTime(formatTimestamp(data.startDateTime));
         setEndDateTime(formatTimestamp(data.endDateTime));
         setTimeLimitMinutes(data.timeLimitMinutes ?? 30);
@@ -174,7 +149,6 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
         setMaxFileSizeMB(data.maxFileSizeMB ?? 10);
         setProjectTitle(data.projectTitle || '');
         setProjectDescription(data.projectDescription || '');
-        setHolidayType(data.holidayType || 'Summer Vacation');
         setProblemStatement(data.coding?.problemStatement || '');
         setCodingExamples(data.coding?.examples || '');
         setStarterCode(data.coding?.starterCode || '');
@@ -184,7 +158,6 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
         setQuestionsMd(questionsToMarkdown(data.questions || []));
         setSectionsJson(JSON.stringify(data.sections || [], null, 2));
         setSectionsMd(sectionsToMarkdown(data.sections || []));
-        setJsonContent(JSON.stringify(data.content || {}, null, 2));
         setStatus('');
       } catch (err) {
         setStatus(`Error loading assessment: ${err.message}`);
@@ -207,11 +180,6 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
   };
 
-  const isTimed = assessmentType === 'Timed Assessment';
-  const isHoliday = assessmentType === 'Holiday Homework';
-  const isProject = assessmentFormat === 'project';
-  const isCoding = assessmentFormat === 'coding';
-
   const handlePasswordSubmit = (e) => {
     e.preventDefault();
     if (isMasterKey(password)) {
@@ -222,61 +190,11 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
     }
   };
 
-  const loadSample = async () => {
-    setStatus('Loading sample...');
-    try {
-      let sample;
-      if (assessmentType === 'Timed Assessment') {
-        const mod = await import('../data/Exams/Timed Assessments/Class 4/Computers/timed-assessment-sample.json');
-        sample = mod.default;
-      } else if (!isHoliday) {
-        const mod = await import('../data/Exams/Coding/add-two-numbers.json');
-        sample = mod.default;
-      } else {
-        setStatus(`Sample for "${assessmentType}" - paste your JSON or use form fields`);
-        return;
-      }
-      setTitle(sample.title || '');
-      setSubject(resolveSubjectValue(sample.subject));
-      setClassNum(sample.classNum || '4');
-      setTeacher(sample.teacher || '');
-      setDescription(sample.description || '');
-      setStartDateTime(formatDateForInput(sample.startDateTime));
-      setEndDateTime(formatDateForInput(sample.endDateTime));
-      setTimeLimitMinutes(sample.timeLimitMinutes || 30);
-      setTotalQuestions(sample.totalQuestions || 10);
-      setWrongAnswerPenaltyFraction(sample.wrongAnswerPenaltyFraction ?? 0);
-      setAssessmentFormat(sample.assessmentFormat || 'mcq');
-      setQuestionsJson(JSON.stringify(sample.questions || [], null, 2));
-      setQuestionsMd(questionsToMarkdown(sample.questions || []));
-      setSectionsJson(JSON.stringify(sample.sections || [], null, 2));
-      setSectionsMd(sectionsToMarkdown(sample.sections || []));
-      setProblemStatement(sample.coding?.problemStatement || '');
-      setCodingExamples(sample.coding?.examples || '');
-      setStarterCode(sample.coding?.starterCode || '');
-      setFunctionName(sample.coding?.functionName || 'solution');
-      setTestCasesJson(JSON.stringify(sample.coding?.testCases || [], null, 2));
-      setJsonContent(JSON.stringify(sample, null, 2));
-      setStatus(`Sample loaded for ${assessmentType}`);
-    } catch (err) {
-      setStatus(`Error loading sample: ${err.message}`);
-    }
-  };
-
-  const formatDateForInput = (dateStr) => {
-    if (!dateStr) return '';
-    const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return '';
-    const pad = (n) => String(n).padStart(2, '0');
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  };
-
   const buildPayload = () => {
     const questions = questionMode === 'simple' ? parseQuestions(questionsMd) : tryParseJson(questionsJson, []);
     const sections = questionMode === 'simple' ? parseSections(sectionsMd) : tryParseJson(sectionsJson, []);
     const hasValidSections = sections.length > 0 && sections.every(s => s.range && s.count && s.marks != null);
     return {
-      examType: assessmentType,
       subject,
       classNum,
       title,
@@ -289,15 +207,12 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
       assessmentFormat,
       createdBy: userProfile?.id || null,
       timeLimitMinutes: Number(timeLimitMinutes),
-      description,
-      startDateTime: startDateTime ? new Date(startDateTime).toISOString() : '',
-      endDateTime: endDateTime ? new Date(endDateTime).toISOString() : '',
+      startDateTime: isTimed && startDateTime ? new Date(startDateTime).toISOString() : '',
+      endDateTime: isTimed && endDateTime ? new Date(endDateTime).toISOString() : '',
       preassessmentsecretkey: preassessmentSecretKey,
       secretKey,
-      holidayType,
       sections,
       questions,
-      content: tryParseJson(jsonContent, {}),
       allowFileUpload,
       allowedFileTypes: allowedFileTypes.split(',').map(s => s.trim()).filter(Boolean),
       maxFileSizeMB: Number(maxFileSizeMB),
@@ -338,7 +253,7 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
       } catch {
         return 'Invalid test cases JSON format';
       }
-    } else if (!isHoliday) {
+    } else {
       if (timeLimitMinutes < 0) return 'Time limit cannot be negative';
       if (Number(totalQuestions) < 1) return 'At least 1 question required';
       if (questionMode === 'simple') {
@@ -356,41 +271,6 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
     return null;
   };
 
-  const clearForm = () => {
-    setTitle('');
-    setSubject(15);
-    setClassNum('');
-    setTeacher('Venkata Vishnu');
-    setInvigilator('');
-    setDescription('');
-    setEnabled(true);
-    setStartDateTime('');
-    setEndDateTime('');
-    setTimeLimitMinutes(30);
-    setTotalQuestions(10);
-    setWrongAnswerPenaltyFraction(0);
-    setPreassessmentSecretKey('');
-    setSecretKey('');
-    setAssessmentFormat('mcq');
-    setAllowFileUpload(true);
-    setAllowedFileTypes('pdf, docx, jpg, png');
-    setMaxFileSizeMB(10);
-    setProjectTitle('');
-    setProjectDescription('');
-    setHolidayType('Summer Vacation');
-    setProblemStatement('');
-    setCodingExamples('');
-    setStarterCode(`def solution():\n    # Write your code here\n    pass\n\nprint(solution())`);
-    setFunctionName('solution');
-    setTestCasesJson('[]');
-    setQuestionsJson(DEFAULT_QUESTIONS);
-    setQuestionsMd(DEFAULT_QUESTIONS_MD);
-    setQuestionMode('simple');
-    setSectionsJson('[]');
-    setSectionsMd('');
-    setJsonContent('');
-  };
-
   const handleCreate = async () => {
     const error = validateForm();
     if (error) { setStatus(`Error: ${error}`); return; }
@@ -401,14 +281,13 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
       const payload = buildPayload();
       if (isEditing) {
         await updateAssessment(id, payload);
-        setDialog({ show: true, type: 'success', message: `"${title}" updated successfully!` });
+        navigate('/dashboard/assessments');
       } else {
-        const newId = await createAssessment(payload);
-        setDialog({ show: true, type: 'success', message: `"${title}" created successfully!`, id: newId });
-        clearForm();
+        await createAssessment(payload);
+        navigate('/dashboard/assessments');
       }
     } catch (err) {
-      setDialog({ show: true, type: 'error', message: `Failed to ${isEditing ? 'update' : 'create'}: ${err.message}` });
+      setStatus(`Error: Failed to ${isEditing ? 'update' : 'create'}: ${err.message}`);
     }
     setCreating(false);
   };
@@ -426,7 +305,6 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
             <input type="password" className={`w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border text-gray-900 dark:text-white placeholder-gray-400 outline-none ${passwordError ? 'border-red-500' : 'border-gray-200 dark:border-white/10 focus:border-primary/50'}`} placeholder="Enter admin password" value={password} onChange={e => { setPassword(e.target.value); if (passwordError) setPasswordError(false); }} autoFocus />
             {passwordError && <p className="text-red-400 text-sm">⚠️ Incorrect password</p>}
             <button type="submit" className="w-full px-6 py-3 rounded-xl font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90">Authorize 🔓</button>
-<button type="button" className="w-full px-6 py-3 rounded-xl font-medium bg-black/5 dark:bg-white/10 border border-gray-300 dark:border-white/20 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20" onClick={() => navigate(skipInitialAuth ? '/dashboard' : '/')}>← Back to Home</button>
           </form>
         </div>
       </div>
@@ -437,55 +315,18 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
     <div className="w-full flex items-start justify-center px-4 py-8">
       <div className="glass-card w-full max-w-4xl animate-slideUp">
         <div className="text-center mb-8">
-          <div className="text-5xl mb-4">{isEditing ? '✏️' : '📝'}</div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{isEditing ? 'Edit Assessment' : 'Create Assessment'}</h2>
-          <p className="text-gray-500 dark:text-gray-400">{isEditing ? 'Modify assessment details and save changes' : 'Configure and publish a new assessment'}</p>
+          <div className="text-5xl mb-4">{readOnly ? '👁️' : isEditing ? '✏️' : '📝'}</div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{readOnly ? 'View Assessment' : isEditing ? 'Edit Assessment' : 'Create Assessment'}</h2>
+          <p className="text-gray-500 dark:text-gray-400">{readOnly ? 'Viewing assessment details (read-only)' : isEditing ? 'Modify assessment details and save changes' : 'Configure and publish a new assessment'}</p>
         </div>
 
-        <div className="flex gap-3 mb-8 justify-center flex-wrap">
-          <button className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${formMode === 'form' ? 'bg-primary text-white' : 'bg-black/5 dark:bg-white/10 text-gray-900 dark:text-white'}`} onClick={() => setFormMode('form')}>Form</button>
-          <button className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${formMode === 'json' ? 'bg-primary text-white' : 'bg-black/5 dark:bg-white/10 text-gray-900 dark:text-white'}`} onClick={() => setFormMode('json')}>Raw JSON</button>
-        </div>
-
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Assessment Type</label>
-          <CustomSelect
-            value={assessmentType}
-            onChange={setAssessmentType}
-            options={ASSESSMENT_TYPES.map(t => ({ value: t, label: `${t} — ${TYPE_DESCRIPTIONS[t]}` }))}
-          />
-        </div>
-
-        {formMode === 'json' ? (
-          <>
-            <div className="mb-6">
-              <div className="border-2 border-dashed border-gray-300 dark:border-white/20 rounded-xl p-6 text-center cursor-pointer hover:border-primary/50 transition-all" onClick={() => fileInputRef.current?.click()}>
-                <div className="text-3xl mb-2">📄</div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Click to upload a JSON file</p>
-                <input ref={fileInputRef} type="file" accept=".json" onChange={e => {
-                  const file = e.target.files?.[0];
-                  if (!file) return;
-                  const reader = new FileReader();
-                  reader.onload = ev => {
-                    try { JSON.parse(ev.target.result); setJsonContent(ev.target.result); setStatus('JSON loaded'); }
-                    catch { setStatus('Error: Invalid JSON'); }
-                  };
-                  reader.readAsText(file);
-                }} className="hidden" />
-              </div>
-            </div>
-            <div className="mb-6">
-              <textarea className="w-full h-80 px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 font-mono text-sm resize-none" placeholder="Paste your assessment JSON here..." value={jsonContent} onChange={e => setJsonContent(e.target.value)} />
-            </div>
-          </>
-        ) : (
           <div className="space-y-6">
             <div className="p-5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-4">📋 Basic Information</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Title *</label>
-                  <input type="text" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 text-sm" placeholder="e.g. Computer Basics Test" value={title} onChange={e => setTitle(e.target.value)} />
+                  <input type="text" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 text-sm" placeholder="e.g. Computer Basics Test" value={title} onChange={e => setTitle(e.target.value)} disabled={readOnly} />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Subject *</label>
@@ -494,106 +335,104 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
                     onChange={setSubject}
                     options={SUBJECTS.map(s => ({ value: s.value, label: s.label }))}
                     className="w-full"
+                    disabled={readOnly}
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Class *</label>
-                  <CustomSelect value={classNum} onChange={setClassNum} options={CLASS_OPTIONS} className="w-full" />
+                  <CustomSelect value={classNum} onChange={setClassNum} options={CLASS_OPTIONS} className="w-full" disabled={readOnly} />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Teacher</label>
                   <input type="text" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 text-sm cursor-not-allowed opacity-70" value={teacher} disabled />
                 </div>
-                {!isHoliday && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Description</label>
-                    <textarea className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 text-sm resize-none" rows={2} value={description} onChange={e => setDescription(e.target.value)} />
-                  </div>
-                )}
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Invigilator</label>
+                  <CustomSelect value={invigilator} onChange={setInvigilator} options={[{ value: '', label: '— None —' }, ...STAFF_NAMES.map(n => ({ value: n, label: n }))]} className="w-full" disabled={readOnly} />
+                </div>
               </div>
             </div>
 
-            {!isHoliday && (
-              <div className="p-5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10">
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-4">📋 Format</h3>
-                <div className="flex gap-3 flex-wrap">
-                  <button type="button" className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${assessmentFormat === 'mcq' ? 'bg-purple-500/30 text-purple-400 border border-purple-500/50' : 'bg-black/5 dark:bg-white/10 text-gray-900 dark:text-white border border-transparent'}`} onClick={() => setAssessmentFormat('mcq')}>MCQ Test</button>
-                  <button type="button" className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${assessmentFormat === 'project' ? 'bg-orange-500/30 text-orange-400 border border-orange-500/50' : 'bg-black/5 dark:bg-white/10 text-gray-900 dark:text-white border border-transparent'}`} onClick={() => setAssessmentFormat('project')}>Project</button>
-                  <button type="button" className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${assessmentFormat === 'coding' ? 'bg-green-500/30 text-green-400 border border-green-500/50' : 'bg-black/5 dark:bg-white/10 text-gray-900 dark:text-white border border-transparent'}`} onClick={() => setAssessmentFormat('coding')}>Coding</button>
-                </div>
+            <div className="p-5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10">
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">📋 Format</h3>
+              <div className="flex gap-3 flex-wrap mb-4">
+                <button type="button" className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${assessmentFormat === 'mcq' ? 'bg-purple-500/30 text-purple-400 border border-purple-500/50' : 'bg-black/5 dark:bg-white/10 text-gray-900 dark:text-white border border-transparent'}`} onClick={() => setAssessmentFormat('mcq')} disabled={readOnly}>MCQ Test</button>
+                <button type="button" className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${assessmentFormat === 'project' ? 'bg-orange-500/30 text-orange-400 border border-orange-500/50' : 'bg-black/5 dark:bg-white/10 text-gray-900 dark:text-white border border-transparent'}`} onClick={() => setAssessmentFormat('project')} disabled={readOnly}>Project</button>
+                <button type="button" className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${assessmentFormat === 'coding' ? 'bg-green-500/30 text-green-400 border border-green-500/50' : 'bg-black/5 dark:bg-white/10 text-gray-900 dark:text-white border border-transparent'}`} onClick={() => setAssessmentFormat('coding')} disabled={readOnly}>Coding</button>
               </div>
-            )}
+              <label className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-300">
+                <input type="checkbox" checked={isTimed} onChange={e => setIsTimed(e.target.checked)} className="rounded" disabled={readOnly} />
+                Timed Assessment (with start/end window)
+              </label>
+            </div>
 
             {isTimed && (
               <div className="p-5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10">
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-4">⏱️ Time Window (Timed Assessment)</h3>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-4">⏱️ Time Window</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Start Date & Time *</label>
-                    <input type="datetime-local" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white outline-none focus:border-primary/50 text-sm" value={startDateTime} onChange={e => setStartDateTime(e.target.value)} />
+                    <input type="datetime-local" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white outline-none focus:border-primary/50 text-sm" value={startDateTime} onChange={e => setStartDateTime(e.target.value)} disabled={readOnly} />
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Assessment becomes visible after this time</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">End Date & Time *</label>
-                    <input type="datetime-local" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white outline-none focus:border-primary/50 text-sm" value={endDateTime} onChange={e => setEndDateTime(e.target.value)} />
+                    <input type="datetime-local" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white outline-none focus:border-primary/50 text-sm" value={endDateTime} onChange={e => setEndDateTime(e.target.value)} disabled={readOnly} />
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Assessment expires and disappears after this time</p>
                   </div>
                 </div>
               </div>
             )}
 
-            {!isHoliday && assessmentFormat === 'mcq' && (
+            {assessmentFormat === 'mcq' && (
               <div className="p-5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10">
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-4">🎯 Scoring & Configuration</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Time Limit (minutes)</label>
-                    <input type="number" min="0" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white outline-none focus:border-primary/50 text-sm" value={timeLimitMinutes} onChange={e => setTimeLimitMinutes(Number(e.target.value))} />
+                    <input type="number" min="0" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white outline-none focus:border-primary/50 text-sm" value={timeLimitMinutes} onChange={e => setTimeLimitMinutes(Number(e.target.value))} disabled={readOnly} />
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">0 = no limit</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Negative Marking (%)</label>
-                    <input type="number" min="0" max="100" step="25" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white outline-none focus:border-primary/50 text-sm" value={wrongAnswerPenaltyFraction * 100} onChange={e => setWrongAnswerPenaltyFraction(Number(e.target.value) / 100)} />
+                    <input type="number" min="0" max="100" step="25" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white outline-none focus:border-primary/50 text-sm" value={wrongAnswerPenaltyFraction * 100} onChange={e => setWrongAnswerPenaltyFraction(Number(e.target.value) / 100)} disabled={readOnly} />
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{wrongAnswerPenaltyFraction * 100}% deducted for wrong answers</p>
                   </div>
                 </div>
               </div>
             )}
 
-            {!isHoliday && (assessmentFormat === 'mcq' || assessmentFormat === 'coding') && (
+            {assessmentFormat !== 'project' && (
               <div className="p-5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10">
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-4">🔑 Access Keys</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Pre-Assessment Key</label>
-                    <input type="text" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 text-sm" placeholder="Required before quiz starts" value={preassessmentSecretKey} onChange={e => setPreassessmentSecretKey(e.target.value)} />
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">(Not used in Timed Assessments)</p>
+                    <input type="text" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 text-sm" placeholder="Required before quiz starts" value={preassessmentSecretKey} onChange={e => setPreassessmentSecretKey(e.target.value)} disabled={readOnly} />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Answer Reveal Key</label>
-                    <input type="text" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 text-sm" placeholder="To view correct answers" value={secretKey} onChange={e => setSecretKey(e.target.value)} />
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">(Not required in Timed Assessments)</p>
+                    <input type="text" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 text-sm" placeholder="To view correct answers" value={secretKey} onChange={e => setSecretKey(e.target.value)} disabled={readOnly} />
                   </div>
-
                 </div>
               </div>
             )}
 
-            {!isHoliday && isProject && (
+            {isProject && (
               <div className="p-5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10">
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-4">📁 Project Configuration</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="sm:col-span-2">
                     <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Project Title</label>
-                    <input type="text" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 text-sm" value={projectTitle} onChange={e => setProjectTitle(e.target.value)} />
+                    <input type="text" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 text-sm" value={projectTitle} onChange={e => setProjectTitle(e.target.value)} disabled={readOnly} />
                   </div>
                   <div className="sm:col-span-2">
                     <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Project Description</label>
-                    <textarea className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 text-sm resize-none" rows={2} value={projectDescription} onChange={e => setProjectDescription(e.target.value)} />
+                    <textarea className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 text-sm resize-none" rows={2} value={projectDescription} onChange={e => setProjectDescription(e.target.value)} disabled={readOnly} />
                   </div>
                   <div>
                     <label className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
-                      <input type="checkbox" checked={allowFileUpload} onChange={e => setAllowFileUpload(e.target.checked)} className="rounded" />
+                      <input type="checkbox" checked={allowFileUpload} onChange={e => setAllowFileUpload(e.target.checked)} className="rounded" disabled={readOnly} />
                       Allow File Upload
                     </label>
                   </div>
@@ -601,12 +440,12 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
                     <>
                       <div>
                         <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Allowed File Types</label>
-                        <input type="text" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 text-sm" value={allowedFileTypes} onChange={e => setAllowedFileTypes(e.target.value)} />
+                        <input type="text" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 text-sm" value={allowedFileTypes} onChange={e => setAllowedFileTypes(e.target.value)} disabled={readOnly} />
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Comma-separated (e.g. pdf, docx, jpg)</p>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Max File Size (MB)</label>
-                        <input type="number" min="1" max="100" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white outline-none focus:border-primary/50 text-sm" value={maxFileSizeMB} onChange={e => setMaxFileSizeMB(Number(e.target.value))} />
+                        <input type="number" min="1" max="100" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white outline-none focus:border-primary/50 text-sm" value={maxFileSizeMB} onChange={e => setMaxFileSizeMB(Number(e.target.value))} disabled={readOnly} />
                       </div>
                     </>
                   )}
@@ -614,47 +453,47 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
               </div>
             )}
 
-            {!isHoliday && isCoding && (
+            {isCoding && (
               <div className="p-5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10">
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-4">💻 Coding Configuration</h3>
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Problem Statement *</label>
-                    <textarea className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 text-sm resize-none" rows={3} placeholder="Describe the coding problem..." value={problemStatement} onChange={e => setProblemStatement(e.target.value)} />
+                    <textarea className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 text-sm resize-none" rows={3} placeholder="Describe the coding problem..." value={problemStatement} onChange={e => setProblemStatement(e.target.value)} disabled={readOnly} />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Examples</label>
-                    <textarea className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 text-sm resize-none font-mono" rows={3} placeholder={`Input: a=2, b=3 → Output: 5\nInput: a=10, b=20 → Output: 30`} value={codingExamples} onChange={e => setCodingExamples(e.target.value)} />
+                    <textarea className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 text-sm resize-none font-mono" rows={3} placeholder={`Input: a=2, b=3 → Output: 5\nInput: a=10, b=20 → Output: 30`} value={codingExamples} onChange={e => setCodingExamples(e.target.value)} disabled={readOnly} />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Function Name *</label>
-                      <input type="text" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 font-mono text-sm" placeholder="e.g. add" value={functionName} onChange={e => setFunctionName(e.target.value)} />
+                      <input type="text" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 font-mono text-sm" placeholder="e.g. add" value={functionName} onChange={e => setFunctionName(e.target.value)} disabled={readOnly} />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Total Test Cases</label>
-                      <input type="number" min="1" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white outline-none focus:border-primary/50 text-sm" value={totalQuestions} onChange={e => setTotalQuestions(Number(e.target.value))} />
+                      <input type="number" min="1" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white outline-none focus:border-primary/50 text-sm" value={totalQuestions} onChange={e => setTotalQuestions(Number(e.target.value))} disabled={readOnly} />
                     </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Time Limit (minutes)</label>
-                    <input type="number" min="0" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white outline-none focus:border-primary/50 text-sm" value={timeLimitMinutes} onChange={e => setTimeLimitMinutes(Number(e.target.value))} />
+                    <input type="number" min="0" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white outline-none focus:border-primary/50 text-sm" value={timeLimitMinutes} onChange={e => setTimeLimitMinutes(Number(e.target.value))} disabled={readOnly} />
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">0 = no limit</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Starter Code</label>
-                    <textarea className="w-full h-32 px-4 py-3 rounded-xl bg-black/10 dark:bg-white/10 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 font-mono text-sm resize-none" value={starterCode} onChange={e => setStarterCode(e.target.value)} />
+                    <textarea className="w-full h-32 px-4 py-3 rounded-xl bg-black/10 dark:bg-white/10 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 font-mono text-sm resize-none" value={starterCode} onChange={e => setStarterCode(e.target.value)} disabled={readOnly} />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Test Cases (JSON) *</label>
-                    <textarea className="w-full h-32 px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 font-mono text-xs resize-none" placeholder='[{"input": [2, 3], "expected": 5}]' value={testCasesJson} onChange={e => setTestCasesJson(e.target.value)} />
+                    <textarea className="w-full h-32 px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 font-mono text-xs resize-none" placeholder='[{"input": [2, 3], "expected": 5}]' value={testCasesJson} onChange={e => setTestCasesJson(e.target.value)} disabled={readOnly} />
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Array of objects with "input" (array of args) and "expected" values</p>
                   </div>
                 </div>
               </div>
             )}
 
-            {!isHoliday && assessmentFormat === 'mcq' && (
+            {assessmentFormat === 'mcq' && (
               <div className="p-5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold text-gray-900 dark:text-white">❓ Questions</h3>
@@ -669,6 +508,7 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
                           setQuestionMode('simple');
                         }
                       }}
+                      disabled={readOnly}
                     >Simple</button>
                     <button
                       type="button"
@@ -680,6 +520,7 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
                           setQuestionMode('json');
                         }
                       }}
+                      disabled={readOnly}
                     >JSON</button>
                   </div>
                 </div>
@@ -732,20 +573,21 @@ Q6-Q10, pick 4, 2 marks each`}</pre>
 marks: 1
 image: https://example.com/diagram.png
 explanation: 2+2 equals 4."
+                      disabled={readOnly}
                     />
                   </>
                 ) : (
                   <>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">Each question needs: id, text, type (single/multiple), options array with text, isCorrect (index or array of indices)</p>
-                    <textarea className="w-full h-48 px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 font-mono text-xs resize-none scrollable-area-custom" value={questionsJson} onChange={e => setQuestionsJson(e.target.value)} />
+                    <textarea className="w-full h-48 px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 font-mono text-xs resize-none scrollable-area-custom" value={questionsJson} onChange={e => setQuestionsJson(e.target.value)} disabled={readOnly} />
                   </>
                 )}
                 <div className="mt-3">
                   <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Sections (optional)</label>
                   {questionMode === 'simple' ? (
-                    <textarea className="w-full h-20 px-4 py-2 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 font-mono text-xs resize-none scrollable-area-custom" value={sectionsMd} onChange={e => setSectionsMd(e.target.value)} placeholder="Q1-Q5, pick 3, 1 mark each" />
+                    <textarea className="w-full h-20 px-4 py-2 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 font-mono text-xs resize-none scrollable-area-custom" value={sectionsMd} onChange={e => setSectionsMd(e.target.value)} placeholder="Q1-Q5, pick 3, 1 mark each" disabled={readOnly} />
                   ) : (
-                    <textarea className="w-full h-20 px-4 py-2 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 font-mono text-xs resize-none scrollable-area-custom" value={sectionsJson} onChange={e => setSectionsJson(e.target.value)} />
+                    <textarea className="w-full h-20 px-4 py-2 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 font-mono text-xs resize-none scrollable-area-custom" value={sectionsJson} onChange={e => setSectionsJson(e.target.value)} disabled={readOnly} />
                   )}
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Divide questions into sections. Each section picks random questions from a range of question IDs.</p>
                   {questionMode === 'json' && (
@@ -779,64 +621,23 @@ explanation: 2+2 equals 4."
                 </div>
               </div>
             )}
+          </div>
 
-            {isHoliday && (
-              <div className="p-5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10">
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-4">🏖️ Holiday Homework Config</h3>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Holiday Type</label>
-                  <input type="text" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white outline-none focus:border-primary/50 text-sm" value={holidayType} onChange={e => setHolidayType(e.target.value)} />
-                </div>
-                <textarea className="w-full h-48 px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 font-mono text-xs resize-none" placeholder="Paste full holiday homework JSON content here..." value={jsonContent} onChange={e => setJsonContent(e.target.value)} />
-              </div>
-            )}
-
-            <div className="flex items-center gap-3">
-              <input type="checkbox" id="showPreview" checked={showJsonPreview} onChange={e => setShowJsonPreview(e.target.checked)} className="rounded" />
-              <label htmlFor="showPreview" className="text-sm text-gray-600 dark:text-gray-300">Show JSON Preview</label>
-            </div>
-
-            {showJsonPreview && (
-              <div className="p-4 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10">
-                <ScrollableArea className="max-h-60">
-                  <pre className="text-xs text-gray-900 dark:text-white font-mono whitespace-pre-wrap">{JSON.stringify(buildPayload(), null, 2)}</pre>
-                </ScrollableArea>
-              </div>
-            )}
+        {readOnly ? (
+          <div className="flex gap-3 justify-center mt-8 flex-wrap">
+            <button className="px-6 py-3 rounded-xl font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90" onClick={() => navigate('/dashboard/assessments')}>← Back to Assessments</button>
+          </div>
+        ) : (
+          <div className="flex gap-3 justify-center mt-8 flex-wrap">
+            <button className={`px-6 py-3 rounded-xl font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 disabled:opacity-50`} onClick={handleCreate} disabled={creating}>
+              {creating ? (isEditing ? 'Updating...' : 'Creating...') : (isEditing ? 'Update Assessment' : 'Create Assessment')}
+            </button>
           </div>
         )}
-
-        <div className="flex gap-3 justify-center mt-8 flex-wrap">
-          <button className="px-5 py-2.5 rounded-xl text-sm font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:bg-blue-500/30" onClick={loadSample}>📥 Load Sample</button>
-          <button className={`px-6 py-3 rounded-xl font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 disabled:opacity-50`} onClick={handleCreate} disabled={creating}>
-            {creating ? (isEditing ? 'Updating...' : 'Creating...') : (isEditing ? 'Update Assessment' : 'Create Assessment')}
-          </button>
-          <button className="px-6 py-3 rounded-xl font-medium bg-black/5 dark:bg-white/10 border border-gray-300 dark:border-white/20 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20" onClick={() => navigate(skipInitialAuth ? '/dashboard' : '/')}>← Back to Home</button>
-        </div>
 
         {status && (
-          <div className={`mt-6 p-4 rounded-xl text-sm ${status.startsWith('Error') ? 'bg-red-500/10 border border-red-500/20 text-red-400' : status.includes('created') ? 'bg-green-500/10 border border-green-500/20 text-green-400' : 'bg-blue-500/10 border border-blue-500/20 text-blue-400'}`}>
+          <div className={`mt-6 p-4 rounded-xl text-sm ${status.startsWith('Error') ? 'bg-red-500/10 border border-red-500/20 text-red-400' : 'bg-blue-500/10 border border-blue-500/20 text-blue-400'}`}>
             {status}
-          </div>
-        )}
-
-        {dialog?.show && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setDialog(null)}>
-            <div className="glass-card w-full max-w-md mx-4 animate-slideUp" onClick={e => e.stopPropagation()}>
-              <div className="text-center mb-6">
-                <div className={`text-5xl mb-4 ${dialog.type === 'success' ? '' : ''}`}>
-                  {dialog.type === 'success' ? '✅' : '❌'}
-                </div>
-                <h3 className={`text-xl font-bold ${dialog.type === 'success' ? 'text-green-400' : 'text-red-400'} mb-2`}>
-                  {dialog.type === 'success' ? 'Success' : 'Error'}
-                </h3>
-                <p className="text-gray-500 dark:text-gray-400">{dialog.message}</p>
-                {dialog.id && <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Document ID: {dialog.id}</p>}
-              </div>
-              <button className="w-full px-6 py-3 rounded-xl font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90" onClick={() => setDialog(null)}>
-                OK
-              </button>
-            </div>
           </div>
         )}
       </div>

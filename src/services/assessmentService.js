@@ -5,7 +5,6 @@ import { collection, doc, getDoc, getDocs, addDoc, setDoc, query, where, orderBy
 const ASSESSMENTS_COL = 'examConfigs';
 const SUBMISSIONS_COL = 'submissions';
 const NOW = () => new Date();
-const TIMED_EXAM_TYPE = 'Timed Assessment';
 
 export const toDate = (ts) => {
   if (!ts) return new Date(0);
@@ -19,7 +18,6 @@ export const getActiveAssessments = async () => {
   try {
     const q = query(
       collection(db, ASSESSMENTS_COL),
-      where('examType', '==', TIMED_EXAM_TYPE),
       where('enabled', '==', true)
     );
     const snapshot = await getDocs(q);
@@ -49,7 +47,6 @@ export const getAssessmentsForClassSubject = async (classNum, subject) => {
   try {
     const q = query(
       collection(db, ASSESSMENTS_COL),
-      where('examType', '==', TIMED_EXAM_TYPE),
       where('classNum', '==', String(classNum)),
       where('subject', '==', subject)
     );
@@ -116,12 +113,9 @@ export const submitMcqAttempt = async (assessmentId, studentInfo, answers, resul
     if (new Date() > toDate(assessment.endDateTime)) {
       throw new Error('Assessment has expired');
     }
-    const examKey = `${assessment.examType}_${assessment.classNum}_${assessment.subject}`;
     const docRef = await addDoc(collection(db, SUBMISSIONS_COL), {
       type: 'mcq',
-      examKey,
       assessmentId,
-      examType: assessment.examType,
       assessmentFormat: assessment.assessmentFormat || 'mcq',
       classNum: String(assessment.classNum),
       subject: assessment.subject,
@@ -159,12 +153,9 @@ export const submitProject = async (assessmentId, studentInfo, projectData, file
       fileUrl = uploadResult.url;
       fileName = uploadResult.name;
     }
-    const examKey = `${assessment.examType}_${assessment.classNum}_${assessment.subject}`;
     const docRef = await addDoc(collection(db, SUBMISSIONS_COL), {
       type: 'project',
-      examKey,
       assessmentId,
-      examType: assessment.examType,
       assessmentFormat: assessment.assessmentFormat || 'project',
       classNum: String(assessment.classNum),
       subject: assessment.subject,
@@ -192,7 +183,7 @@ export const uploadFile = async (file, assessmentId, rollNumber, onProgress) => 
   const timestamp = Date.now();
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
   const fileName = `${rollNumber}_${timestamp}_${safeName}`;
-  const dirPath = `timed-assessments/${assessmentId}`;
+  const dirPath = `assessments/${assessmentId}`;
 
   const result = await puter.fs.upload([file], dirPath, {
     createMissingParents: true,

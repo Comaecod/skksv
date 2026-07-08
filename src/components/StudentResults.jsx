@@ -1,14 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../auth/contexts/AuthContext';
 
-const FILTER_KEYS = ['All', 'Timed Assessment', 'Unit Test', 'Mid Term', 'Final Exam', 'Weekly Test', 'Holiday Homework'];
 const SUBJECTS = ['All', 'Computers', 'English', 'Hindi', 'Maths', 'Science', 'Social', 'Telugu', 'GK', 'General'];
 
 export default function StudentResults() {
   const { userProfile: authUser } = useAuth();
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [examTypeFilter, setExamTypeFilter] = useState('All');
   const [subjectFilter, setSubjectFilter] = useState('All');
   const [search, setSearch] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: 'submittedAt', direction: 'desc' });
@@ -69,14 +67,12 @@ export default function StudentResults() {
 
   const filtered = useMemo(() => {
     let items = [...results];
-    if (examTypeFilter !== 'All') items = items.filter(r => r.examType === examTypeFilter);
     if (subjectFilter !== 'All') items = items.filter(r => r.subject === subjectFilter);
     if (search) {
       const q = search.toLowerCase();
       items = items.filter(r =>
         r.title.toLowerCase().includes(q) ||
-        r.subject.toLowerCase().includes(q) ||
-        r.examType.toLowerCase().includes(q)
+        r.subject.toLowerCase().includes(q)
       );
     }
     items.sort((a, b) => {
@@ -93,7 +89,7 @@ export default function StudentResults() {
       return sortConfig.direction === 'asc' ? (aVal || 0) - (bVal || 0) : (bVal || 0) - (aVal || 0);
     });
     return items;
-  }, [results, examTypeFilter, subjectFilter, search, sortConfig]);
+  }, [results, subjectFilter, search, sortConfig]);
 
   const handleSort = (key) => {
     setSortConfig(prev => ({ key, direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc' }));
@@ -108,10 +104,7 @@ export default function StudentResults() {
     return ['All', ...Array.from(set).sort()];
   }, [results]);
 
-  const examTypes = useMemo(() => {
-    const set = new Set(results.map(r => r.examType).filter(Boolean));
-    return ['All', ...Array.from(set).sort()];
-  }, [results]);
+  const isFiltered = subjectFilter !== 'All' || search;
 
   if (loading) {
     return (
@@ -162,13 +155,7 @@ export default function StudentResults() {
         >
           {subjects.map(s => <option key={s} value={s}>{s === 'All' ? 'All Subjects' : s}</option>)}
         </select>
-        <select
-          value={examTypeFilter}
-          onChange={e => setExamTypeFilter(e.target.value)}
-          className="px-4 py-2.5 rounded-xl bg-[#282843] border border-white/10 text-white text-sm focus:outline-none focus:border-primary/50"
-        >
-          {examTypes.map(t => <option key={t} value={t}>{t === 'All' ? 'All Types' : t}</option>)}
-        </select>
+
       </div>
 
       {filtered.length === 0 ? (
@@ -183,7 +170,6 @@ export default function StudentResults() {
               <tr className="border-b border-white/10">
                 <th className="px-4 py-3 text-left text-sm font-semibold text-gray-300 cursor-pointer hover:text-white" onClick={() => handleSort('title')}>Title <SortIcon columnKey="title" /></th>
                 <th className="px-4 py-3 text-left text-sm font-semibold text-gray-300 cursor-pointer hover:text-white" onClick={() => handleSort('subject')}>Subject <SortIcon columnKey="subject" /></th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-300 cursor-pointer hover:text-white" onClick={() => handleSort('examType')}>Type <SortIcon columnKey="examType" /></th>
                 <th className="px-4 py-3 text-left text-sm font-semibold text-gray-300">Class</th>
                 <th className="px-4 py-3 text-left text-sm font-semibold text-gray-300 cursor-pointer hover:text-white" onClick={() => handleSort('correct')}>Correct <SortIcon columnKey="correct" /></th>
                 <th className="px-4 py-3 text-left text-sm font-semibold text-gray-300 cursor-pointer hover:text-white" onClick={() => handleSort('wrong')}>Wrong <SortIcon columnKey="wrong" /></th>
@@ -201,13 +187,6 @@ export default function StudentResults() {
                   <tr key={row.id} className="border-b border-white/5 hover:bg-white/5">
                     <td className="px-4 py-3 text-sm text-white">{row.title}</td>
                     <td className="px-4 py-3 text-sm text-gray-400">{row.subject || '-'}</td>
-                    <td className="px-4 py-3 text-sm">
-                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                        isCoding ? 'bg-blue-500/20 text-blue-300' :
-                        row.examType === 'Timed Assessment' ? 'bg-purple-500/20 text-purple-300' :
-                        'bg-gray-500/20 text-gray-300'
-                      }`}>{row.examType || (isCoding ? 'Coding' : 'MCQ')}</span>
-                    </td>
                     <td className="px-4 py-3 text-sm text-gray-400">{row.classNum || '-'}</td>
                     <td className="px-4 py-3 text-sm text-emerald-400">{row.correct}</td>
                     <td className="px-4 py-3 text-sm text-red-400">{row.wrong}</td>

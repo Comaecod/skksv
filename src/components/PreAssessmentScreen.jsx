@@ -35,7 +35,6 @@ const PreAssessmentScreen = ({ config, onSuccess, onBack }) => {
 
       <div className="mb-6 p-4 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10">
         <div className="text-center">
-          <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">{config.examType}</div>
           <div className="text-lg font-semibold text-gray-900 dark:text-white">Class {config.classNum} - {subjectLabel(config.subject)}</div>
         </div>
       </div>

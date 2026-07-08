@@ -209,14 +209,14 @@ export default function CodingScreen({ config, studentInfo, onComplete }) {
     try {
       const { db } = await import('../firebase');
       const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
-      const examKey = `${config.examType}_${config.classNum}_${config.subject}`;
       await addDoc(collection(db, 'submissions'), {
         type: 'coding',
-        examKey,
-        examType: config.examType,
         subject: config.subject,
         title: config.examTitle,
         assessmentId: config.id || '',
+        teacher: config.teacher || '',
+        invigilator: config.invigilator || '',
+        createdBy: config.createdBy || null,
         student: {
           userId: studentInfo?.userId || null,
           name: studentInfo?.name || `${studentInfo?.firstName || ''} ${studentInfo?.lastName || ''}`.trim() || 'Unknown',

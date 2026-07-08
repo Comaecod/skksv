@@ -1,12 +1,12 @@
 import { subjectLabel } from '../utils/format';
 
-const SubjectSelectionScreen = ({ examType, classNum, subjects, isLoading, onSelect, onBack }) => {
+const SubjectSelectionScreen = ({ classNum, subjects, isLoading, onSelect, onBack }) => {
   return (
     <div className="glass-card w-full max-w-2xl animate-slideUp">
       <div className="text-center mb-8">
         <div className="text-5xl mb-4">📚</div>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{examType}</h2>
-        <p className="text-gray-500 dark:text-gray-400">Class {classNum} - Select Subject</p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Select Subject</h2>
+        <p className="text-gray-500 dark:text-gray-400">Class {classNum}</p>
       </div>
 
       {isLoading ? (

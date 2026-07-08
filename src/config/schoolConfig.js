@@ -34,14 +34,8 @@ export const GRADING_SYSTEM = {
   E: { min: 0, grade: 'E', label: 'Needs Improvement', color: 'text-red-400' }
 };
 
-export const EXAM_TYPES = {
-  ASSESSMENT: 'Assessment',
-  HOLIDAY_HOMEWORK: 'Holiday Homework'
-};
-
 export const SCREENS = {
   HOME: 'home',
-  HOLIDAY_TYPE: 'holiday-type',
   CLASS: 'class',
   SUBJECT: 'subject',
   INTRO: 'intro',
@@ -49,8 +43,7 @@ export const SCREENS = {
   STUDENT: 'student',
   QUIZ: 'quiz',
   RESULT: 'result',
-  REPORTS: 'reports',
-  CONTENT: 'content'
+  REPORTS: 'reports'
 };
 
 export const SUBJECTS = [

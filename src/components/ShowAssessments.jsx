@@ -1,31 +1,28 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { isMasterKey } from '../utils/auth';
+import { subjectLabel } from '../utils/format';
+import { useAuth } from '../auth/contexts/AuthContext';
 
-const CATEGORY_ICONS = {
-  'Slip Test': '📝',
-  'Unit Test 1': '📖',
-  'Unit Test 2': '📖',
-  'Term 1': '📚',
-  'Term 2': '📚',
-  'Bridge Course': '🌉',
-  'Timed Assessment': '⏱️',
-  'Holiday Homework': '🏖️'
-};
+const FORMAT_LABELS = { mcq: 'MCQ', project: 'Project', coding: 'Coding' };
+const FORMAT_COLORS = { mcq: 'bg-purple-500/20 text-purple-400', project: 'bg-orange-500/20 text-orange-400', coding: 'bg-green-500/20 text-green-400' };
 
-const TYPE_COLORS = {
-  'Slip Test': 'border-blue-500/30 bg-blue-500/5',
-  'Unit Test 1': 'border-green-500/30 bg-green-500/5',
-  'Unit Test 2': 'border-teal-500/30 bg-teal-500/5',
-  'Term 1': 'border-purple-500/30 bg-purple-500/5',
-  'Term 2': 'border-fuchsia-500/30 bg-fuchsia-500/5',
-  'Bridge Course': 'border-amber-500/30 bg-amber-500/5',
-  'Timed Assessment': 'border-cyan-500/30 bg-cyan-500/5',
-  'Holiday Homework': 'border-rose-500/30 bg-rose-500/5'
-};
+function SortIcon({ active, direction }) {
+  return <span className="inline-block ml-1 text-[10px]">{active ? (direction === 'asc' ? '▲' : '▼') : '⇅'}</span>;
+}
+
+const SORTABLE_COLUMNS = [
+  { key: 'title', label: 'Title' },
+  { key: 'subject', label: 'Subject' },
+  { key: 'classNum', label: 'Class' },
+  { key: 'assessmentFormat', label: 'Format' },
+  { key: 'teacher', label: 'Teacher' },
+  { key: 'enabled', label: 'Status' },
+];
 
 const ShowAssessments = ({ skipInitialAuth } = {}) => {
   const navigate = useNavigate();
+  const { userProfile } = useAuth();
 
   const [password, setPassword] = useState('');
   const [isAuthorized, setIsAuthorized] = useState(skipInitialAuth || false);
@@ -34,11 +31,11 @@ const ShowAssessments = ({ skipInitialAuth } = {}) => {
   const [assessments, setAssessments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [expandedId, setExpandedId] = useState(null);
-  const [status, setStatus] = useState('');
-  const [activeCategory, setActiveCategory] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [search, setSearch] = useState('');
+  const [sortKey, setSortKey] = useState('title');
+  const [sortDir, setSortDir] = useState('asc');
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [status, setStatus] = useState('');
 
   const handlePasswordSubmit = (e) => {
     e.preventDefault();
@@ -57,11 +54,8 @@ const ShowAssessments = ({ skipInitialAuth } = {}) => {
     try {
       const { db } = await import('../firebase');
       const { collection, getDocs } = await import('firebase/firestore');
-
       const snap = await getDocs(collection(db, 'examConfigs'));
-      const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-      setAssessments(items);
+      setAssessments(snap.docs.map(d => ({ id: d.id, ...d.data() })));
     } catch (err) {
       setError(err.message);
     }
@@ -69,30 +63,13 @@ const ShowAssessments = ({ skipInitialAuth } = {}) => {
   }, []);
 
   useEffect(() => {
-    if (skipInitialAuth) {
-      fetchAll();
-    }
+    if (skipInitialAuth) fetchAll();
   }, [skipInitialAuth, fetchAll]);
 
-  const grouped = getAllGrouped();
-
-  function getAllGrouped() {
-    const all = assessments.map(e => ({ ...e, category: e.examType || 'Unknown' }));
-    const grouped = {};
-    all.forEach(item => {
-      const cat = item.category || 'Other';
-      if (!grouped[cat]) grouped[cat] = [];
-      grouped[cat].push(item);
-    });
-    Object.keys(grouped).forEach(k => grouped[k].sort((a, b) => String(a.title || '').localeCompare(String(b.title || ''))));
-    return grouped;
-  }
-
-  const categories = Object.keys(grouped).sort();
-
-  const filtered = activeCategory === 'all'
-    ? Object.entries(grouped)
-    : [[activeCategory, grouped[activeCategory] || []]];
+  const handleSort = (key) => {
+    if (sortKey === key) setSortDir(d => (d === 'asc' ? 'desc' : 'asc'));
+    else { setSortKey(key); setSortDir('asc'); }
+  };
 
   const handleDelete = async (item) => {
     if (confirmDelete !== item.id) { setConfirmDelete(item.id); return; }
@@ -108,9 +85,30 @@ const ShowAssessments = ({ skipInitialAuth } = {}) => {
     }
   };
 
-  const handleEdit = (item) => {
-    navigate(`/dashboard/assessments/edit/${item.id}`);
-  };
+  const handleEdit = (item) => navigate(`/dashboard/assessments/edit/${item.id}`);
+
+  const filtered = [...assessments]
+    .filter(item => {
+      if (userProfile && userProfile.role !== 'super_admin' && userProfile.role !== 'admin') {
+        if (item.createdBy !== userProfile.id) return false;
+      }
+      if (!search) return true;
+      const q = search.toLowerCase();
+      return (item.title || '').toLowerCase().includes(q)
+        || String(item.subject || '').toLowerCase().includes(q)
+        || String(item.classNum || '').includes(q)
+        || (item.teacher || '').toLowerCase().includes(q);
+    })
+    .sort((a, b) => {
+      let va = a[sortKey], vb = b[sortKey];
+      if (sortKey === 'classNum') { va = String(va || '').padStart(10, '0'); vb = String(vb || '').padStart(10, '0'); }
+      else if (sortKey === 'subject') { va = subjectLabel(va) || ''; vb = subjectLabel(vb) || ''; }
+      else if (sortKey === 'enabled') { va = va === false ? 0 : 1; vb = vb === false ? 0 : 1; }
+      else { va = String(va || '').toLowerCase(); vb = String(vb || '').toLowerCase(); }
+      if (va < vb) return sortDir === 'asc' ? -1 : 1;
+      if (va > vb) return sortDir === 'asc' ? 1 : -1;
+      return 0;
+    });
 
   if (!isAuthorized) {
     return (
@@ -134,150 +132,106 @@ const ShowAssessments = ({ skipInitialAuth } = {}) => {
 
   if (loading) {
     return (
-      <div className="w-full flex items-center justify-center px-4 py-8">
-        <div className="glass-card p-8 text-center w-full max-w-md">
-          <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-500 dark:text-gray-400">Loading assessments...</p>
-        </div>
+      <div className="flex items-center justify-center py-20">
+        <div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
 
-  const totalCount = categories.reduce((sum, c) => sum + grouped[c].length, 0);
-
   return (
-    <div className="w-full px-4 py-8">
-      <div className="max-w-5xl mx-auto">
-        <div className="glass-card p-6 sm:p-8 animate-slideUp">
-          <div className="text-center mb-8">
-            <div className="text-5xl mb-4">📋</div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">All Assessments</h2>
-            <p className="text-gray-500 dark:text-gray-400">{totalCount} assessments across {categories.length} categories</p>
-          </div>
-
-          {status && (
-            <div className={`mb-6 p-4 rounded-xl text-sm ${status.startsWith('Deleted') || status.startsWith('Save failed') || status.startsWith('Delete failed') ? 'bg-red-500/10 border border-red-500/20 text-red-400' : 'bg-green-500/10 border border-green-500/20 text-green-400'}`}>
-              {status}
-              <button className="ml-3 text-xs underline" onClick={() => setStatus('')}>Dismiss</button>
-            </div>
-          )}
-
-          {error && (
-            <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">{error}</div>
-          )}
-
-          <div className="flex flex-col sm:flex-row gap-4 mb-8">
-            <div className="flex-1">
-              <input type="text" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 text-sm" placeholder="Search assessments..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
-            </div>
-            <div className="flex gap-2 flex-wrap">
-              <button className={`px-3 py-2 rounded-xl text-xs font-medium transition-all ${activeCategory === 'all' ? 'bg-primary text-white' : 'bg-black/5 dark:bg-white/10 text-gray-900 dark:text-white'}`} onClick={() => setActiveCategory('all')}>All ({totalCount})</button>
-              {categories.map(cat => (
-                <button key={cat} className={`px-3 py-2 rounded-xl text-xs font-medium transition-all ${activeCategory === cat ? 'bg-primary text-white' : 'bg-black/5 dark:bg-white/10 text-gray-900 dark:text-white'}`} onClick={() => setActiveCategory(cat)}>
-                  {CATEGORY_ICONS[cat] || '📋'} {cat} ({grouped[cat].length})
-                </button>
-              ))}
-              <button className="px-3 py-2 rounded-xl text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-green-500/30" onClick={() => navigate('/dashboard/assessments/new')}>+ New</button>
-              <button className="px-3 py-2 rounded-xl text-xs font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:bg-blue-500/30" onClick={fetchAll}>🔄 Refresh</button>
-            </div>
-          </div>
-
-          {filtered.length === 0 || filtered.every(([, items]) => items.length === 0) ? (
-            <div className="text-center py-12">
-              <div className="text-5xl mb-4">📭</div>
-              <p className="text-gray-500 dark:text-gray-400">No assessments found</p>
-            </div>
-          ) : (
-            <div className="space-y-8">
-              {filtered.map(([category, items]) => {
-                if (!items || items.length === 0) return null;
-                const filteredItems = searchQuery
-                  ? items.filter(i =>
-                      (i.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-                      (i.subject || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-                      String(i.classNum || '').includes(searchQuery)
-                    )
-                  : items;
-                if (filteredItems.length === 0) return null;
-
-                return (
-                  <div key={category}>
-                    <div className={`p-4 rounded-xl border mb-4 ${TYPE_COLORS[category] || 'border-gray-200 dark:border-white/10 bg-black/5 dark:bg-white/5'}`}>
-                      <div className="flex items-center gap-3">
-                        <span className="text-2xl">{CATEGORY_ICONS[category] || '📋'}</span>
-                        <div>
-                          <h3 className="font-bold text-gray-900 dark:text-white">{category}</h3>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">{filteredItems.length} assessment{filteredItems.length !== 1 ? 's' : ''}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      {filteredItems.map(item => {
-                        const isExpanded = expandedId === item.id;
-                        const isConfirmingDelete = confirmDelete === item.id;
-                        const key = item.id;
-
-                        return (
-                          <div key={key} className="rounded-xl border border-gray-200 dark:border-white/10 bg-black/5 dark:bg-white/5 overflow-hidden transition-all">
-                            <div className="p-4">
-                              <div className="flex items-start justify-between gap-4">
-                                <div className="flex-1 min-w-0">
-                                  <div className="font-semibold text-gray-900 dark:text-white">{item.title || item.id}</div>
-                                  <div className="flex gap-3 mt-1 text-xs text-gray-500 dark:text-gray-400 flex-wrap">
-                                    {item.subject && <span>{item.subject}</span>}
-                                    {item.teacher && <span>Teacher: {item.teacher}</span>}
-                                    {item.examType && (
-                                      <span className={`px-1.5 py-0.5 rounded text-xs ${item.examType === 'Timed Assessment' ? 'bg-cyan-500/20 text-cyan-400' : 'bg-gray-500/20 text-gray-400'}`}>
-                                        {item.examType === 'Timed Assessment' ? '⏱️ Timed' : '📋 Standard'}
-                                      </span>
-                                    )}
-                                    {item.assessmentFormat && (
-                                      <span className={`px-1.5 py-0.5 rounded text-xs ${
-                                        item.assessmentFormat === 'mcq' ? 'bg-purple-500/20 text-purple-400' :
-                                        item.assessmentFormat === 'project' ? 'bg-orange-500/20 text-orange-400' :
-                                        'bg-green-500/20 text-green-400'
-                                      }`}>
-                                        {item.assessmentFormat === 'mcq' ? 'MCQ' : item.assessmentFormat === 'project' ? 'Project' : 'Coding'}
-                                      </span>
-                                    )}
-                                    {item.enabled === false && (
-                                      <span className="text-red-400 font-medium">Disabled</span>
-                                    )}
-                                  </div>
-                                </div>
-                                <div className="flex gap-2 flex-shrink-0">
-                                  <button className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-white/10 text-gray-500 dark:text-gray-400 text-sm" onClick={() => setExpandedId(isExpanded ? null : item.id)}>
-                                    {isExpanded ? '▲' : '▼'}
-                                  </button>
-                                  <button className="p-2 rounded-lg hover:bg-blue-500/20 text-blue-400 text-sm" onClick={() => handleEdit(item)}>✏️</button>
-                                  <button className={`p-2 rounded-lg text-sm ${isConfirmingDelete ? 'bg-red-500/20 text-red-400 animate-pulse' : 'hover:bg-red-500/20 text-red-400'}`} onClick={() => handleDelete(item)}>
-                                    {isConfirmingDelete ? '⚠️' : '🗑️'}
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-
-                            {isExpanded && (
-                              <div className="border-t border-gray-200 dark:border-white/10 p-4">
-                                <pre className="text-xs text-gray-900 dark:text-white font-mono overflow-auto max-h-96 whitespace-pre-wrap bg-black/10 dark:bg-white/5 rounded-lg p-3">{JSON.stringify(item, null, 2)}</pre>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          <div className="text-center mt-8">
-            <button className="px-6 py-3 rounded-xl font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90" onClick={() => navigate(skipInitialAuth ? '/dashboard' : '/')}>← Back to Home</button>
-          </div>
+    <div className="p-6 max-w-7xl mx-auto">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-bold text-white">All Assessments</h2>
+        <div className="flex gap-2">
+          <button className="px-4 py-2 rounded-xl text-sm font-medium bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-green-500/30" onClick={() => navigate('/dashboard/assessments/new')}>+ New</button>
+          <button className="px-4 py-2 rounded-xl text-sm font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:bg-blue-500/30" onClick={fetchAll}>🔄 Refresh</button>
         </div>
       </div>
+
+      {status && (
+        <div className={`mb-4 p-3 rounded-lg text-sm ${status.startsWith('Deleted') || status.startsWith('Delete failed') ? 'bg-red-500/10 border border-red-500/20 text-red-400' : 'bg-green-500/10 border border-green-500/20 text-green-400'}`}>
+          {status} <button className="ml-3 text-xs underline" onClick={() => setStatus('')}>Dismiss</button>
+        </div>
+      )}
+
+      {error && (
+        <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">{error}</div>
+      )}
+
+      <div className="flex flex-col sm:flex-row gap-3 mb-4">
+        <input
+          type="text"
+          placeholder="Search assessments..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="flex-1 px-4 py-2.5 rounded-xl bg-[#282843] border border-white/10 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all"
+        />
+        <span className="text-sm text-gray-400 self-center whitespace-nowrap">{filtered.length} result{filtered.length !== 1 ? 's' : ''}</span>
+      </div>
+
+      {filtered.length === 0 ? (
+        <div className="text-center py-16 bg-[#282843] rounded-xl border border-white/10">
+          <div className="text-4xl mb-3">{assessments.length === 0 ? '📭' : '🔍'}</div>
+          <p className="text-gray-400">{assessments.length === 0 ? 'No assessments found in database.' : 'No assessments match your filters.'}</p>
+        </div>
+      ) : (
+        <div className="bg-[#282843] rounded-xl border border-white/10 overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-white/10 text-left text-xs text-gray-400 uppercase tracking-wider">
+                {SORTABLE_COLUMNS.map(col => (
+                  <th
+                    key={col.key}
+                    onClick={() => handleSort(col.key)}
+                    className={`px-4 py-3 font-semibold select-none cursor-pointer hover:text-white transition-colors ${sortKey === col.key ? 'text-primary' : ''}`}
+                  >
+                    {col.label}
+                    <SortIcon active={sortKey === col.key} direction={sortDir} />
+                  </th>
+                ))}
+                <th className="px-4 py-3 font-semibold">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map(item => {
+                const isConfirming = confirmDelete === item.id;
+                return (
+                  <tr
+                    key={item.id}
+                    className="border-b border-white/5 hover:bg-white/5 text-sm text-gray-300 cursor-pointer transition-colors"
+                    onClick={() => navigate('/dashboard/assessments/view/' + item.id)}
+                  >
+                    <td className="px-4 py-3 text-white font-medium max-w-[240px] truncate" title={item.title}>{item.title || item.id}</td>
+                    <td className="px-4 py-3">{subjectLabel(item.subject)}</td>
+                    <td className="px-4 py-3">{item.classNum || '—'}</td>
+                    <td className="px-4 py-3">
+                      {item.assessmentFormat && (
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${FORMAT_COLORS[item.assessmentFormat] || 'bg-gray-500/20 text-gray-400'}`}>
+                          {FORMAT_LABELS[item.assessmentFormat] || item.assessmentFormat}
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">{item.teacher || '—'}</td>
+                    <td className="px-4 py-3">
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${item.enabled === false ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+                        {item.enabled === false ? 'Disabled' : 'Active'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <button className="px-2 py-1 rounded-lg text-xs font-medium bg-blue-500/20 text-blue-400 hover:bg-blue-500/30" onClick={(e) => { e.stopPropagation(); handleEdit(item); }}>Edit</button>
+                        <button className={`px-2 py-1 rounded-lg text-xs font-medium ${isConfirming ? 'bg-red-500/20 text-red-400 animate-pulse' : 'bg-red-500/10 text-red-400 hover:bg-red-500/20'}`} onClick={(e) => { e.stopPropagation(); handleDelete(item); }}>
+                          {isConfirming ? 'Confirm?' : 'Delete'}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };

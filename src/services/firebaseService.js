@@ -4,7 +4,7 @@
  */
 
 import { db } from '../firebase';
-import { collection, addDoc, doc, getDoc, setDoc, serverTimestamp, increment, query, where, getDocs } from 'firebase/firestore';
+import { collection, addDoc, doc, getDoc, setDoc, serverTimestamp, increment } from 'firebase/firestore';
 
 const ANALYTICS_DOC = 'analytics';
 const VISITOR_COUNT_FIELD = 'pageViews';
@@ -72,17 +72,16 @@ export const getPageViewCount = async () => {
  */
 export const saveQuizResult = async (studentInfo, config, results) => {
   try {
-    const examKey = `${config.examType}_${config.classNum}_${config.subject}`;
     const docRef = await addDoc(collection(db, 'submissions'), {
       type: 'mcq',
-      examKey,
       assessmentId: config.id || '',
-      examType: config.examType,
       assessmentFormat: config.assessmentFormat || 'mcq',
       classNum: String(config.classNum),
       subject: config.subject,
       title: config.examTitle || config.title,
       teacher: config.teacher || '',
+      invigilator: config.invigilator || '',
+      createdBy: config.createdBy || null,
       
       student: {
         userId: studentInfo.userId || null,
@@ -112,17 +111,4 @@ export const saveQuizResult = async (studentInfo, config, results) => {
   }
 };
 
-export const checkExistingSubmission = async (userId, examKey) => {
-  if (!userId || !examKey) return false;
-  try {
-    const q = query(
-      collection(db, 'submissions'),
-      where('examKey', '==', examKey),
-      where('student.userId', '==', userId)
-    );
-    const snapshot = await getDocs(q);
-    return snapshot.docs.length > 0;
-  } catch {
-    return false;
-  }
-};
+

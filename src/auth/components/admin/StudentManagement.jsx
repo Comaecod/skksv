@@ -51,7 +51,7 @@ const initialFormState = {
   password: '',
   displayName: '',
   phone: '',
-  studentClass: '',
+  studentClass: '4',
   section: '',
   dayScholarOrHostel: '',
   penNo: '',
@@ -80,6 +80,8 @@ export default function StudentManagement() {
   const [formSuccess, setFormSuccess] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterClass, setFilterClass] = useState('');
+  const [filterResidence, setFilterResidence] = useState('');
 
   useEffect(() => {
     loadStudents();
@@ -204,6 +206,8 @@ export default function StudentManagement() {
   };
 
   const filteredStudents = students.filter((s) => {
+    if (filterClass && s.studentClass !== filterClass) return false;
+    if (filterResidence && s.dayScholarOrHostel !== filterResidence) return false;
     if (!searchTerm) return true;
     const q = searchTerm.toLowerCase();
     return (
@@ -313,6 +317,8 @@ export default function StudentManagement() {
 
       <div className="flex flex-col sm:flex-row gap-3 mb-4">
         <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search by name, email, admission no, or father's name..." className="flex-1 px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 transition-all text-sm" />
+        <CustomSelect value={filterClass} onChange={setFilterClass} options={[{ value: '', label: 'All Classes' }, ...CLASS_OPTIONS]} className="min-w-[140px]" />
+        <CustomSelect value={filterResidence} onChange={setFilterResidence} options={[{ value: '', label: 'All Residences' }, ...RESIDENCE_OPTIONS]} className="min-w-[160px]" />
         <button onClick={loadStudents} className="px-4 py-2.5 rounded-xl text-sm font-medium border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-all">Refresh</button>
       </div>
 

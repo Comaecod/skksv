@@ -17,7 +17,7 @@ const getNested = (obj, ...keys) => {
 
 export const downloadReportAsExcel = (data, config) => {
   const first = data[0] || {};
-  const isProject = first.assessmentType === 'project';
+  const isProject = first.type === 'project';
 
   const worksheetData = [
     ['Student Report'],

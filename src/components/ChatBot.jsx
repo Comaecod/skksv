@@ -22,7 +22,6 @@ const SparkleIcon = () => (
 const pageNameMap = {
   '/': 'Home',
   '/assessments': 'Assessments',
-  '/holiday-homework': 'Holiday Homework',
   '/people': 'Staff Directory',
   '/gallery': 'Gallery',
   '/contact': 'Contact',
