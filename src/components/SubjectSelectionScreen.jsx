@@ -1,3 +1,5 @@
+import { subjectLabel } from '../utils/format';
+
 const SubjectSelectionScreen = ({ examType, classNum, subjects, isLoading, onSelect, onBack }) => {
   return (
     <div className="glass-card w-full max-w-2xl animate-slideUp">
@@ -22,7 +24,7 @@ const SubjectSelectionScreen = ({ examType, classNum, subjects, isLoading, onSel
             >
               <span className="text-3xl">📖</span>
               <div className="flex-1">
-                <div className="font-semibold text-gray-900 dark:text-white group-hover:text-primary transition-colors">{subject}</div>
+                <div className="font-semibold text-gray-900 dark:text-white group-hover:text-primary transition-colors">{subjectLabel(subject)}</div>
                 <div className="text-sm text-gray-500 dark:text-gray-400">Click to start assessment</div>
               </div>
               <span className="text-gray-500 dark:text-gray-400 group-hover:text-primary transition-colors">→</span>

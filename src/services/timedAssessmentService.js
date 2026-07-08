@@ -1,6 +1,6 @@
 import puter from '@heyputer/puter.js';
 import { db } from '../firebase';
-import { collection, doc, getDoc, getDocs, addDoc, query, where, orderBy, serverTimestamp, Timestamp } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, addDoc, setDoc, query, where, orderBy, serverTimestamp, Timestamp } from 'firebase/firestore';
 
 const ASSESSMENTS_COL = 'examConfigs';
 const SUBMISSIONS_COL = 'submissions';
@@ -72,6 +72,23 @@ export const getAssessmentById = async (id) => {
   } catch (err) {
     console.error('Error fetching assessment:', err.message);
     return null;
+  }
+};
+
+export const updateAssessment = async (id, data) => {
+  try {
+    const docData = { ...data, updatedAt: serverTimestamp() };
+    if (docData.startDateTime && typeof docData.startDateTime === 'string') {
+      docData.startDateTime = Timestamp.fromDate(new Date(docData.startDateTime));
+    }
+    if (docData.endDateTime && typeof docData.endDateTime === 'string') {
+      docData.endDateTime = Timestamp.fromDate(new Date(docData.endDateTime));
+    }
+    await setDoc(doc(db, ASSESSMENTS_COL, id), docData);
+    return id;
+  } catch (err) {
+    console.error('Error updating assessment:', err.message);
+    throw err;
   }
 };
 

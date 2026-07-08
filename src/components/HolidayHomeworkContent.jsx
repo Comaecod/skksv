@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { subjectLabel } from '../utils/format';
 
 const HolidayHomeworkContent = ({ config, onBack }) => {
   const { examTitle, title, classNum, subject, holidayType, teacher, content } = config;
@@ -24,7 +25,7 @@ const HolidayHomeworkContent = ({ config, onBack }) => {
             <span className="text-sm font-medium">Holiday Homework</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">{examTitle || title}</h1>
-          <p className="text-gray-500 dark:text-gray-400">Class {classNum} • {subject}</p>
+          <p className="text-gray-500 dark:text-gray-400">Class {classNum} • {subjectLabel(subject)}</p>
         </div>
 
         {content && (

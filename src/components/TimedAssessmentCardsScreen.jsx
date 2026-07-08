@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { toDate } from '../services/timedAssessmentService';
+import { subjectLabel } from '../utils/format';
 
 const CountdownTimer = ({ endDateTime }) => {
   const getEndTime = () => toDate(endDateTime);
@@ -78,7 +79,7 @@ const TimedAssessmentCardsScreen = ({ classNum, subject, assessments, isLoading,
       <div className="text-center mb-8">
         <div className="text-5xl mb-4">⏱️</div>
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Timed Assessments</h2>
-        <p className="text-gray-500 dark:text-gray-400">Class {classNum} - {subject}</p>
+        <p className="text-gray-500 dark:text-gray-400">Class {classNum} - {subjectLabel(subject)}</p>
       </div>
 
       {isLoading ? (

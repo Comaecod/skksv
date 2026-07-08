@@ -8,7 +8,7 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [localError, setLocalError] = useState('');
   const [linkSent, setLinkSent] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(true);
   const { loginWithEmail, loginWithGoogle, sendSignInLink, error, clearError } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -134,35 +134,35 @@ export default function LoginScreen() {
                   required
                   autoComplete="current-password"
                 />
+                <div className="text-right mt-1">
+                  <Link
+                    to="/forgot-password"
+                    className="text-sm text-primary dark:text-primary-light hover:underline"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
               </div>
             )}
-
-            <div className="flex items-center justify-between">
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="text-sm text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary-light transition-colors"
-              >
-                {showPassword ? '← Use magic link instead' : 'Use password instead →'}
-              </button>
-              {showPassword && (
-                <Link
-                  to="/forgot-password"
-                  className="text-sm text-primary dark:text-primary-light hover:underline"
-                >
-                  Forgot password?
-                </Link>
-              )}
-            </div>
 
             <button
               type="submit"
               disabled={isLoading}
               className="w-full px-6 py-3 rounded-xl font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 transition-all disabled:opacity-50"
             >
-              {isLoading ? 'Sending...' : showPassword ? 'Sign In' : 'Send Magic Link ✉️'}
+              {isLoading ? 'Signing in...' : showPassword ? 'Sign In' : 'Send Magic Link ✉️'}
             </button>
           </form>
+
+          <div className="mt-4 text-center">
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="text-sm text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary-light transition-colors"
+            >
+              {showPassword ? '← Sign in with a magic link instead' : '← Use password instead'}
+            </button>
+          </div>
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">

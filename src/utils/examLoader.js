@@ -1,5 +1,6 @@
 import { db } from '../firebase';
 import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
+import { resolveSubjectValue } from './format';
 
 const CACHE_TTL = 60 * 1000;
 const queryCache = new Map();
@@ -75,10 +76,17 @@ export const getSubjectsForClass = async (examType, classNum) => {
       where('classNum', '==', String(classNum))
     );
     const snapshot = await getDocs(q);
+    const seen = new Set();
     const subjects = [];
     snapshot.forEach(d => {
       const data = d.data();
-      if (data.subject) subjects.push(data.subject);
+      if (data.subject != null) {
+        const val = resolveSubjectValue(data.subject);
+        if (!seen.has(val)) {
+          seen.add(val);
+          subjects.push(val);
+        }
+      }
     });
     return subjects;
   } catch (error) {

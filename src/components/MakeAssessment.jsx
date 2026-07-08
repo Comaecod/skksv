@@ -1,10 +1,11 @@
-import { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useRef, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../auth/contexts/AuthContext';
 import { isMasterKey } from '../utils/auth';
-import { createAssessment } from '../services/timedAssessmentService';
+import { createAssessment, updateAssessment, getAssessmentById } from '../services/timedAssessmentService';
 import CustomSelect from './CustomSelect';
 import ScrollableArea from './ui/ScrollableArea';
+import { resolveSubjectValue } from '../utils/format';
 
 const ASSESSMENT_TYPES = [
   'Slip Test',
@@ -81,7 +82,7 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
 
   const [assessmentType, setAssessmentType] = useState('Timed Assessment');
   const [title, setTitle] = useState('');
-  const [subject, setSubject] = useState('Computers');
+  const [subject, setSubject] = useState(15);
   const [classNum, setClassNum] = useState('4');
   const { userProfile } = useAuth();
   const [teacher, setTeacher] = useState(userProfile?.displayName || 'Unknown');
@@ -117,6 +118,68 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
 
   const [showJsonPreview, setShowJsonPreview] = useState(true);
 
+  const { id } = useParams();
+  const isEditing = !!id;
+
+  useEffect(() => {
+    if (!id) return;
+    (async () => {
+      setStatus('Loading assessment...');
+      try {
+        const data = await getAssessmentById(id);
+        if (!data) { setStatus('Error: Assessment not found'); return; }
+        setAssessmentType(data.examType || 'Timed Assessment');
+        setTitle(data.title || '');
+        setSubject(resolveSubjectValue(data.subject));
+        setClassNum(data.classNum || '4');
+        setTeacher(data.teacher || '');
+        setInvigilator(data.invigilator || '');
+        setDescription(data.description || '');
+        setEnabled(data.enabled !== false);
+        setStartDateTime(formatTimestamp(data.startDateTime));
+        setEndDateTime(formatTimestamp(data.endDateTime));
+        setTimeLimitMinutes(data.timeLimitMinutes ?? 30);
+        setTotalQuestions(data.totalQuestions ?? 10);
+        setWrongAnswerPenaltyFraction(data.wrongAnswerPenaltyFraction ?? 0);
+        setPreassessmentSecretKey(data.preassessmentsecretkey || '');
+        setSecretKey(data.secretKey || '');
+        setAssessmentFormat(data.assessmentFormat || 'mcq');
+        setAllowFileUpload(data.allowFileUpload ?? true);
+        setAllowedFileTypes((data.allowedFileTypes || ['pdf', 'docx', 'jpg', 'png']).join(', '));
+        setMaxFileSizeMB(data.maxFileSizeMB ?? 10);
+        setProjectTitle(data.projectTitle || '');
+        setProjectDescription(data.projectDescription || '');
+        setHolidayType(data.holidayType || 'Summer Vacation');
+        setProblemStatement(data.coding?.problemStatement || '');
+        setCodingExamples(data.coding?.examples || '');
+        setStarterCode(data.coding?.starterCode || '');
+        setFunctionName(data.coding?.functionName || 'solution');
+        setTestCasesJson(JSON.stringify(data.coding?.testCases || [], null, 2));
+        setQuestionsJson(JSON.stringify(data.questions || [], null, 2));
+        setSectionsJson(JSON.stringify(data.sections || [], null, 2));
+        setJsonContent(JSON.stringify(data.content || {}, null, 2));
+        setStatus('');
+      } catch (err) {
+        setStatus(`Error loading assessment: ${err.message}`);
+      }
+    })();
+  }, [id]);
+
+  const formatTimestamp = (ts) => {
+    if (!ts) return '';
+    let d;
+    if (typeof ts.toDate === 'function') {
+      d = ts.toDate();
+    } else if (ts instanceof Date) {
+      d = ts;
+    } else {
+      d = new Date(ts);
+    }
+    if (isNaN(d.getTime())) return '';
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  };
+
   const isTimed = assessmentType === 'Timed Assessment';
   const isHoliday = assessmentType === 'Holiday Homework';
   const isProject = assessmentFormat === 'project';
@@ -147,7 +210,7 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
         return;
       }
       setTitle(sample.title || '');
-      setSubject(sample.subject || 'Computers');
+      setSubject(resolveSubjectValue(sample.subject));
       setClassNum(sample.classNum || '4');
       setTeacher(sample.teacher || '');
       setDescription(sample.description || '');
@@ -258,7 +321,7 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
 
   const clearForm = () => {
     setTitle('');
-    setSubject('Computers');
+    setSubject(15);
     setClassNum('');
     setTeacher('Venkata Vishnu');
     setInvigilator('');
@@ -293,15 +356,19 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
     if (error) { setStatus(`Error: ${error}`); return; }
 
     setCreating(true);
-    setStatus('Creating assessment...');
+    setStatus(isEditing ? 'Updating assessment...' : 'Creating assessment...');
     try {
       const payload = buildPayload();
-      const id = await createAssessment(payload);
-
-      setDialog({ show: true, type: 'success', message: `"${title}" created successfully!`, id });
-      clearForm();
+      if (isEditing) {
+        await updateAssessment(id, payload);
+        setDialog({ show: true, type: 'success', message: `"${title}" updated successfully!` });
+      } else {
+        const newId = await createAssessment(payload);
+        setDialog({ show: true, type: 'success', message: `"${title}" created successfully!`, id: newId });
+        clearForm();
+      }
     } catch (err) {
-      setDialog({ show: true, type: 'error', message: `Failed to create: ${err.message}` });
+      setDialog({ show: true, type: 'error', message: `Failed to ${isEditing ? 'update' : 'create'}: ${err.message}` });
     }
     setCreating(false);
   };
@@ -330,9 +397,9 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
     <div className="w-full flex items-start justify-center px-4 py-8">
       <div className="glass-card w-full max-w-4xl animate-slideUp">
         <div className="text-center mb-8">
-          <div className="text-5xl mb-4">📝</div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Create Assessment</h2>
-          <p className="text-gray-500 dark:text-gray-400">Configure and publish a new assessment</p>
+          <div className="text-5xl mb-4">{isEditing ? '✏️' : '📝'}</div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{isEditing ? 'Edit Assessment' : 'Create Assessment'}</h2>
+          <p className="text-gray-500 dark:text-gray-400">{isEditing ? 'Modify assessment details and save changes' : 'Configure and publish a new assessment'}</p>
         </div>
 
         <div className="flex gap-3 mb-8 justify-center flex-wrap">
@@ -382,7 +449,12 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Subject *</label>
-                  <input type="text" className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 text-sm" placeholder="e.g. Computers" value={subject} onChange={e => setSubject(e.target.value)} />
+                  <CustomSelect
+                    value={subject}
+                    onChange={setSubject}
+                    options={SUBJECTS.map(s => ({ value: s.value, label: s.label }))}
+                    className="w-full"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Class *</label>
@@ -601,7 +673,7 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
         <div className="flex gap-3 justify-center mt-8 flex-wrap">
           <button className="px-5 py-2.5 rounded-xl text-sm font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:bg-blue-500/30" onClick={loadSample}>📥 Load Sample</button>
           <button className={`px-6 py-3 rounded-xl font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 disabled:opacity-50`} onClick={handleCreate} disabled={creating}>
-            {creating ? 'Creating...' : 'Create Assessment'}
+            {creating ? (isEditing ? 'Updating...' : 'Creating...') : (isEditing ? 'Update Assessment' : 'Create Assessment')}
           </button>
           <button className="px-6 py-3 rounded-xl font-medium bg-black/5 dark:bg-white/10 border border-gray-300 dark:border-white/20 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20" onClick={() => navigate(skipInitialAuth ? '/dashboard' : '/')}>← Back to Home</button>
         </div>

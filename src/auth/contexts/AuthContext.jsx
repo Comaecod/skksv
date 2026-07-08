@@ -58,6 +58,7 @@ export function AuthProvider({ children }) {
         profileLoadAttempted.current = true;
         await fetchUserProfile(firebaseUser);
       } else if (!firebaseUser) {
+        setError(null);
         setUserProfile(null);
         setPermissions([]);
         profileLoadAttempted.current = false;
@@ -118,6 +119,7 @@ export function AuthProvider({ children }) {
   }, [fetchUserProfile]);
 
   const logout = useCallback(async () => {
+    setError(null);
     try {
       if (user) {
         await auditService.log(AUDIT_ACTIONS.LOGOUT, user.uid, {
@@ -125,13 +127,17 @@ export function AuthProvider({ children }) {
         });
       }
       await authService.signOut();
-      setUser(null);
-      setUserProfile(null);
-      setPermissions([]);
-      profileLoadAttempted.current = false;
     } catch (err) {
-      console.error('Logout error:', err);
+      if (err?.message?.includes('ERR_BLOCKED_BY_CLIENT') || err?.toString?.()?.includes('ERR_BLOCKED_BY_CLIENT')) {
+        console.warn('Logout: ad-blocker suppressed Firestore channel termination (benign):', err);
+      } else {
+        console.error('Logout error:', err);
+      }
     }
+    setUser(null);
+    setUserProfile(null);
+    setPermissions([]);
+    profileLoadAttempted.current = false;
   }, [user]);
 
   const createUser = useCallback(async (email, password, userData) => {

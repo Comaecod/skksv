@@ -1,3 +1,5 @@
+import { subjectLabel } from '../utils/format';
+
 const IntroScreen = ({ config, onStart, onReports, userRole }) => {
   const { 
     examTitle, 
@@ -21,7 +23,7 @@ const IntroScreen = ({ config, onStart, onReports, userRole }) => {
 
       <div className="text-center mb-6 sm:mb-8">
         <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white mb-2">{examTitle}</h2>
-        <p className="text-gray-500 dark:text-gray-400">Class {className} | {subject}</p>
+        <p className="text-gray-500 dark:text-gray-400">Class {className} | {subjectLabel(subject)}</p>
       </div>
 
       <div className="flex justify-center gap-3 sm:gap-4 mb-4 sm:mb-6 flex-wrap" role="list" aria-label="Exam staff information">

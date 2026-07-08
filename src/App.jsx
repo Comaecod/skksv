@@ -200,6 +200,11 @@ function App() {
               <DashboardLayout><MakeAssessment skipInitialAuth /></DashboardLayout>
             </ProtectedRoute>
           } />
+          <Route path="/dashboard/assessments/edit/:id" element={
+            <ProtectedRoute>
+              <DashboardLayout><MakeAssessment skipInitialAuth /></DashboardLayout>
+            </ProtectedRoute>
+          } />
           <Route path="/dashboard/notifications" element={
             <ProtectedRoute>
               <DashboardLayout><MakeNotification /></DashboardLayout>

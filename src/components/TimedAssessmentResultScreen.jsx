@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { formatName } from '../utils/format';
+import { formatName, subjectLabel } from '../utils/format';
 import { getPerformanceMessage, getGradeInfo } from '../utils/scoring';
 import { SCHOOL_CONFIG } from '../config/schoolConfig';
 import { validateAnswerReveal } from '../utils/auth';
@@ -8,7 +8,7 @@ const CertificateCard = ({ studentInfo, assessment, results }) => {
   const date = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' });
   const teacherName = assessment?.teacher || 'Assessment Creator';
   const gradeInfo = getGradeInfo(results.percentage);
-  const subject = assessment?.subject || 'General';
+  const subject = subjectLabel(assessment?.subject) || 'General';
   const title = assessment?.title || 'Assessment';
 
   return (

@@ -174,8 +174,8 @@ export default function AdminResults() {
               subject: d.subject || '',
               examTitle: d.title || 'Untitled',
               examType: d.examType || '',
-              score: results.correctCount || results.score || 0,
-              total: (results.correctCount || 0) + (results.wrongCount || 0) + (results.skippedCount || 0) || results.total || 0,
+              score: results.totalEarned ?? results.correctCount ?? results.score ?? 0,
+              total: (results.totalMarks ?? ((results.correctCount || 0) + (results.wrongCount || 0) + (results.skippedCount || 0))) || 0,
               percentage: parseFloat(results.percentage) || 0,
               grade: results.grade || '-',
               timestamp: d.submittedAt?.toDate?.() || new Date(0),
@@ -209,7 +209,7 @@ export default function AdminResults() {
   }, [results]);
 
   const handleExport = async () => {
-    const { default: XLSX } = await import('xlsx');
+    const XLSX = await import('xlsx');
     const rows = filtered.map(r => ({
       Student: r.studentName,
       'Roll No': r.rollNumber,

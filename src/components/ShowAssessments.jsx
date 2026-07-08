@@ -35,9 +35,6 @@ const ShowAssessments = ({ skipInitialAuth } = {}) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [expandedId, setExpandedId] = useState(null);
-  const [editMode, setEditMode] = useState(null);
-  const [editContent, setEditContent] = useState('');
-  const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -112,30 +109,7 @@ const ShowAssessments = ({ skipInitialAuth } = {}) => {
   };
 
   const handleEdit = (item) => {
-    setEditMode(item.id);
-    setEditContent(JSON.stringify(item, null, 2));
-    setExpandedId(item.id);
-  };
-
-  const handleSaveEdit = async (item) => {
-    setSaving(true);
-    try {
-      const parsed = JSON.parse(editContent);
-      const { db } = await import('../firebase');
-      const { doc, setDoc } = await import('firebase/firestore');
-      await setDoc(doc(db, 'examConfigs', item.id), parsed);
-      setStatus(`Updated "${parsed.title || item.id}"`);
-      setEditMode(null);
-      fetchAll();
-    } catch (err) {
-      setStatus(`Save failed: ${err.message}`);
-    }
-    setSaving(false);
-  };
-
-  const cancelEdit = () => {
-    setEditMode(null);
-    setEditContent('');
+    navigate(`/dashboard/assessments/edit/${item.id}`);
   };
 
   if (!isAuthorized) {
@@ -241,7 +215,6 @@ const ShowAssessments = ({ skipInitialAuth } = {}) => {
                     <div className="space-y-3">
                       {filteredItems.map(item => {
                         const isExpanded = expandedId === item.id;
-                        const isEditing = editMode === item.id;
                         const isConfirmingDelete = confirmDelete === item.id;
                         const key = item.id;
 
@@ -285,19 +258,9 @@ const ShowAssessments = ({ skipInitialAuth } = {}) => {
                               </div>
                             </div>
 
-                            {isExpanded && !isEditing && (
+                            {isExpanded && (
                               <div className="border-t border-gray-200 dark:border-white/10 p-4">
                                 <pre className="text-xs text-gray-900 dark:text-white font-mono overflow-auto max-h-96 whitespace-pre-wrap bg-black/10 dark:bg-white/5 rounded-lg p-3">{JSON.stringify(item, null, 2)}</pre>
-                              </div>
-                            )}
-
-                            {isEditing && (
-                              <div className="border-t border-gray-200 dark:border-white/10 p-4">
-                                <textarea className="w-full h-64 px-4 py-3 rounded-xl bg-black/10 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white font-mono text-xs resize-none outline-none focus:border-primary/50" value={editContent} onChange={e => setEditContent(e.target.value)} />
-                                <div className="flex gap-3 mt-3">
-                                  <button className="px-4 py-2 rounded-xl text-sm font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 disabled:opacity-50" onClick={() => handleSaveEdit(item)} disabled={saving}>{saving ? 'Saving...' : 'Save'}</button>
-                                  <button className="px-4 py-2 rounded-xl text-sm font-medium bg-black/5 dark:bg-white/10 border border-gray-300 dark:border-white/20 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20" onClick={cancelEdit}>Cancel</button>
-                                </div>
                               </div>
                             )}
                           </div>

@@ -53,4 +53,21 @@ export const SCREENS = {
   CONTENT: 'content'
 };
 
-export const PORTFOLIO_URL = 'https://comaecod.github.io/portfolio';
+export const SUBJECTS = [
+  { value: 1, label: 'Mathematics' },
+  { value: 2, label: 'English' },
+  { value: 3, label: 'Hindi' },
+  { value: 4, label: 'Telugu' },
+  { value: 5, label: 'Sanskrit' },
+  { value: 6, label: 'Science' },
+  { value: 7, label: 'Physics' },
+  { value: 8, label: 'Biology' },
+  { value: 9, label: 'Chemistry' },
+  { value: 10, label: 'Social Science' },
+  { value: 11, label: 'History' },
+  { value: 12, label: 'Civics' },
+  { value: 13, label: 'Geography' },
+  { value: 14, label: 'Economics' },
+  { value: 15, label: 'Computers' },
+  { value: 16, label: 'EVS' },
+];
