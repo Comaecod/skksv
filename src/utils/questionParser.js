@@ -24,6 +24,9 @@ export const parseQuestions = (md) => {
     const explanationLine = lines.find(l => /^explanation:\s*/i.test(l));
     const explanation = explanationLine ? explanationLine.replace(/^explanation:\s*/i, '').trim() : '';
 
+    const imageLine = lines.find(l => /^image:\s*/i.test(l));
+    const image = imageLine ? imageLine.replace(/^image:\s*/i, '').trim() : '';
+
     const correctIndices = [];
     options.forEach((opt, idx) => { if (opt.isCorrect) correctIndices.push(idx); });
 
@@ -40,6 +43,7 @@ export const parseQuestions = (md) => {
       isCorrect: type === 'multiple' ? correctIndices : correctIndices[0],
     };
     if (explanation) result.explanation = explanation;
+    if (image) result.image = image;
     return result;
   });
 };
@@ -58,6 +62,7 @@ export const questionsToMarkdown = (questions) => {
     });
 
     if (q.marks && q.marks !== 1) lines.push(`marks: ${q.marks}`);
+    if (q.image) lines.push(`image: ${q.image}`);
     if (q.explanation) lines.push(`explanation: ${q.explanation}`);
 
     return lines.join('\n');

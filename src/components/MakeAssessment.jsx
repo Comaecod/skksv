@@ -69,6 +69,7 @@ const DEFAULT_QUESTIONS_MD = `## Sample single-correct question with image hint?
 - Wrong Option
 - Wrong Option
 marks: 2
+image: https://via.placeholder.com/400x200/FFE4B5/000000?text=Question+Image+Hint
 explanation: This explains why the correct answer is right and the others are wrong.
 
 ## Sample multiple-correct question (select all that apply)?
@@ -697,12 +698,14 @@ const MakeAssessment = ({ skipInitialAuth } = {}) => {
 - 5
 - 6
 marks: 1
+image: https://example.com/diagram.png
 explanation: 2+2 equals 4.`}</pre>
                         <ul className="list-disc pl-4 space-y-0.5">
                           <li><code className="text-primary">##</code> question title</li>
                           <li><code className="text-primary">-</code> option</li>
                           <li><code className="text-primary">*</code> anywhere on correct option line</li>
                           <li><code className="text-primary">marks:</code> points (default 1)</li>
+                          <li><code className="text-primary">image:</code> optional image URL</li>
                           <li><code className="text-primary">explanation:</code> answer explanation</li>
                           <li>One <code className="text-primary">*</code> = single; multiple = multi-correct</li>
                           <li>No <code className="text-primary">*</code> = first option correct</li>
@@ -727,6 +730,7 @@ Q6-Q10, pick 4, 2 marks each`}</pre>
 - 5
 - 6
 marks: 1
+image: https://example.com/diagram.png
 explanation: 2+2 equals 4."
                     />
                   </>
