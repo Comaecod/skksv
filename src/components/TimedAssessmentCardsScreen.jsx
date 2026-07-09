@@ -3,11 +3,15 @@ import { motion } from 'framer-motion';
 import { toDate } from '../services/assessmentService';
 import { subjectLabel } from '../utils/format';
 
-const CountdownTimer = ({ endDateTime }) => {
-  const getEndTime = () => toDate(endDateTime);
+const CountdownTimer = ({ startDateTime, endDateTime }) => {
+  const now = new Date();
+  const start = toDate(startDateTime);
+  const end = toDate(endDateTime);
+  const target = now < start ? start : end;
+  const label = now < start ? 'Starts in' : 'Ends in';
 
   const calcTimeLeft = () => {
-    const diff = getEndTime() - new Date();
+    const diff = target - new Date();
     if (diff <= 0) return { total: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
     return {
       total: diff,
@@ -29,9 +33,12 @@ const CountdownTimer = ({ endDateTime }) => {
       if (tl.total <= 0) clearInterval(intervalRef.current);
     }, 1000);
     return () => clearInterval(intervalRef.current);
-  }, [endDateTime]);
+  }, [startDateTime, endDateTime]);
 
-  if (timeLeft.total <= 0) return <span className="text-red-400 font-semibold">Expired</span>;
+  if (timeLeft.total <= 0) {
+    const ended = now >= end;
+    return <span className={`font-semibold ${ended ? 'text-red-400' : 'text-green-400'}`}>{ended ? 'Expired' : 'Active'}</span>;
+  }
 
   const parts = [];
   if (timeLeft.days > 0) parts.push(`${timeLeft.days}d`);
@@ -39,12 +46,12 @@ const CountdownTimer = ({ endDateTime }) => {
   parts.push(`${String(timeLeft.minutes).padStart(2, '0')}m`);
   parts.push(`${String(timeLeft.seconds).padStart(2, '0')}s`);
 
-  const isWarning = timeLeft.total < 300000;
-  const isCritical = timeLeft.total < 60000;
+  const isWarning = target === end && timeLeft.total < 300000;
+  const isCritical = target === end && timeLeft.total < 60000;
 
   return (
     <span className={`font-mono font-bold text-sm ${isCritical ? 'text-red-400 animate-pulse' : isWarning ? 'text-yellow-400' : 'text-gray-900 dark:text-white'}`}>
-      Ends in {parts.join(' ')}
+      {label} {parts.join(' ')}
     </span>
   );
 };
@@ -74,6 +81,25 @@ const AssessmentTypeBadge = ({ type }) => {
 };
 
 const TimedAssessmentCardsScreen = ({ classNum, subject, assessments, isLoading, onSelect, onBack }) => {
+  const [expiredIds, setExpiredIds] = useState(() => new Set());
+
+  useEffect(() => {
+    const check = () => {
+      const now = new Date();
+      const newlyExpired = assessments
+        .filter(a => toDate(a.endDateTime) <= now)
+        .map(a => a.id);
+      if (newlyExpired.length > 0) {
+        setExpiredIds(prev => new Set([...prev, ...newlyExpired]));
+      }
+    };
+    check();
+    const id = setInterval(check, 1000);
+    return () => clearInterval(id);
+  }, [assessments]);
+
+  const visible = assessments.filter(a => !expiredIds.has(a.id));
+
   return (
     <div className="glass-card w-full max-w-2xl animate-slideUp">
       <div className="text-center mb-8">
@@ -87,14 +113,14 @@ const TimedAssessmentCardsScreen = ({ classNum, subject, assessments, isLoading,
           <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mb-4" />
           <p className="text-gray-500 dark:text-gray-400">Loading assessments...</p>
         </div>
-      ) : assessments.length === 0 ? (
+      ) : visible.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12">
           <div className="text-4xl mb-4">📭</div>
           <p className="text-gray-500 dark:text-gray-400">No assessments available</p>
         </div>
       ) : (
         <div className="space-y-4 mb-8">
-          {assessments.map((asm) => (
+          {visible.map((asm) => (
             <div
               key={asm.id}
               className="w-full p-5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 hover:border-primary/50 transition-all"
@@ -109,22 +135,41 @@ const TimedAssessmentCardsScreen = ({ classNum, subject, assessments, isLoading,
 
               <div className="flex items-center gap-3 flex-wrap mb-4">
                 <AssessmentTypeBadge type={asm.assessmentFormat} />
-                <CountdownTimer endDateTime={asm.endDateTime} />
+                <CountdownTimer startDateTime={asm.startDateTime} endDateTime={asm.endDateTime} />
                 {asm.assessmentFormat === 'mcq' && asm.totalQuestions && (
                   <span className="text-xs text-gray-500 dark:text-gray-400">{asm.totalQuestions} questions</span>
                 )}
               </div>
 
-              <div className="flex gap-3">
-                <motion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => onSelect(asm.id)}
-                  className="w-full px-4 py-2.5 rounded-xl font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 transition-all text-sm"
-                >
-                  Start Assessment →
-                </motion.button>
-              </div>
+              {(() => {
+                const asmStart = toDate(asm.startDateTime);
+                const asmEnd = toDate(asm.endDateTime);
+                const asmNow = new Date();
+                if (asmNow >= asmStart && asmNow <= asmEnd) {
+                  return (
+                    <motion.button
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => onSelect(asm.id)}
+                      className="w-full px-4 py-2.5 rounded-xl font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 transition-all text-sm"
+                    >
+                      Start Assessment →
+                    </motion.button>
+                  );
+                } else if (asmNow < asmStart) {
+                  return (
+                    <div className="w-full px-4 py-2.5 rounded-xl font-medium text-sm text-center bg-black/5 dark:bg-white/5 text-gray-400 cursor-not-allowed">
+                      Not yet available
+                    </div>
+                  );
+                } else {
+                  return (
+                    <div className="w-full px-4 py-2.5 rounded-xl font-medium text-sm text-center bg-black/5 dark:bg-white/5 text-gray-400 cursor-not-allowed">
+                      Assessment ended
+                    </div>
+                  );
+                }
+              })()}
             </div>
           ))}
         </div>

@@ -241,7 +241,10 @@ const MakeAssessment = ({ skipInitialAuth, readOnly } = {}) => {
     if (isTimed) {
       if (!startDateTime) return 'Start date/time is required for timed assessments';
       if (!endDateTime) return 'End date/time is required for timed assessments';
-      if (new Date(endDateTime) <= new Date(startDateTime)) return 'End time must be after start time';
+      const start = new Date(startDateTime);
+      const end = new Date(endDateTime);
+      if (end <= start) return 'End time must be after start time';
+      if (!isEditing && start <= new Date()) return 'Start time must be in the future';
     }
 
     if (isCoding) {
