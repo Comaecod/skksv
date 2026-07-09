@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { userService } from '../../services/userService';
 import { useAuth } from '../../contexts/AuthContext';
 import { ROLES, USER_STATUS } from '../../types/roles';
@@ -70,6 +71,7 @@ const initialFormState = {
 };
 
 export default function StudentManagement() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -233,12 +235,15 @@ export default function StudentManagement() {
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Student Management</h1>
           <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Create and manage student accounts</p>
         </div>
-        <button
-          onClick={() => { if (showForm) resetForm(); else setShowForm(true); }}
-          className="px-4 py-2 rounded-xl text-sm font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 transition-all"
-        >
-          {showForm ? 'Cancel' : '+ Add Student'}
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => { if (showForm) resetForm(); else setShowForm(true); }}
+            className="px-4 py-2 rounded-xl text-sm font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 transition-all"
+          >
+            {showForm ? 'Cancel' : '+ Add Student'}
+          </button>
+          <button onClick={loadStudents} className="px-4 py-2 rounded-xl text-sm font-medium border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-all">Refresh</button>
+        </div>
       </div>
 
       {formSuccess && (
@@ -316,60 +321,58 @@ export default function StudentManagement() {
       )}
 
       <div className="flex flex-col sm:flex-row gap-3 mb-4">
-        <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search by name, email, admission no, or father's name..." className="flex-1 px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-primary/50 transition-all text-sm" />
+        <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search by name, email, admission no, or father's name..." className="flex-1 px-4 py-2.5 rounded-xl bg-[#282843] border border-white/10 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all" />
         <CustomSelect value={filterClass} onChange={setFilterClass} options={[{ value: '', label: 'All Classes' }, ...CLASS_OPTIONS]} className="min-w-[140px]" />
         <CustomSelect value={filterResidence} onChange={setFilterResidence} options={[{ value: '', label: 'All Residences' }, ...RESIDENCE_OPTIONS]} className="min-w-[160px]" />
-        <button onClick={loadStudents} className="px-4 py-2.5 rounded-xl text-sm font-medium border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-all">Refresh</button>
+        <span className="text-sm text-gray-400 self-center whitespace-nowrap">{filteredStudents.length} result{filteredStudents.length !== 1 ? 's' : ''}</span>
       </div>
 
-      <div className="glass-card overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-200 dark:border-white/10">
-                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Name</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Class</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Email</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Admission No</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Residence</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+      <div className="bg-[#282843] rounded-xl border border-white/10 overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-white/10">
+              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400">Name</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400">Class</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400">Email</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400">Admission No</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400">Residence</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400">Status</th>
+              <th className="text-center px-4 py-3 text-xs font-semibold text-gray-400">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-500">Loading students...</td></tr>
+            ) : filteredStudents.length === 0 ? (
+              <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-500">No students found</td></tr>
+            ) : filteredStudents.map((s) => (
+              <tr key={s.id} className="border-b border-white/5 hover:bg-white/5 text-sm text-gray-300 transition-colors">
+                <td className="px-4 py-3">
+                  <span className="font-medium text-white">{s.displayName || '—'}</span>
+                </td>
+                <td className="px-4 py-3 text-gray-400">{s.studentClass || '—'}{s.section ? ` - ${s.section}` : ''}</td>
+                <td className="px-4 py-3 text-gray-400">{s.email}</td>
+                <td className="px-4 py-3 text-gray-400">{s.admissionNo || '—'}</td>
+                <td className="px-4 py-3 text-gray-400">
+                  {RESIDENCE_LABELS[s.dayScholarOrHostel] || '—'}
+                </td>
+                <td className="px-4 py-3">
+                  <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
+                    s.status === USER_STATUS.ACTIVE ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'
+                  }`}>{s.status}</span>
+                </td>
+                <td className="px-4 py-3 text-right">
+                  <div className="flex items-center justify-end gap-2">
+                    <button onClick={() => handleEdit(s)} className="px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition-all">Edit</button>
+                    <button onClick={() => handleToggleStatus(s.id, s.status)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                      s.status === USER_STATUS.ACTIVE ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20' : 'bg-green-500/10 text-green-400 hover:bg-green-500/20'
+                    }`}>{s.status === USER_STATUS.ACTIVE ? 'Deactivate' : 'Activate'}</button>
+                  </div>
+                </td>
               </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-white/5">
-              {loading ? (
-                <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">Loading students...</td></tr>
-              ) : filteredStudents.length === 0 ? (
-                <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">No students found</td></tr>
-              ) : filteredStudents.map((s) => (
-                <tr key={s.id} className="hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-                  <td className="px-4 py-3">
-                    <div className="text-sm font-medium text-gray-900 dark:text-white">{s.displayName || '—'}</div>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{s.studentClass || '—'}{s.section ? ` - ${s.section}` : ''}</td>
-                  <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{s.email}</td>
-                  <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{s.admissionNo || '—'}</td>
-                  <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
-                    {RESIDENCE_LABELS[s.dayScholarOrHostel] || '—'}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
-                      s.status === USER_STATUS.ACTIVE ? 'bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400' : 'bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400'
-                    }`}>{s.status}</span>
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <button onClick={() => handleEdit(s)} className="px-3 py-1.5 rounded-lg text-xs font-medium text-primary dark:text-primary-light hover:bg-primary/10 transition-all">Edit</button>
-                      <button onClick={() => handleToggleStatus(s.id, s.status)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                        s.status === USER_STATUS.ACTIVE ? 'text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10' : 'text-green-500 hover:bg-green-50 dark:hover:bg-green-500/10'
-                      }`}>{s.status === USER_STATUS.ACTIVE ? 'Deactivate' : 'Activate'}</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

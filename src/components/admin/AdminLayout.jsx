@@ -14,7 +14,6 @@ const ALL_NAV_ITEMS = {
     { to: '/dashboard/audit', icon: '📋', label: 'Audit Logs' },
     { to: '/dashboard/results', icon: '📊', label: 'Results' },
     { to: '/dashboard/assessments', icon: '📝', label: 'Assessments' },
-    { to: '/dashboard/assessments/new', icon: '➕', label: 'New Assessment' },
     { to: '/dashboard/notifications', icon: '🔔', label: 'Notifications' },
     { to: '/dashboard/feedback', icon: '💬', label: 'Feedback Reports' },
     { to: '/dashboard/images', icon: '🖼️', label: 'Images' },
@@ -25,7 +24,6 @@ const ALL_NAV_ITEMS = {
     { to: '/dashboard/students', icon: '🎓', label: 'Students' },
     { to: '/dashboard/results', icon: '📊', label: 'Results' },
     { to: '/dashboard/assessments', icon: '📝', label: 'Assessments' },
-    { to: '/dashboard/assessments/new', icon: '➕', label: 'New Assessment' },
     { to: '/dashboard/notifications', icon: '🔔', label: 'Notifications' },
     { to: '/dashboard/feedback', icon: '💬', label: 'Feedback Reports' },
     { to: '/dashboard/images', icon: '🖼️', label: 'Images' },
@@ -35,7 +33,6 @@ const ALL_NAV_ITEMS = {
     { to: '/dashboard/students', icon: '🎓', label: 'Students' },
     { to: '/dashboard/results', icon: '📊', label: 'Results' },
     { to: '/dashboard/assessments', icon: '📝', label: 'Assessments' },
-    { to: '/dashboard/assessments/new', icon: '➕', label: 'New Assessment' },
   ],
   student: [
     { to: '/dashboard', icon: '📊', label: 'Dashboard' },

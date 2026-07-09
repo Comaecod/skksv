@@ -247,9 +247,7 @@ export default function AdminResults() {
 
   const filtered = useMemo(() => {
     let data = results.filter(r => {
-      if (userProfile && userProfile.role !== 'super_admin' && userProfile.role !== 'admin') {
-        if (r.createdBy !== userProfile.id) return false;
-      }
+      if (userProfile?.role === 'staff' && r.createdBy !== userProfile.id) return false;
       if (classFilter !== 'all' && r.className !== classFilter) return false;
       if (subjectFilter !== 'all' && r.subject !== subjectFilter) return false;
       if (formatFilter !== 'all' && r.type !== formatFilter) return false;
@@ -280,7 +278,7 @@ export default function AdminResults() {
     });
 
     return data;
-  }, [results, search, classFilter, subjectFilter, formatFilter, sortKey, sortDir]);
+  }, [results, search, classFilter, subjectFilter, formatFilter, sortKey, sortDir, userProfile]);
 
   if (loading) {
     return (

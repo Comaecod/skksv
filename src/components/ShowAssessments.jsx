@@ -190,8 +190,8 @@ const ShowAssessments = ({ skipInitialAuth } = {}) => {
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-white">All Assessments</h2>
         <div className="flex gap-2">
-          <button className="px-4 py-2 rounded-xl text-sm font-medium bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-green-500/30" onClick={() => navigate('/dashboard/assessments/new')}>+ New</button>
-          <button className="px-4 py-2 rounded-xl text-sm font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:bg-blue-500/30" onClick={fetchAll}>🔄 Refresh</button>
+          <button className="px-4 py-2 rounded-xl text-sm font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 transition-all" onClick={() => navigate('/dashboard/assessments/new')}>+ New Assessment</button>
+          <button className="px-4 py-2 rounded-xl text-sm font-medium border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-all" onClick={fetchAll}>Refresh</button>
         </div>
       </div>
 
