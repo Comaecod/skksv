@@ -121,10 +121,10 @@ export const submitMcqAttempt = async (assessmentId, studentInfo, answers, resul
       subject: assessment.subject,
       title: assessment.title,
       teacher: assessment.teacher || '',
+      createdBy: assessment.createdBy || null,
       student: {
         userId: studentInfo.userId || null,
         name: `${studentInfo.firstName || ''} ${studentInfo.lastName || ''}`.trim(),
-        rollNumber: String(studentInfo.rollNumber)
       },
       answers,
       results,
@@ -161,10 +161,10 @@ export const submitProject = async (assessmentId, studentInfo, projectData, file
       subject: assessment.subject,
       title: assessment.title,
       teacher: assessment.teacher || '',
+      createdBy: assessment.createdBy || null,
       student: {
         userId: studentInfo.userId || null,
         name: `${studentInfo.firstName || ''} ${studentInfo.lastName || ''}`.trim(),
-        rollNumber: String(studentInfo.rollNumber)
       },
       topic: projectData.topic || '',
       description: projectData.description || '',

@@ -220,7 +220,6 @@ export default function CodingScreen({ config, studentInfo, onComplete }) {
         student: {
           userId: studentInfo?.userId || null,
           name: studentInfo?.name || `${studentInfo?.firstName || ''} ${studentInfo?.lastName || ''}`.trim() || 'Unknown',
-          rollNumber: studentInfo?.rollNumber || '',
         },
         code,
         testResults: testResults || [],

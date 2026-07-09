@@ -86,7 +86,6 @@ export const saveQuizResult = async (studentInfo, config, results) => {
       student: {
         userId: studentInfo.userId || null,
         name: `${studentInfo.firstName || ''} ${studentInfo.lastName || ''}`.trim(),
-        rollNumber: String(studentInfo.rollNumber || '')
       },
       
       results: {

@@ -77,7 +77,6 @@ const ReportsScreen = ({ config: propConfig, assessmentId: propAssessmentId, ass
             id: doc.id,
             type: d.type || 'mcq',
             name: student.name || `${student.firstName || ''} ${student.lastName || ''}`.trim(),
-            rollNumber: String(student.rollNumber || ''),
             correct: results.correctCount || 0,
             wrong: results.wrongCount || 0,
             skipped: results.skippedCount || 0,
@@ -89,7 +88,7 @@ const ReportsScreen = ({ config: propConfig, assessmentId: propAssessmentId, ass
             topic: d.projectData?.topic || d.topic || '',
             fileUrl: d.fileUrl || '',
             submittedAt: d.submittedAt,
-            submittedTime: d.submittedAt?.toDate?.()?.toLocaleString() || '-',
+            submittedTime: d.submittedAt?.toDate?.()?.toLocaleString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).replace(/\//g, '-') || '-',
           };
         });
         setReportData(data);
@@ -241,7 +240,6 @@ const ReportsScreen = ({ config: propConfig, assessmentId: propAssessmentId, ass
                   <thead>
                     <tr className="border-b border-gray-200 dark:border-white/10">
                       <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300 cursor-pointer hover:text-gray-900 dark:hover:text-white" onClick={() => handleSort('name')}>Name <SortIcon columnKey="name" /></th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300 cursor-pointer hover:text-gray-900 dark:hover:text-white" onClick={() => handleSort('rollNumber')}>Roll No <SortIcon columnKey="rollNumber" /></th>
                       <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300">Type</th>
                       {isMcq ? (
                         <>
@@ -263,7 +261,6 @@ const ReportsScreen = ({ config: propConfig, assessmentId: propAssessmentId, ass
                     {sortedData.map((row) => (
                       <tr key={row.id} className="border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5">
                         <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">{row.name}</td>
-                        <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{row.rollNumber}</td>
                         <td className="px-4 py-3 text-sm">
                           <span className={`px-2 py-0.5 rounded text-xs font-medium ${
                             row.type === 'coding' ? 'bg-green-500/20 text-green-400' :

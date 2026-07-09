@@ -139,7 +139,6 @@ const TimedAssessmentResultScreen = ({ questions, answers, studentInfo, assessme
           {studentInfo && (
             <div className="p-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10 mb-6">
               <p className="font-semibold text-gray-900 dark:text-white">{formatName(studentInfo.firstName)} {formatName(studentInfo.lastName)}</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Roll: {studentInfo.rollNumber}</p>
             </div>
           )}
           <p className="text-gray-500 dark:text-gray-400 mb-6">Your project has been submitted for review.</p>
@@ -165,7 +164,6 @@ const TimedAssessmentResultScreen = ({ questions, answers, studentInfo, assessme
             <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
               {formatName(studentInfo.firstName)} {formatName(studentInfo.lastName)}
             </h3>
-            <p className="text-gray-500 dark:text-gray-400">Roll Number: {studentInfo.rollNumber}</p>
           </div>
         )}
 

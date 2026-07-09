@@ -30,11 +30,10 @@ export const downloadReportAsExcel = (data, config) => {
   ];
 
   if (isProject) {
-    worksheetData.push(['Name', 'Roll No', 'Topic', 'Description', 'File URL', 'Submitted Date']);
+    worksheetData.push(['Name', 'Topic', 'Description', 'File URL', 'Submitted Date']);
     data.forEach(row => {
       worksheetData.push([
         row.name,
-        row.rollNumber,
         row.topic || '-',
         row.description || '-',
         row.fileUrl || '-',
@@ -45,7 +44,7 @@ export const downloadReportAsExcel = (data, config) => {
     worksheetData.push(['Total Submissions', data.length]);
 
     const colWidths = [
-      { wch: 25 }, { wch: 10 }, { wch: 30 }, { wch: 40 },
+      { wch: 25 }, { wch: 30 }, { wch: 40 },
       { wch: 60 }, { wch: 20 }
     ];
     const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
@@ -57,11 +56,10 @@ export const downloadReportAsExcel = (data, config) => {
     return;
   }
 
-  worksheetData.push(['Name', 'Roll No', 'Correct', 'Wrong', 'Skipped', 'Marks', 'Percentage', 'Grade']);
+  worksheetData.push(['Name', 'Correct', 'Wrong', 'Skipped', 'Marks', 'Percentage', 'Grade']);
   data.forEach(row => {
     worksheetData.push([
       row.name,
-      row.rollNumber,
       getNested(row, 'correctCount', 'correct'),
       getNested(row, 'wrongCount', 'wrong'),
       getNested(row, 'skippedCount', 'skipped'),
@@ -91,7 +89,7 @@ export const downloadReportAsExcel = (data, config) => {
 
   const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
   const colWidths = [
-    { wch: 25 }, { wch: 10 }, { wch: 10 }, { wch: 10 },
+    { wch: 25 }, { wch: 10 }, { wch: 10 },
     { wch: 10 }, { wch: 10 }, { wch: 12 }, { wch: 8 }
   ];
   worksheet['!cols'] = colWidths;

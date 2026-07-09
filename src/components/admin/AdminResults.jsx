@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { subjectLabel } from '../../utils/format';
 import { useAuth } from '../../auth/contexts/AuthContext';
+import CustomSelect from '../CustomSelect';
 
 function DetailModal({ submission, onClose }) {
   if (!submission) return null;
@@ -28,8 +29,7 @@ function DetailModal({ submission, onClose }) {
         <div className="p-5 space-y-5">
           <div className="flex items-center gap-4 text-sm">
             <div><span className="text-gray-400">Student:</span> <span className="text-white font-medium">{submission.studentName}</span></div>
-            <div><span className="text-gray-400">Roll:</span> <span className="text-white">{submission.rollNumber}</span></div>
-            <div><span className="text-gray-400">Date:</span> <span className="text-white">{submission.timestamp.toLocaleDateString()}</span></div>
+            <div><span className="text-gray-400">Date:</span> <span className="text-white">{submission.timestamp.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-')}</span></div>
             {submission.invigilator && <div><span className="text-gray-400">Invigilator:</span> <span className="text-white">{submission.invigilator}</span></div>}
           </div>
 
@@ -107,12 +107,18 @@ function SortIcon({ active, direction }) {
   );
 }
 
+const FORMAT_OPTIONS = [
+  { value: 'all', label: 'All Formats' },
+  { value: 'mcq', label: 'MCQ' },
+  { value: 'coding', label: 'Coding' },
+  { value: 'project', label: 'Project' },
+];
+
 const SORTABLE_COLUMNS = [
   { key: 'studentName', label: 'Student' },
-  { key: 'rollNumber', label: 'Roll No' },
   { key: 'className', label: 'Class' },
   { key: 'subject', label: 'Subject' },
-  { key: 'examTitle', label: 'Exam' },
+  { key: 'type', label: 'Type' },
   { key: 'invigilator', label: 'Invigilator' },
   { key: 'score', label: 'Score' },
   { key: 'percentage', label: '%' },
@@ -126,6 +132,7 @@ export default function AdminResults() {
   const [search, setSearch] = useState('');
   const [classFilter, setClassFilter] = useState('all');
   const [subjectFilter, setSubjectFilter] = useState('all');
+  const [formatFilter, setFormatFilter] = useState('all');
   const [sortKey, setSortKey] = useState('timestamp');
   const [sortDir, setSortDir] = useState('desc');
   const [selected, setSelected] = useState(null);
@@ -144,7 +151,6 @@ export default function AdminResults() {
           const d = doc.data();
           const student = d.student || d.studentInfo || {};
           const studentName = student.name || `${student.firstName || ''} ${student.lastName || ''}`.trim() || 'N/A';
-          const rollNumber = String(student.rollNumber || '');
           const type = d.type || 'mcq';
 
           if (type === 'coding') {
@@ -153,7 +159,6 @@ export default function AdminResults() {
               type: 'coding',
               _raw: d,
               studentName,
-              rollNumber,
               className: d.classNum || d.examKey?.split('_')[1] || '',
               subject: subjectLabel(d.subject) || d.subject || '',
               examTitle: d.title || 'Coding Assessment',
@@ -173,7 +178,6 @@ export default function AdminResults() {
               type,
               _raw: d,
               studentName,
-              rollNumber,
               className: d.classNum || '',
               subject: subjectLabel(d.subject) || d.subject || '',
               examTitle: d.title || 'Untitled',
@@ -215,7 +219,6 @@ export default function AdminResults() {
     const XLSX = await import('xlsx');
     const rows = filtered.map(r => ({
       Student: r.studentName,
-      'Roll No': r.rollNumber,
       Class: r.className,
       Subject: r.subject,
       Invigilator: r.invigilator,
@@ -224,7 +227,7 @@ export default function AdminResults() {
       Score: `${r.score}/${r.total}`,
       Percentage: r.percentage.toFixed(1),
       Grade: r.grade,
-      Date: r.timestamp.toLocaleDateString(),
+      Date: r.timestamp.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-'),
     }));
     const ws = XLSX.utils.json_to_sheet(rows);
     const wb = XLSX.utils.book_new();
@@ -245,17 +248,17 @@ export default function AdminResults() {
   const filtered = useMemo(() => {
     let data = results.filter(r => {
       if (userProfile && userProfile.role !== 'super_admin' && userProfile.role !== 'admin') {
-        if (r.createdBy && r.createdBy !== userProfile.id) return false;
+        if (r.createdBy !== userProfile.id) return false;
       }
       if (classFilter !== 'all' && r.className !== classFilter) return false;
       if (subjectFilter !== 'all' && r.subject !== subjectFilter) return false;
+      if (formatFilter !== 'all' && r.type !== formatFilter) return false;
       if (!search) return true;
       const q = search.toLowerCase();
       return r.studentName.toLowerCase().includes(q)
         || r.examTitle.toLowerCase().includes(q)
         || r.subject.toLowerCase().includes(q)
-        || r.className.toLowerCase().includes(q)
-        || r.rollNumber.includes(q);
+        || r.className.toLowerCase().includes(q);
     });
 
     data.sort((a, b) => {
@@ -264,7 +267,7 @@ export default function AdminResults() {
       if (sortKey === 'timestamp') {
         va = va.getTime?.() || 0;
         vb = vb.getTime?.() || 0;
-      } else if (sortKey === 'className' || sortKey === 'rollNumber') {
+      } else if (sortKey === 'className') {
         va = String(va).padStart(10, '0');
         vb = String(vb).padStart(10, '0');
       } else {
@@ -277,7 +280,7 @@ export default function AdminResults() {
     });
 
     return data;
-  }, [results, search, classFilter, subjectFilter, sortKey, sortDir]);
+  }, [results, search, classFilter, subjectFilter, formatFilter, sortKey, sortDir]);
 
   if (loading) {
     return (
@@ -303,16 +306,15 @@ export default function AdminResults() {
             />
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           </div>
-          <select value={classFilter} onChange={e => setClassFilter(e.target.value)}
-            className="px-3 py-2.5 rounded-xl bg-[#282843] border border-white/10 text-white text-sm focus:outline-none focus:border-primary/50">
-            <option value="all">All Classes</option>
-            {filterOptions.classes.map(c => <option key={c} value={c}>Class {c}</option>)}
-          </select>
-          <select value={subjectFilter} onChange={e => setSubjectFilter(e.target.value)}
-            className="px-3 py-2.5 rounded-xl bg-[#282843] border border-white/10 text-white text-sm focus:outline-none focus:border-primary/50">
-            <option value="all">All Subjects</option>
-            {filterOptions.subjects.map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
+          <CustomSelect value={classFilter} onChange={setClassFilter}
+            options={[{ value: 'all', label: 'All Classes' }, ...filterOptions.classes.map(c => ({ value: c, label: `Class ${c}` }))]}
+            className="min-w-[140px]" />
+          <CustomSelect value={subjectFilter} onChange={setSubjectFilter}
+            options={[{ value: 'all', label: 'All Subjects' }, ...filterOptions.subjects.map(s => ({ value: s, label: s }))]}
+            className="min-w-[140px]" />
+          <CustomSelect value={formatFilter} onChange={setFormatFilter}
+            options={FORMAT_OPTIONS.map(o => ({ value: o.value, label: o.label }))}
+            className="min-w-[130px]" />
           <button onClick={handleExport} disabled={filtered.length === 0}
             className="px-4 py-2.5 rounded-xl bg-primary/20 border border-primary/30 text-primary text-sm font-medium hover:bg-primary/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap">
             Export Excel
@@ -350,23 +352,21 @@ export default function AdminResults() {
                   className="border-b border-white/5 hover:bg-white/5 text-sm text-gray-300 cursor-pointer transition-colors"
                 >
                   <td className="px-4 py-3 text-white font-medium">{r.studentName}</td>
-                  <td className="px-4 py-3">{r.rollNumber}</td>
                   <td className="px-4 py-3">{r.className}</td>
                   <td className="px-4 py-3">{r.subject}</td>
-                  <td className="px-4 py-3 text-xs text-gray-400">{r.invigilator || '—'}</td>
-                  <td className="px-4 py-3 max-w-[200px] truncate" title={r.examTitle}>{r.examTitle}</td>
                   <td className="px-4 py-3">
                     <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
-                      r.type === 'quiz' ? 'bg-emerald-500/20 text-emerald-300' :
+                      r.type === 'mcq' || r.type === 'quiz' ? 'bg-emerald-500/20 text-emerald-300' :
                       r.type === 'coding' ? 'bg-blue-500/20 text-blue-300' :
                       'bg-amber-500/20 text-amber-300'
                     }`}>
-                      {r.type === 'quiz' ? 'QUIZ' : r.type === 'coding' ? 'CODING' : 'TIMED'}
+                      {r.type === 'mcq' || r.type === 'quiz' ? 'MCQ' : r.type === 'coding' ? 'CODING' : 'PROJECT'}
                     </span>
                   </td>
+                  <td className="px-4 py-3 text-xs text-gray-400">{r.invigilator || '—'}</td>
                   <td className="px-4 py-3">{r.score}/{r.total}</td>
                   <td className={`px-4 py-3 font-semibold ${r.percentage >= 40 ? 'text-emerald-400' : 'text-red-400'}`}>{r.percentage.toFixed(1)}%</td>
-                  <td className="px-4 py-3 text-xs text-gray-500">{r.timestamp.toLocaleDateString()}</td>
+                  <td className="px-4 py-3 text-xs text-gray-500">{r.timestamp.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-')}</td>
                 </tr>
               ))}
             </tbody>

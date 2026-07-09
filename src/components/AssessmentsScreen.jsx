@@ -185,7 +185,6 @@ const AssessmentsScreen = () => {
     return {
       firstName: nameParts[0] || '',
       lastName: nameParts.slice(1).join(' ') || '',
-      rollNumber: authUser?.admissionNo || 1,
       userId: authUser?.id || authUser?.uid || null,
     };
   };

@@ -38,7 +38,6 @@ export default function StudentResults() {
             teacher: d.teacher || '',
             assessmentId: d.assessmentId || '',
             name: student.name || `${student.firstName || ''} ${student.lastName || ''}`.trim() || '',
-            rollNumber: String(student.rollNumber || ''),
             correct: r.correctCount || 0,
             wrong: r.wrongCount || 0,
             skipped: r.skippedCount || 0,
@@ -193,7 +192,7 @@ export default function StudentResults() {
                     <td className="px-4 py-3 text-sm text-white">{row.marks?.toFixed?.(1) || row.marks || 0}/{row.totalMarks || '-'}</td>
                     <td className="px-4 py-3 text-sm"><span className={row.percentage >= 40 ? 'text-emerald-400' : 'text-red-400'}>{row.percentage}%</span></td>
                     <td className="px-4 py-3 text-sm text-gray-400">{row.grade || '-'}</td>
-                    <td className="px-4 py-3 text-sm text-gray-500">{ts.toLocaleDateString()} {ts.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+                    <td className="px-4 py-3 text-sm text-gray-500">{ts.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-')} {ts.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
                   </tr>
                 );
               })}
