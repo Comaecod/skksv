@@ -28,7 +28,7 @@ const getAvatarText = (person) => {
 
 let staffPhotoMap = {
   'staff-13': apPhoto,
-  'staff-16': vvPhoto,
+  'executive-1': vvPhoto,
 };
 
 export const initStaffPhotos = async () => {
@@ -128,8 +128,14 @@ export const getHierarchy = (person) => {
     return hierarchy;
   }
 
-  if (person.designation === 'Director') {
-    hierarchy.push({ role: 'Director', name: capitalize(person.name) });
+  if (person.designation === 'Site Supervisor') {
+    hierarchy.push({ role: 'Site Supervisor', name: capitalize(person.name) });
+    return hierarchy;
+  }
+
+  if (person.designation === 'Executive Assistant') {
+    hierarchy.push({ role: 'Principal', name: capitalize(staffData.principal?.name || '') });
+    hierarchy.push({ role: 'Executive Assistant', name: capitalize(person.name) });
     return hierarchy;
   }
 

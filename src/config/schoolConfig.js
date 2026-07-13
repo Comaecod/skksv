@@ -1,26 +1,7 @@
 export const SCHOOL_CONFIG = {
   name: 'Sri Kanchi Kamakoti Sankara Vidyalaya',
   shortName: 'SKKSV Scholar',
-  beta: true,
-  correspondence: {
-    name: 'M K Prabhakaran',
-    salutation: 'Mr',
-    alias: 'MKP',
-    designation: 'Correspondent'
-  },
-  principal: {
-    name: 'Padma Gayathri',
-    salutation: 'Mrs',
-    alias: 'PG',
-    designation: 'Principal',
-    qualifications: 'X AISSCE, XII AISSE, BSc (OU), B.Ed (Annamalai University), MA English (OU), MA Economics (IGNOU)'
-  },
-  director: {
-    name: 'Bhavaraju V N U R Sekhar',
-    salutation: 'Mr',
-    designation: 'Director',
-    qualifications: 'M.Sc., MBA'
-  }
+  beta: true
 };
 
 export const GRADING_SYSTEM = {

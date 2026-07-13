@@ -28,7 +28,7 @@ const SectionWithConnector = ({ title, icon, count, children, delay = 0 }) => (
 );
 
 const StaffDirectoryScreen = () => {
-  const { correspondent, principal, director, adminTeam, staff } = staffData;
+  const { correspondent, principal, siteSupervisor, executiveAssistant, adminTeam, staff } = staffData;
   const [selectedPerson, setSelectedPerson] = useState(null);
   const navigate = useNavigate();
 
@@ -108,13 +108,22 @@ const StaffDirectoryScreen = () => {
             <CardButton person={principal} size="lg" />
           </motion.div>
 
-          {director && (
+          {siteSupervisor && (
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.25 }}
             >
-              <CardButton person={director} size="lg" />
+              <CardButton person={siteSupervisor} size="lg" />
+            </motion.div>
+          )}
+          {executiveAssistant && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              <CardButton person={executiveAssistant} size="lg" />
             </motion.div>
           )}
         </div>

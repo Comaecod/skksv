@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { formatName, subjectLabel } from '../utils/format';
 import { getPerformanceMessage, getGradeInfo } from '../utils/scoring';
 import { SCHOOL_CONFIG } from '../config/schoolConfig';
+import staffData from '../data/staffDirectory.json';
 import { validateAnswerReveal } from '../utils/auth';
 
 const CertificateCard = ({ studentInfo, assessment, results }) => {
@@ -85,7 +86,7 @@ const CertificateCard = ({ studentInfo, assessment, results }) => {
           </div>
           <div className="text-center">
             <div className="w-24 mx-auto h-px bg-gradient-to-r from-transparent via-purple-400 to-transparent mb-2" />
-            <p className="text-white font-medium text-sm">{SCHOOL_CONFIG.principal.name}</p>
+            <p className="text-white font-medium text-sm">{staffData.principal.name}</p>
             <p className="text-purple-300 text-xs">Principal</p>
           </div>
         </div>

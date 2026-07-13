@@ -10,7 +10,7 @@ const APP_DESCRIPTION = `This is the official digital platform of ${SCHOOL.name}
 function buildStaffContext() {
   const lines = [];
   const allStaff = [
-    { type: 'Management', items: [STAFF_DATA.correspondent, STAFF_DATA.principal, STAFF_DATA.director] },
+    { type: 'Management', items: [STAFF_DATA.correspondent, STAFF_DATA.principal, STAFF_DATA.siteSupervisor, STAFF_DATA.executiveAssistant].filter(Boolean) },
     { type: 'Admin Team', items: STAFF_DATA.adminTeam },
     { type: 'Teaching Staff', items: STAFF_DATA.staff },
   ];
@@ -58,7 +58,7 @@ const INTENTS = [
       /principal\s+qualifications/i,
     ],
     response: () => {
-      const p = SCHOOL.principal;
+      const p = STAFF_DATA.principal;
       const qual = p.qualifications ? '.\n\nQualifications: ' + p.qualifications : '.';
       return 'The ' + p.designation + ' of ' + SCHOOL.name + ' is ' + p.salutation + ' ' + p.name + qual;
     }
@@ -71,21 +71,34 @@ const INTENTS = [
       /tell\s+(me\s+)?about\s+(the\s+)?correspondent/i,
     ],
     response: () => {
-      const c = SCHOOL.correspondence;
+      const c = STAFF_DATA.correspondent;
       return `The ${c.designation} is ${c.salutation} ${c.name}.`;
     }
   },
   {
-    id: 'who_director',
+    id: 'who_site_supervisor',
     patterns: [
-      /who\s+is\s+(the\s+)?director/i,
-      /director\s*(name|info|details)/i,
-      /tell\s+(me\s+)?about\s+(the\s+)?director/i,
+      /who\s+is\s+(the\s+)?site\s*supervisor/i,
+      /site\s*supervisor\s*(name|info|details)/i,
+      /tell\s+(me\s+)?about\s+(the\s+)?site\s*supervisor/i,
     ],
     response: () => {
-      const d = SCHOOL.director;
+      const d = STAFF_DATA.siteSupervisor;
       const qual = d.qualifications ? '.\n\nQualifications: ' + d.qualifications : '.';
       return 'The ' + d.designation + ' is ' + d.salutation + ' ' + d.name + qual;
+    }
+  },
+  {
+    id: 'who_executive_assistant',
+    patterns: [
+      /who\s+is\s+(the\s+)?executive\s*assistant/i,
+      /executive\s*assistant\s*(name|info|details)/i,
+      /tell\s+(me\s+)?about\s+(the\s+)?executive\s*assistant/i,
+    ],
+    response: () => {
+      const ea = STAFF_DATA.executiveAssistant;
+      const qual = ea.qualifications ? '.\n\nQualifications: ' + ea.qualifications : '.';
+      return 'The ' + ea.designation + ' is ' + ea.salutation + ' ' + ea.name + qual;
     }
   },
   {
@@ -385,9 +398,10 @@ async function groqQuery(userMessage, context) {
 Key information about the school:
 - Full name: ${SCHOOL.name}
 - Short name: ${SCHOOL.shortName}
-- Principal: ${SCHOOL.principal.salutation} ${SCHOOL.principal.name}
-- Correspondent: ${SCHOOL.correspondence.salutation} ${SCHOOL.correspondence.name}
-- Director: ${SCHOOL.director.salutation} ${SCHOOL.director.name}
+- Principal: ${STAFF_DATA.principal.salutation} ${STAFF_DATA.principal.name}
+- Correspondent: ${STAFF_DATA.correspondent.salutation} ${STAFF_DATA.correspondent.name}
+- Site Supervisor: ${STAFF_DATA.siteSupervisor.salutation} ${STAFF_DATA.siteSupervisor.name}
+- Executive Assistant: ${STAFF_DATA.executiveAssistant.salutation} ${STAFF_DATA.executiveAssistant.name}
 
 About Adi Shankaracharya:
 Adi Shankaracharya (c. 788–820 CE) was a revered philosopher who consolidated Advaita Vedanta (non-duality). He established four mathas across India (Sringeri, Dwarka, Puri, Joshimath) and wrote commentaries on the Brahma Sutras, Upanishads, and Bhagavad Gita. The Kanchi Kamakoti Peetham traces its lineage to him.

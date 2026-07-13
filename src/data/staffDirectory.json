@@ -22,18 +22,30 @@
                       "career":  "Experienced educator and academic leader. Holds dual Master\u0027s degrees in English and Economics. Qualified with B.Ed from Annamalai University. Currently serving as the Principal of SKKSV.",
                       "email":  "padmagayathri26@gmail.com"
                   },
-    "director":  {
-                     "id":  "director-1",
-                     "name":  "Bhavaraju V N U R Sekhar",
-                     "salutation":  "Mr",
-                     "gender":  "M",
-                     "alias":  null,
-                     "designation":  "Director",
-                     "subject":  null,
-                     "qualifications":  "M.Sc., MBA",
-                     "career":  "Holds a Master\u0027s in Science and an MBA. Serves as the Director, guiding the strategic direction and academic vision of the institution.",
-                     "email":  "raja.bhavaraju1981@gmail.com"
-                 },
+    "siteSupervisor":  {
+                      "id":  "site-supervisor-1",
+                      "name":  "Bhavaraju V N U R Sekhar",
+                      "salutation":  "Mr",
+                      "gender":  "M",
+                      "alias":  null,
+                      "designation":  "Site Supervisor",
+                      "subject":  null,
+                      "qualifications":  "M.Sc., MBA",
+                      "career":  "Holds a Master\u0027s in Science and an MBA. Serves as the Site Supervisor, overseeing the school\u0027s infrastructure and facilities.",
+                      "email":  "raja.bhavaraju1981@gmail.com"
+                  },
+    "executiveAssistant":  {
+                      "id":  "executive-1",
+                      "name":  "Venkata Vishnu",
+                      "salutation":  "Mr",
+                      "gender":  "M",
+                      "alias":  "VV",
+                      "designation":  "Executive Assistant",
+                      "subject":  null,
+                      "qualifications":  "MCA (Master of Computer Applications), B.Voc (Software Development)",
+                      "career":  "Holds an MCA and B.Voc in Software Development. Also the developer of this digital platform. Serves as the Executive Assistant.",
+                      "email":  "vishnuthecoder@gmail.com"
+                  },
     "adminTeam":  [
                       {
                           "id":  "admin-1",
@@ -1405,172 +1417,9 @@
                       "qualifications":  "MA, B.Ed.",
                       "career":  "Holds a Master\u0027s degree (MA) and B.Ed. Teaches Social Science at SKKSV.",
                       "email":  "jvenugopalsharma@gmail.com"
-                  },
-                  {
-                      "id":  "staff-16",
-                      "name":  "Venkata Vishnu",
-                      "salutation":  "Mr",
-                      "gender":  "M",
-                      "alias":  "VV",
-                      "designation":  "Computer Teacher",
-                      "subject":  "Computers",
-                      "qualifications":  "MCA (Master of Computer Applications), B.Voc (Software Development)",
-                      "career":  "Holds an MCA and B.Voc in Software Development. Also the developer of this digital platform. Teaches Computers at SKKSV.",
-                      "timetable":  {
-                                        "periods":  [
-                                                        {
-                                                            "time":  "09:00 - 09:40",
-                                                            "mon":  "",
-                                                            "tue":  "",
-                                                            "wed":  "",
-                                                            "thu":  "",
-                                                            "fri":  "",
-                                                            "sat":  ""
-                                                        },
-                                                        {
-                                                            "time":  "09:40 - 10:20",
-                                                            "mon":  "",
-                                                            "tue":  [
-                                                                        "5",
-                                                                        "English"
-                                                                    ],
-                                                            "wed":  [
-                                                                        "5",
-                                                                        "English"
-                                                                    ],
-                                                            "thu":  [
-                                                                        "5",
-                                                                        "English"
-                                                                    ],
-                                                            "fri":  [
-                                                                        "10",
-                                                                        "Computers"
-                                                                    ],
-                                                            "sat":  ""
-                                                        },
-                                                        {
-                                                            "time":  "10:30 - 11:10",
-                                                            "mon":  [
-                                                                        "9B",
-                                                                        "Computers"
-                                                                    ],
-                                                            "tue":  "",
-                                                            "wed":  "",
-                                                            "thu":  [
-                                                                        "6",
-                                                                        "English"
-                                                                    ],
-                                                            "fri":  [
-                                                                        "5",
-                                                                        "English"
-                                                                    ],
-                                                            "sat":  [
-                                                                        "5",
-                                                                        "English"
-                                                                    ]
-                                                        },
-                                                        {
-                                                            "time":  "11:10 - 11:50",
-                                                            "mon":  [
-                                                                        "5",
-                                                                        "English"
-                                                                    ],
-                                                            "tue":  [
-                                                                        "5",
-                                                                        "English"
-                                                                    ],
-                                                            "wed":  [
-                                                                        "6",
-                                                                        "English"
-                                                                    ],
-                                                            "thu":  [
-                                                                        "9A",
-                                                                        "Computers"
-                                                                    ],
-                                                            "fri":  "",
-                                                            "sat":  ""
-                                                        },
-                                                        {
-                                                            "time":  "11:50 - 12:30",
-                                                            "mon":  [
-                                                                        "6",
-                                                                        "English"
-                                                                    ],
-                                                            "tue":  [
-                                                                        "6",
-                                                                        "English"
-                                                                    ],
-                                                            "wed":  "",
-                                                            "thu":  "",
-                                                            "fri":  [
-                                                                        "6",
-                                                                        "English"
-                                                                    ],
-                                                            "sat":  [
-                                                                        "9B",
-                                                                        "Computers"
-                                                                    ]
-                                                        },
-                                                        {
-                                                            "time":  "01:30 - 02:10",
-                                                            "mon":  "",
-                                                            "tue":  [
-                                                                        "10",
-                                                                        "Computers"
-                                                                    ],
-                                                            "wed":  "",
-                                                            "thu":  "",
-                                                            "fri":  "",
-                                                            "sat":  [
-                                                                        "6",
-                                                                        "English"
-                                                                    ]
-                                                        },
-                                                        {
-                                                            "time":  "02:10 - 02:50",
-                                                            "mon":  "",
-                                                            "tue":  [
-                                                                        "9A",
-                                                                        "Computers"
-                                                                    ],
-                                                            "wed":  "",
-                                                            "thu":  "",
-                                                            "fri":  "",
-                                                            "sat":  [
-                                                                        "10",
-                                                                        "Computers"
-                                                                    ]
-                                                        },
-                                                        {
-                                                            "time":  "02:50 - 03:25",
-                                                            "mon":  "",
-                                                            "tue":  "",
-                                                            "wed":  "",
-                                                            "thu":  "",
-                                                            "fri":  [
-                                                                        "6",
-                                                                        "Spoken English"
-                                                                    ],
-                                                            "sat":  ""
-                                                        },
-                                                        {
-                                                            "time":  "03:25 - 04:00",
-                                                            "mon":  "",
-                                                            "tue":  "",
-                                                            "wed":  "",
-                                                            "thu":  "",
-                                                            "fri":  [
-                                                                        "6",
-                                                                        "Spoken English"
-                                                                    ],
-                                                            "sat":  ""
-                                                        }
-                                                    ]
-                                    },
-                      "email":  "vishnuthecoder@gmail.com"
-                  },
-                  {
-                      "id":  "staff-17",
+                   },
+                   {
+                       "id":  "staff-17",
                       "name":  "Kasibhotla Sri Ram Kiran",
                       "salutation":  "Mr",
                       "gender":  "M",
