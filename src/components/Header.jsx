@@ -12,7 +12,6 @@ const PUBLIC_NAV_ITEMS = [
     label: 'Learn',
     icon: '📖',
     children: [
-      { to: '/about-school', icon: '🏫', label: 'About Our School' },
       { to: '/academic-calendar', icon: '📅', label: 'Academic Calendar' },
     ]
   },
