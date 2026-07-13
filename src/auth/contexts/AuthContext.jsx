@@ -149,7 +149,6 @@ export function AuthProvider({ children }) {
         await auditService.log(AUDIT_ACTIONS.USER_CREATED, user.uid, {
           targetUser: email,
           targetRole: userData.role,
-          userEmail: user.email,
         });
       }
 
@@ -169,7 +168,6 @@ export function AuthProvider({ children }) {
       if (user) {
         await auditService.log(AUDIT_ACTIONS.PASSWORD_RESET, user.uid, {
           targetEmail: email,
-          userEmail: user.email,
         });
       }
     } catch (err) {

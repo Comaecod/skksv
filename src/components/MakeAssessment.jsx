@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../auth/contexts/AuthContext';
 import { isMasterKey } from '../utils/auth';
 import { createAssessment, updateAssessment, getAssessmentById } from '../services/assessmentService';
+import { auditService, AUDIT_ACTIONS } from '../auth/services/auditService';
 import CustomSelect from './CustomSelect';
 import { resolveSubjectValue } from '../utils/format';
 import { SUBJECTS } from '../config/schoolConfig';
@@ -284,9 +285,11 @@ const MakeAssessment = ({ skipInitialAuth, readOnly } = {}) => {
       const payload = buildPayload();
       if (isEditing) {
         await updateAssessment(id, payload);
+        auditService.log(AUDIT_ACTIONS.ASSESSMENT_UPDATED, userProfile?.id, { assessmentId: id, title: payload.title, subject: payload.subject, classNum: payload.classNum });
         navigate('/dashboard/assessments');
       } else {
         await createAssessment(payload);
+        auditService.log(AUDIT_ACTIONS.ASSESSMENT_CREATED, userProfile?.id, { title: payload.title, subject: payload.subject, classNum: payload.classNum });
         navigate('/dashboard/assessments');
       }
     } catch (err) {

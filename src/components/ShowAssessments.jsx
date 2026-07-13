@@ -4,22 +4,20 @@ import { isMasterKey } from '../utils/auth';
 import { subjectLabel } from '../utils/format';
 import { useAuth } from '../auth/contexts/AuthContext';
 import { toDate } from '../services/assessmentService';
+import { auditService, AUDIT_ACTIONS } from '../auth/services/auditService';
 import CustomSelect from './CustomSelect';
+import DataTable from './DataTable';
 
 const FORMAT_LABELS = { mcq: 'MCQ', project: 'Project', coding: 'Coding' };
-const FORMAT_COLORS = { mcq: 'bg-purple-500/20 text-purple-400', project: 'bg-orange-500/20 text-orange-400', coding: 'bg-green-500/20 text-green-400' };
+const FORMAT_COLORS = { mcq: 'bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-400', project: 'bg-orange-100 dark:bg-orange-500/20 text-orange-700 dark:text-orange-400', coding: 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400' };
 
 const STATUS_LABELS = { upcoming: 'Upcoming', active: 'Active', expired: 'Expired', disabled: 'Disabled' };
 const STATUS_COLORS = {
-  upcoming: 'bg-blue-500/20 text-blue-400',
-  active: 'bg-green-500/20 text-green-400',
-  expired: 'bg-red-500/20 text-red-400',
-  disabled: 'bg-gray-500/20 text-gray-400',
+  upcoming: 'bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400',
+  active: 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400',
+  expired: 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400',
+  disabled: 'bg-gray-100 dark:bg-gray-500/20 text-gray-600 dark:text-gray-400',
 };
-
-function SortIcon({ active, direction }) {
-  return <span className="inline-block ml-1 text-[10px]">{active ? (direction === 'asc' ? '▲' : '▼') : '⇅'}</span>;
-}
 
 const getAssessmentStatus = (item) => {
   if (item.enabled === false) return 'disabled';
@@ -30,15 +28,6 @@ const getAssessmentStatus = (item) => {
   if (end && now > end) return 'expired';
   return 'active';
 };
-
-const SORTABLE_COLUMNS = [
-  { key: 'title', label: 'Title' },
-  { key: 'subject', label: 'Subject' },
-  { key: 'classNum', label: 'Class' },
-  { key: 'assessmentFormat', label: 'Format' },
-  { key: 'teacher', label: 'Teacher' },
-  { key: 'status', label: 'Status' },
-];
 
 const ShowAssessments = ({ skipInitialAuth } = {}) => {
   const navigate = useNavigate();
@@ -101,6 +90,7 @@ const ShowAssessments = ({ skipInitialAuth } = {}) => {
       const { db } = await import('../firebase');
       const { doc, deleteDoc } = await import('firebase/firestore');
       await deleteDoc(doc(db, 'examConfigs', item.id));
+      auditService.log(AUDIT_ACTIONS.ASSESSMENT_DELETED, userProfile?.id, { assessmentId: item.id, title: item.title, subject: item.subject, classNum: item.classNum });
       setStatus(`Deleted "${item.title || item.id}"`);
       fetchAll();
     } catch (err) {
@@ -188,7 +178,7 @@ const ShowAssessments = ({ skipInitialAuth } = {}) => {
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-white">All Assessments</h2>
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white">All Assessments</h2>
         <div className="flex gap-2">
           <button className="px-4 py-2 rounded-xl text-sm font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 transition-all" onClick={() => navigate('/dashboard/assessments/new')}>+ New Assessment</button>
           <button className="px-4 py-2 rounded-xl text-sm font-medium border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-all" onClick={fetchAll}>Refresh</button>
@@ -196,13 +186,13 @@ const ShowAssessments = ({ skipInitialAuth } = {}) => {
       </div>
 
       {status && (
-        <div className={`mb-4 p-3 rounded-lg text-sm ${status.startsWith('Deleted') || status.startsWith('Delete failed') ? 'bg-red-500/10 border border-red-500/20 text-red-400' : 'bg-green-500/10 border border-green-500/20 text-green-400'}`}>
+        <div className={`mb-4 p-3 rounded-lg text-sm ${status.startsWith('Deleted') || status.startsWith('Delete failed') ? 'bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400' : 'bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 text-green-600 dark:text-green-400'}`}>
           {status} <button className="ml-3 text-xs underline" onClick={() => setStatus('')}>Dismiss</button>
         </div>
       )}
 
       {error && (
-        <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">{error}</div>
+        <div className="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400 text-sm">{error}</div>
       )}
 
       <div className="flex flex-wrap gap-3 mb-4">
@@ -211,7 +201,7 @@ const ShowAssessments = ({ skipInitialAuth } = {}) => {
           placeholder="Search assessments..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="flex-1 min-w-[180px] px-4 py-2.5 rounded-xl bg-[#282843] border border-white/10 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all"
+          className="flex-1 min-w-[180px] px-4 py-2.5 rounded-xl bg-white dark:bg-[#282843] border border-gray-300 dark:border-white/10 text-gray-900 dark:text-white text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all"
         />
         <CustomSelect value={subjectFilter} onChange={setSubjectFilter}
           options={[{ value: 'all', label: 'All Subjects' }, ...filterOptions.subjects.map(s => ({ value: s, label: subjectLabel(s) || s }))]}
@@ -222,71 +212,42 @@ const ShowAssessments = ({ skipInitialAuth } = {}) => {
         <CustomSelect value={statusFilter} onChange={setStatusFilter}
           options={[{ value: 'all', label: 'All Status' }, ...Object.entries(STATUS_LABELS).map(([v, l]) => ({ value: v, label: l }))]}
           className="min-w-[130px]" />
-        <span className="text-sm text-gray-400 self-center whitespace-nowrap">{filtered.length} result{filtered.length !== 1 ? 's' : ''}</span>
+        <span className="text-sm text-gray-500 dark:text-gray-400 self-center whitespace-nowrap">{filtered.length} result{filtered.length !== 1 ? 's' : ''}</span>
       </div>
 
       {filtered.length === 0 ? (
-        <div className="text-center py-16 bg-[#282843] rounded-xl border border-white/10">
-          <div className="text-4xl mb-3">{assessments.length === 0 ? '📭' : '🔍'}</div>
-          <p className="text-gray-400">{assessments.length === 0 ? 'No assessments found in database.' : 'No assessments match your filters.'}</p>
+        <div className="text-center py-16 bg-gray-50 dark:bg-[#282843] rounded-xl border border-gray-200 dark:border-white/10">
+          <div className="text-4xl mb-3">{assessments.length === 0 ? '\uD83D\uDCED' : '\uD83D\uDD0D'}</div>
+          <p className="text-gray-500 dark:text-gray-400">{assessments.length === 0 ? 'No assessments found in database.' : 'No assessments match your filters.'}</p>
         </div>
       ) : (
-        <div className="bg-[#282843] rounded-xl border border-white/10 overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-white/10 text-left text-xs text-gray-400 uppercase tracking-wider">
-                {SORTABLE_COLUMNS.map(col => (
-                  <th
-                    key={col.key}
-                    onClick={() => handleSort(col.key)}
-                    className={`px-4 py-3 font-semibold select-none cursor-pointer hover:text-white transition-colors ${sortKey === col.key ? 'text-primary' : ''}`}
-                  >
-                    {col.label}
-                    <SortIcon active={sortKey === col.key} direction={sortDir} />
-                  </th>
-                ))}
-                <th className="px-4 py-3 font-semibold">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map(item => {
-                const isConfirming = confirmDelete === item.id;
-                return (
-                  <tr
-                    key={item.id}
-                    className="border-b border-white/5 hover:bg-white/5 text-sm text-gray-300 cursor-pointer transition-colors"
-                    onClick={() => navigate('/dashboard/assessments/view/' + item.id)}
-                  >
-                    <td className="px-4 py-3 text-white font-medium max-w-[240px] truncate" title={item.title}>{item.title || item.id}</td>
-                    <td className="px-4 py-3">{subjectLabel(item.subject)}</td>
-                    <td className="px-4 py-3">{item.classNum || '—'}</td>
-                    <td className="px-4 py-3">
-                      {item.assessmentFormat && (
-                        <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${FORMAT_COLORS[item.assessmentFormat] || 'bg-gray-500/20 text-gray-400'}`}>
-                          {FORMAT_LABELS[item.assessmentFormat] || item.assessmentFormat}
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">{item.teacher || '—'}</td>
-                    <td className="px-4 py-3">
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${STATUS_COLORS[item._status] || 'bg-gray-500/20 text-gray-400'}`}>
-                        {STATUS_LABELS[item._status] || item._status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <button className="px-2 py-1 rounded-lg text-xs font-medium bg-blue-500/20 text-blue-400 hover:bg-blue-500/30" onClick={(e) => { e.stopPropagation(); handleEdit(item); }}>Edit</button>
-                        <button className={`px-2 py-1 rounded-lg text-xs font-medium ${isConfirming ? 'bg-red-500/20 text-red-400 animate-pulse' : 'bg-red-500/10 text-red-400 hover:bg-red-500/20'}`} onClick={(e) => { e.stopPropagation(); handleDelete(item); }}>
-                          {isConfirming ? 'Confirm?' : 'Delete'}
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          columns={[
+            { key: 'title', label: 'Title', sortable: true, cellClassName: 'text-gray-900 dark:text-white font-medium max-w-[240px] truncate', render: (item) => <span title={item.title}>{item.title || item.id}</span> },
+            { key: 'subject', label: 'Subject', sortable: true, render: (item) => subjectLabel(item.subject) },
+            { key: 'classNum', label: 'Class', sortable: true, render: (item) => item.classNum || '—' },
+            { key: 'assessmentFormat', label: 'Format', sortable: true, render: (item) => item.assessmentFormat ? <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${FORMAT_COLORS[item.assessmentFormat] || 'bg-gray-100 dark:bg-gray-500/20 text-gray-600 dark:text-gray-400'}`}>{FORMAT_LABELS[item.assessmentFormat] || item.assessmentFormat}</span> : null },
+            { key: 'teacher', label: 'Teacher', sortable: true, render: (item) => item.teacher || '—' },
+            { key: 'status', label: 'Status', sortable: true, render: (item) => <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${STATUS_COLORS[item._status] || 'bg-gray-100 dark:bg-gray-500/20 text-gray-600 dark:text-gray-400'}`}>{STATUS_LABELS[item._status] || item._status}</span> },
+            { key: 'actions', label: 'Actions', render: (item) => {
+              const isConfirming = confirmDelete === item.id;
+              return (
+                <div className="flex items-center gap-2">
+                  <button className="px-2 py-1 rounded-lg text-xs font-medium bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-500/30" onClick={(e) => { e.stopPropagation(); handleEdit(item); }}>Edit</button>
+                  <button className={`px-2 py-1 rounded-lg text-xs font-medium ${isConfirming ? 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400 animate-pulse' : 'bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-500/20'}`} onClick={(e) => { e.stopPropagation(); handleDelete(item); }}>
+                    {isConfirming ? 'Confirm?' : 'Delete'}
+                  </button>
+                </div>
+              );
+            }},
+          ]}
+          data={filtered}
+          rowKey="id"
+          sortKey={sortKey}
+          sortDir={sortDir}
+          onSort={handleSort}
+          onRowClick={(item) => navigate('/dashboard/assessments/view/' + item.id)}
+        />
       )}
     </div>
   );

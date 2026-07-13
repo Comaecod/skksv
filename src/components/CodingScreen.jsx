@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { auditService, AUDIT_ACTIONS } from '../auth/services/auditService';
 
 const PYODIDE_URL = 'https://cdn.jsdelivr.net/pyodide/v0.25.1/full/pyodide.js';
 const INDEX_URL = 'https://cdn.jsdelivr.net/pyodide/v0.25.1/full/';
@@ -227,6 +228,7 @@ export default function CodingScreen({ config, studentInfo, onComplete }) {
         total: testCases.length,
         submittedAt: serverTimestamp(),
       });
+      auditService.log(AUDIT_ACTIONS.ASSESSMENT_SUBMITTED, studentInfo?.userId, { studentName: studentInfo?.name || `${studentInfo?.firstName || ''} ${studentInfo?.lastName || ''}`.trim(), assessmentId: config.id, title: config.examTitle, subject: config.subject, classNum: config.classNum, type: 'coding' });
       setSubmitted(true);
     } catch (err) {
       setOutput(`Submit error: ${err.message}`);

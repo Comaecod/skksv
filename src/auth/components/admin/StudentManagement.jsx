@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { userService } from '../../services/userService';
 import { useAuth } from '../../contexts/AuthContext';
 import { ROLES, USER_STATUS } from '../../types/roles';
+import { auditService, AUDIT_ACTIONS } from '../../services/auditService';
 import CustomSelect from '../../../components/CustomSelect';
+import DataTable from '../../../components/DataTable';
 
 const CLASS_OPTIONS = [
   { value: '4', label: 'Class 4' },
@@ -133,6 +135,7 @@ export default function StudentManagement() {
         createdBy: user?.uid,
       });
 
+      auditService.log(AUDIT_ACTIONS.STUDENT_CREATED, user?.uid, { targetEmail: form.email, targetName: form.displayName });
       setFormSuccess(`Student ${form.displayName || form.email} created successfully!`);
       setForm(initialFormState);
       setShowForm(false);
@@ -183,6 +186,7 @@ export default function StudentManagement() {
       delete updates.email;
       delete updates.password;
       await userService.updateUser(editingId, updates);
+      auditService.log(AUDIT_ACTIONS.STUDENT_UPDATED, user?.uid, { targetId: editingId, targetName: form.displayName });
       setFormSuccess(`Student updated successfully!`);
       setForm(initialFormState);
       setShowForm(false);
@@ -198,8 +202,10 @@ export default function StudentManagement() {
     try {
       if (currentStatus === USER_STATUS.ACTIVE) {
         await userService.deactivateUser(studentId);
+        auditService.log(AUDIT_ACTIONS.STUDENT_DEACTIVATED, user?.uid, { targetId: studentId });
       } else {
         await userService.activateUser(studentId);
+        auditService.log(AUDIT_ACTIONS.STUDENT_ACTIVATED, user?.uid, { targetId: studentId });
       }
       loadStudents();
     } catch (err) {
@@ -321,59 +327,35 @@ export default function StudentManagement() {
       )}
 
       <div className="flex flex-col sm:flex-row gap-3 mb-4">
-        <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search by name, email, admission no, or father's name..." className="flex-1 px-4 py-2.5 rounded-xl bg-[#282843] border border-white/10 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all" />
+        <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search by name, email, admission no, or father's name..." className="flex-1 px-4 py-2.5 rounded-xl bg-white dark:bg-[#282843] border border-gray-300 dark:border-white/10 text-gray-900 dark:text-white text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all" />
         <CustomSelect value={filterClass} onChange={setFilterClass} options={[{ value: '', label: 'All Classes' }, ...CLASS_OPTIONS]} className="min-w-[140px]" />
         <CustomSelect value={filterResidence} onChange={setFilterResidence} options={[{ value: '', label: 'All Residences' }, ...RESIDENCE_OPTIONS]} className="min-w-[160px]" />
-        <span className="text-sm text-gray-400 self-center whitespace-nowrap">{filteredStudents.length} result{filteredStudents.length !== 1 ? 's' : ''}</span>
+        <span className="text-sm text-gray-500 dark:text-gray-400 self-center whitespace-nowrap">{filteredStudents.length} result{filteredStudents.length !== 1 ? 's' : ''}</span>
       </div>
 
-      <div className="bg-[#282843] rounded-xl border border-white/10 overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-white/10">
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400">Name</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400">Class</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400">Email</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400">Admission No</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400">Residence</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400">Status</th>
-              <th className="text-center px-4 py-3 text-xs font-semibold text-gray-400">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-500">Loading students...</td></tr>
-            ) : filteredStudents.length === 0 ? (
-              <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-500">No students found</td></tr>
-            ) : filteredStudents.map((s) => (
-              <tr key={s.id} className="border-b border-white/5 hover:bg-white/5 text-sm text-gray-300 transition-colors">
-                <td className="px-4 py-3">
-                  <span className="font-medium text-white">{s.displayName || '—'}</span>
-                </td>
-                <td className="px-4 py-3 text-gray-400">{s.studentClass || '—'}{s.section ? ` - ${s.section}` : ''}</td>
-                <td className="px-4 py-3 text-gray-400">{s.email}</td>
-                <td className="px-4 py-3 text-gray-400">{s.admissionNo || '—'}</td>
-                <td className="px-4 py-3 text-gray-400">
-                  {RESIDENCE_LABELS[s.dayScholarOrHostel] || '—'}
-                </td>
-                <td className="px-4 py-3">
-                  <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
-                    s.status === USER_STATUS.ACTIVE ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'
-                  }`}>{s.status}</span>
-                </td>
-                <td className="px-4 py-3 text-right">
-                  <div className="flex items-center justify-end gap-2">
-                    <button onClick={() => handleEdit(s)} className="px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition-all">Edit</button>
-                    <button onClick={() => handleToggleStatus(s.id, s.status)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                      s.status === USER_STATUS.ACTIVE ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20' : 'bg-green-500/10 text-green-400 hover:bg-green-500/20'
-                    }`}>{s.status === USER_STATUS.ACTIVE ? 'Deactivate' : 'Activate'}</button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <DataTable
+        columns={[
+          { key: 'name', label: 'Name', render: (s) => <span className="font-medium text-gray-900 dark:text-white">{s.displayName || '—'}</span> },
+          { key: 'class', label: 'Class', render: (s) => <span className="text-gray-500 dark:text-gray-400">{s.studentClass || '—'}{s.section ? ` - ${s.section}` : ''}</span> },
+          { key: 'email', label: 'Email', render: (s) => <span className="text-gray-500 dark:text-gray-400">{s.email}</span> },
+          { key: 'admissionNo', label: 'Admission No', render: (s) => <span className="text-gray-500 dark:text-gray-400">{s.admissionNo || '—'}</span> },
+          { key: 'residence', label: 'Residence', render: (s) => <span className="text-gray-500 dark:text-gray-400">{RESIDENCE_LABELS[s.dayScholarOrHostel] || '—'}</span> },
+          { key: 'status', label: 'Status', render: (s) => (
+            <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${s.status === USER_STATUS.ACTIVE ? 'bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400' : 'bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400'}`}>{s.status}</span>
+          )},
+          { key: 'actions', label: 'Actions', className: 'text-center', render: (s) => (
+            <div className="flex items-center justify-center gap-2">
+              <button onClick={() => handleEdit(s)} className="px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-500/30 transition-all">Edit</button>
+              <button onClick={() => handleToggleStatus(s.id, s.status)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${s.status === USER_STATUS.ACTIVE ? 'bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-500/20' : 'bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-500/20'}`}>{s.status === USER_STATUS.ACTIVE ? 'Deactivate' : 'Activate'}</button>
+            </div>
+          )},
+        ]}
+        data={filteredStudents}
+        loading={loading}
+        loadingMessage="Loading students..."
+        emptyMessage="No students found"
+        rowKey="id"
+      />
     </div>
   );
 }

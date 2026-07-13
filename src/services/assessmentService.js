@@ -1,6 +1,7 @@
 import puter from '@heyputer/puter.js';
 import { db } from '../firebase';
 import { collection, doc, getDoc, getDocs, addDoc, setDoc, query, where, orderBy, serverTimestamp, Timestamp } from 'firebase/firestore';
+import { auditService, AUDIT_ACTIONS } from '../auth/services/auditService';
 
 const ASSESSMENTS_COL = 'examConfigs';
 const SUBMISSIONS_COL = 'submissions';
@@ -132,6 +133,7 @@ export const submitMcqAttempt = async (assessmentId, studentInfo, answers, resul
       timeLimit: assessment.timeLimitMinutes || 0,
       submittedAt: serverTimestamp(),
     });
+    auditService.log(AUDIT_ACTIONS.ASSESSMENT_SUBMITTED, studentInfo.userId, { studentName: `${studentInfo.firstName || ''} ${studentInfo.lastName || ''}`.trim(), assessmentId, title: assessment.title, subject: assessment.subject, classNum: assessment.classNum, type: 'mcq' });
     return docRef.id;
   } catch (err) {
     console.error('Error submitting MCQ:', err.message);
@@ -172,6 +174,7 @@ export const submitProject = async (assessmentId, studentInfo, projectData, file
       fileName,
       submittedAt: serverTimestamp(),
     });
+    auditService.log(AUDIT_ACTIONS.ASSESSMENT_SUBMITTED, studentInfo.userId, { studentName: `${studentInfo.firstName || ''} ${studentInfo.lastName || ''}`.trim(), assessmentId, title: assessment.title, subject: assessment.subject, classNum: assessment.classNum, type: 'project' });
     return { id: docRef.id, fileUrl, fileName };
   } catch (err) {
     console.error('Error submitting project:', err.message);

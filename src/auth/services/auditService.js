@@ -6,18 +6,18 @@ const AUDIT_COLLECTION = 'auditLogs';
 export const AUDIT_ACTIONS = {
   LOGIN: 'login',
   LOGOUT: 'logout',
-  LOGIN_FAILED: 'login_failed',
   USER_CREATED: 'user_created',
-  USER_UPDATED: 'user_updated',
-  USER_DELETED: 'user_deleted',
   USER_ACTIVATED: 'user_activated',
   USER_DEACTIVATED: 'user_deactivated',
   PASSWORD_RESET: 'password_reset',
-  PASSWORD_CHANGED: 'password_changed',
-  ROLE_CHANGED: 'role_changed',
-  PERMISSION_CHANGED: 'permission_changed',
-  SETTINGS_CHANGED: 'settings_changed',
-  PROFILE_UPDATED: 'profile_updated',
+  ASSESSMENT_CREATED: 'assessment_created',
+  ASSESSMENT_UPDATED: 'assessment_updated',
+  ASSESSMENT_DELETED: 'assessment_deleted',
+  ASSESSMENT_SUBMITTED: 'assessment_submitted',
+  STUDENT_CREATED: 'student_created',
+  STUDENT_UPDATED: 'student_updated',
+  STUDENT_ACTIVATED: 'student_activated',
+  STUDENT_DEACTIVATED: 'student_deactivated',
 };
 
 export const auditService = {
