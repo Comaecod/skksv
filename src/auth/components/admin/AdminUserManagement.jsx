@@ -40,6 +40,11 @@ export default function AdminUserManagement() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
+  const [resetTarget, setResetTarget] = useState(null);
+  const [resetLink, setResetLink] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetError, setResetError] = useState('');
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     loadUsers();
@@ -150,14 +155,33 @@ export default function AdminUserManagement() {
   };
 
   const handleResetPassword = async (email) => {
+    setFormError('');
+    setFormSuccess('');
+    setResetTarget(email);
+    setResetLink('');
+    setResetError('');
+    setCopied(false);
+    setResetLoading(true);
     try {
-      await userService.sendPasswordReset(email);
+      const { link } = await userService.generatePasswordResetLink(email);
+      setResetLink(link);
       await auditService.log(AUDIT_ACTIONS.PASSWORD_RESET, user?.uid, {
         targetEmail: email,
       });
-      setFormSuccess(`Password reset email sent to ${email}`);
     } catch (err) {
-      setFormError('Failed to send reset email');
+      setResetError(err.message || 'Failed to generate reset link');
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(resetLink);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      window.prompt('Copy the reset link manually:', resetLink);
     }
   };
 
@@ -310,6 +334,61 @@ export default function AdminUserManagement() {
         emptyMessage="No users found"
         rowKey="id"
       />
+
+      {resetTarget && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/70">
+          <div className="bg-white dark:bg-[#1e1e38] border border-gray-200 dark:border-white/10 rounded-2xl w-full max-w-md p-6 animate-slideUp">
+            <div className="text-center mb-5">
+              <div className="text-4xl mb-2">🔑</div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">Password Reset Link</h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Generated for <strong>{resetTarget}</strong>
+              </p>
+            </div>
+
+            {resetError && (
+              <div className="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20">
+                <p className="text-red-600 dark:text-red-400 text-sm">{resetError}</p>
+              </div>
+            )}
+
+            {resetLoading ? (
+              <div className="flex items-center justify-center py-6">
+                <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+              </div>
+            ) : resetLink ? (
+              <div className="space-y-4">
+                <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 text-sm text-amber-700 dark:text-amber-400">
+                  ⚠️ This link is <strong>single-use</strong> and valid for a limited time. Share it privately with the user only. The user will set a new password when they open it.
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    readOnly
+                    value={resetLink}
+                    onFocus={(e) => e.target.select()}
+                    className="flex-1 px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-[#1e1e38] border border-gray-300 dark:border-white/10 text-gray-900 dark:text-white text-sm placeholder-gray-400 outline-none focus:border-primary/50 transition-all"
+                  />
+                  <button
+                    onClick={handleCopyLink}
+                    className="px-4 py-2.5 rounded-xl text-sm font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 transition-all"
+                  >
+                    {copied ? 'Copied ✓' : 'Copy'}
+                  </button>
+                </div>
+              </div>
+            ) : null}
+
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => setResetTarget(null)}
+                className="px-5 py-2.5 rounded-xl text-sm font-medium border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-all"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

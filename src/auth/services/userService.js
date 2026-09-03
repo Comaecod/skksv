@@ -150,6 +150,24 @@ export const userService = {
     await sendPasswordResetEmail(auth, email);
   },
 
+  generatePasswordResetLink: async (email) => {
+    const apiKey = import.meta.env.VITE_FIREBASE_API_KEY;
+    const resp = await fetch(
+      `https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ requestType: 'PASSWORD_RESET', email }),
+      }
+    );
+    const data = await resp.json();
+    if (!resp.ok) {
+      throw new Error(data.error?.message || 'Failed to generate reset link');
+    }
+    const link = `${window.location.origin}/reset-password?oobCode=${data.oobCode}`;
+    return { link, email: data.email };
+  },
+
   updateLastLogin: async (uid) => {
     const userRef = doc(db, USERS_COLLECTION, uid);
     await updateDoc(userRef, {
