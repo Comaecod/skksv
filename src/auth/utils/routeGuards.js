@@ -11,6 +11,7 @@ export const ROUTE_PERMISSIONS = {
   '/dashboard/users': { roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN] },
   '/dashboard/students': { roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.STAFF] },
   '/dashboard/audit': { roles: [ROLES.SUPER_ADMIN] },
+  '/dashboard/counselling': { roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN] },
   '/dashboard/settings': { roles: [ROLES.SUPER_ADMIN] },
   '/profile': { roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.STAFF, ROLES.STUDENT] },
   '/exams': { roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.STAFF, ROLES.STUDENT] },

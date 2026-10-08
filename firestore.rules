@@ -186,6 +186,22 @@ service cloud.firestore {
       allow write: if true;
     }
 
+    // Counselling sessions (sensitive, admin-only)
+    match /counsellingSessions/{sessionId} {
+      allow read: if isAdmin();
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Counselling question bank (editable by admins for age-appropriate check-ins)
+    match /counsellingQuestions/{questionId} {
+      allow read: if isAuthenticated();
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
     // Default deny
     match /{document=**} {
       allow read, write: if false;

@@ -8,6 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "seed": "node scripts/seed.mjs",
+    "seed:counselling": "node scripts/seedCounsellingQuestions.mjs",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
   },

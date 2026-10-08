@@ -23,6 +23,13 @@ export const AUDIT_ACTIONS = {
   NOTIFICATION_UPDATED: 'notification_updated',
   NOTIFICATION_DELETED: 'notification_deleted',
   AUDIT_LOG_DELETED: 'audit_log_deleted',
+  COUNSELLING_SESSION_CREATED: 'counselling_session_created',
+  COUNSELLING_SESSION_UPDATED: 'counselling_session_updated',
+  COUNSELLING_SESSION_DELETED: 'counselling_session_deleted',
+  COUNSELLING_FOLLOWUP_COMPLETED: 'counselling_followup_completed',
+  COUNSELLING_QUESTION_CREATED: 'counselling_question_created',
+  COUNSELLING_QUESTION_UPDATED: 'counselling_question_updated',
+  COUNSELLING_QUESTION_DELETED: 'counselling_question_deleted',
 };
 
 export const auditService = {

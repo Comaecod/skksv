@@ -46,6 +46,12 @@ const AdminUserManagement = lazy(() => import('./auth/components/admin/AdminUser
 const StudentManagement = lazy(() => import('./auth/components/admin/StudentManagement'));
 const AuditLogViewer = lazy(() => import('./auth/components/admin/AuditLogViewer'));
 
+const CounsellingDashboard = lazy(() => import('./components/counselling/CounsellingDashboard'));
+const CounsellingSessionsList = lazy(() => import('./components/counselling/CounsellingSessionsList'));
+const CounsellingSessionForm = lazy(() => import('./components/counselling/CounsellingSessionForm'));
+const StudentCounsellingProfile = lazy(() => import('./components/counselling/StudentCounsellingProfile'));
+const QuestionBankManager = lazy(() => import('./components/counselling/QuestionBankManager'));
+
 const AuthFallback = () => (
   <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
     <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
@@ -217,6 +223,36 @@ function App() {
           <Route path="/dashboard/results" element={
             <ProtectedRoute>
               <DashboardLayout><AdminResults /></DashboardLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/dashboard/counselling" element={
+            <ProtectedRoute>
+              <DashboardLayout><CounsellingDashboard /></DashboardLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/dashboard/counselling/sessions" element={
+            <ProtectedRoute>
+              <DashboardLayout><CounsellingSessionsList /></DashboardLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/dashboard/counselling/sessions/new" element={
+            <ProtectedRoute>
+              <DashboardLayout><CounsellingSessionForm /></DashboardLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/dashboard/counselling/sessions/edit/:id" element={
+            <ProtectedRoute>
+              <DashboardLayout><CounsellingSessionForm /></DashboardLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/dashboard/counselling/student/:studentId" element={
+            <ProtectedRoute>
+              <DashboardLayout><StudentCounsellingProfile /></DashboardLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/dashboard/counselling/question-bank" element={
+            <ProtectedRoute>
+              <DashboardLayout><QuestionBankManager /></DashboardLayout>
             </ProtectedRoute>
           } />
         </Routes>

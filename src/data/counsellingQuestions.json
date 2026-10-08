@@ -1,0 +1,1575 @@
+[
+  {
+    "id": "q001",
+    "question": "I feel worried or anxious at school.",
+    "category": "emotional",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "rating",
+    "core": true,
+    "followup": false,
+    "guidance": "Frequent worry at school may indicate anxiety; note whether it relates to studies, peers, or home.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q002",
+    "question": "I feel happy and cheerful most days.",
+    "category": "emotional",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "rating",
+    "core": true,
+    "followup": false,
+    "reverse": true,
+    "guidance": "Answers of Never or Rarely signal low positive mood; consider a one-to-one chat and track across months.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q003",
+    "question": "I feel I have friends to talk to at school.",
+    "category": "social",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "rating",
+    "core": true,
+    "followup": false,
+    "reverse": true,
+    "guidance": "Low responses suggest social isolation; check break-time companions and seating or group arrangements.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q004",
+    "question": "I feel confident about my studies.",
+    "category": "academic",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "rating",
+    "core": true,
+    "followup": false,
+    "reverse": true,
+    "guidance": "Low confidence in studies can precede avoidance and withdrawal; connect the student to academic support.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q005",
+    "question": "I feel sad or low even during school hours.",
+    "category": "emotional",
+    "classRange": { "min": 6, "max": 10 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "guidance": "Persistent low mood is a key signal; compare with the self-harm item and watch for withdrawal.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q006",
+    "question": "I feel tired at school.",
+    "category": "physical",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "rating",
+    "core": true,
+    "followup": false,
+    "guidance": "Chronic tiredness affects attention and mood; ask about sleep timing and late-night screen use.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q007",
+    "question": "I get headaches or stomach aches at school.",
+    "category": "physical",
+    "classRange": { "min": 6, "max": 10 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "guidance": "Recurrent physical symptoms can be stress-related; check whether they follow a school-day pattern.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q008",
+    "question": "I get upset or angry quickly at school.",
+    "category": "behavioral",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "guidance": "Frequent angry outbursts may point to frustration or unexpressed stress; track triggers before judging behaviour.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q009",
+    "question": "I feel my home life is stressful.",
+    "category": "family",
+    "classRange": { "min": 6, "max": 10 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "guidance": "Avoid blame; explore what feels stressful at home without pressing the child for details.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q010",
+    "question": "I feel pressured about exams and marks.",
+    "category": "academic",
+    "classRange": { "min": 8, "max": 10 },
+    "type": "rating",
+    "core": true,
+    "followup": false,
+    "guidance": "Exam pressure peaks in classes 9-10; gently probe where the expectations come from.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q011",
+    "question": "I feel left out or alone during breaks.",
+    "category": "social",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "rating",
+    "core": true,
+    "followup": false,
+    "guidance": "Being left out at breaks is a strong social-exclusion flag; observe playground interaction.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q012",
+    "question": "I have trouble sleeping because I am worried.",
+    "category": "emotional",
+    "classRange": { "min": 6, "max": 10 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "guidance": "Worry-driven insomnia affects mood and study; check bedtime routines and mental load before sleep.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q013",
+    "question": "I feel safe at school.",
+    "category": "general",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "rating",
+    "core": true,
+    "followup": false,
+    "reverse": true,
+    "guidance": "A low 'safe at school' answer must be followed up seriously; ask what could be changed to feel safer.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q014",
+    "question": "I feel nervous when a teacher asks me to answer.",
+    "category": "emotional",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "guidance": "Common in low-confidence students; consider gradual participation support rather than avoidance.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q015",
+    "question": "I find it hard to keep up with classwork.",
+    "category": "academic",
+    "classRange": { "min": 4, "max": 8 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "guidance": "Early academic frustration can grow into avoidance; arrange remediation before it compounds.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q016",
+    "question": "Is everything okay for you overall this month?",
+    "category": "general",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "yesno",
+    "core": true,
+    "followup": false,
+    "guidance": "A No is a prompt to explore the specific areas raised in the rest of the answers.",
+    "options": [
+      { "label": "No", "value": "no", "score": 100 },
+      { "label": "Yes", "value": "yes", "score": 0 }
+    ]
+  },
+  {
+    "id": "q017",
+    "question": "Do you feel like talking to someone about how you feel?",
+    "category": "emotional",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "yesno",
+    "core": true,
+    "followup": true,
+    "guidance": "A Yes is a direct request for support; route the student to the counsellor without delay.",
+    "options": [
+      { "label": "No", "value": "no", "score": 0 },
+      { "label": "Yes", "value": "yes", "score": 100 }
+    ]
+  },
+  {
+    "id": "q018",
+    "question": "Are you being teased or left out by other students?",
+    "category": "social",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "yesno",
+    "core": true,
+    "followup": false,
+    "guidance": "Peer victimisation needs a response plan; do not dismiss it as normal childish behaviour.",
+    "options": [
+      { "label": "No", "value": "no", "score": 0 },
+      { "label": "Yes", "value": "yes", "score": 100 }
+    ]
+  },
+  {
+    "id": "q019",
+    "question": "Is there a grown-up at home or school you can talk to?",
+    "category": "general",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "yesno",
+    "core": false,
+    "followup": false,
+    "guidance": "A No means the child has no trusted adult; actively help build one within the school.",
+    "options": [
+      { "label": "Yes", "value": "yes", "score": 0 },
+      { "label": "No", "value": "no", "score": 100 }
+    ]
+  },
+  {
+    "id": "q020",
+    "question": "Have you thought about hurting yourself?",
+    "category": "emotional",
+    "classRange": { "min": 6, "max": 10 },
+    "type": "yesno",
+    "core": true,
+    "followup": true,
+    "safeguard": true,
+    "guidance": "Any Yes requires immediate safeguarding action; inform the designated safeguarding lead the same day.",
+    "options": [
+      { "label": "No", "value": "no", "score": 0 },
+      { "label": "Yes", "value": "yes", "score": 100 }
+    ]
+  },
+  {
+    "id": "q021",
+    "question": "Do you have any pain or health problem that bothers you?",
+    "category": "physical",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "yesno",
+    "core": false,
+    "followup": false,
+    "guidance": "Rule out a medical cause; persistent unexplained pain can also be a body signal of stress.",
+    "options": [
+      { "label": "No", "value": "no", "score": 0 },
+      { "label": "Yes", "value": "yes", "score": 100 }
+    ]
+  },
+  {
+    "id": "q022",
+    "question": "Do you eat your meals regularly at school?",
+    "category": "physical",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "yesno",
+    "core": false,
+    "followup": false,
+    "guidance": "Skipping meals affects energy, attention and mood; check access to mid-day food.",
+    "options": [
+      { "label": "Yes", "value": "yes", "score": 0 },
+      { "label": "No", "value": "no", "score": 100 }
+    ]
+  },
+  {
+    "id": "q023",
+    "question": "Are you avoiding school because of fear or worry?",
+    "category": "behavioral",
+    "classRange": { "min": 6, "max": 10 },
+    "type": "yesno",
+    "core": false,
+    "followup": true,
+    "guidance": "School avoidance is serious; involve parents early with a step-by-step return plan.",
+    "options": [
+      { "label": "No", "value": "no", "score": 0 },
+      { "label": "Yes", "value": "yes", "score": 100 }
+    ]
+  },
+  {
+    "id": "q024",
+    "question": "Do you feel tired or sleepy in class often?",
+    "category": "physical",
+    "classRange": { "min": 6, "max": 10 },
+    "type": "yesno",
+    "core": false,
+    "followup": false,
+    "guidance": "Could point to sleep deficit, screen time or focus difficulties; track across several days.",
+    "options": [
+      { "label": "No", "value": "no", "score": 0 },
+      { "label": "Yes", "value": "yes", "score": 100 }
+    ]
+  },
+  {
+    "id": "q025",
+    "question": "Do you get enough sleep at night?",
+    "category": "physical",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "yesno",
+    "core": false,
+    "followup": false,
+    "guidance": "School children need 8-10 hours; late-night screen time is the most common cause of short sleep.",
+    "options": [
+      { "label": "Yes", "value": "yes", "score": 0 },
+      { "label": "No", "value": "no", "score": 100 }
+    ]
+  },
+  {
+    "id": "q026",
+    "question": "Is anything happening at home that worries you?",
+    "category": "family",
+    "classRange": { "min": 6, "max": 10 },
+    "type": "yesno",
+    "core": false,
+    "followup": true,
+    "guidance": "Open, non-prying phrasing encourages disclosure; let the child choose what to share.",
+    "options": [
+      { "label": "No", "value": "no", "score": 0 },
+      { "label": "Yes", "value": "yes", "score": 100 }
+    ]
+  },
+  {
+    "id": "q027",
+    "question": "How often do you talk to your parents about school?",
+    "category": "family",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "mcq",
+    "core": false,
+    "followup": false,
+    "guidance": "Low parent-child communication about school is a connectedness signal worth raising at parent meetings.",
+    "options": [
+      { "label": "Every day", "value": "daily", "score": 0 },
+      { "label": "A few times a week", "value": "weekly", "score": 25 },
+      { "label": "Sometimes", "value": "sometimes", "score": 50 },
+      { "label": "Rarely", "value": "rarely", "score": 75 },
+      { "label": "Never", "value": "never", "score": 100 }
+    ]
+  },
+  {
+    "id": "q028",
+    "question": "How are your studies going so far?",
+    "category": "academic",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "mcq",
+    "core": true,
+    "followup": false,
+    "guidance": "Anchor item for academic tracking; 'harder' or 'struggling' should trigger practical support.",
+    "options": [
+      { "label": "Very well", "value": "very-well", "score": 0 },
+      { "label": "Okay", "value": "okay", "score": 25 },
+      { "label": "Getting harder", "value": "harder", "score": 50 },
+      { "label": "Very hard", "value": "very-hard", "score": 75 },
+      { "label": "I am struggling", "value": "struggling", "score": 100 }
+    ]
+  },
+  {
+    "id": "q029",
+    "question": "How do you feel most days at school?",
+    "category": "emotional",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "mcq",
+    "core": true,
+    "followup": false,
+    "guidance": "Quick mood snapshot; a 'worried' or 'scared' choice should be explored in conversation.",
+    "options": [
+      { "label": "Happy", "value": "happy", "score": 0 },
+      { "label": "Okay", "value": "okay", "score": 25 },
+      { "label": "Bored", "value": "bored", "score": 50 },
+      { "label": "Worried", "value": "worried", "score": 75 },
+      { "label": "Scared", "value": "scared", "score": 100 }
+    ]
+  },
+  {
+    "id": "q030",
+    "question": "When something bothers me, I usually...",
+    "category": "general",
+    "classRange": { "min": 6, "max": 10 },
+    "type": "mcq",
+    "core": false,
+    "followup": false,
+    "guidance": "Coping style predicts outcomes; 'keep it to myself' indicates the need for a trusted outlet.",
+    "options": [
+      { "label": "Talk to someone", "value": "talk", "score": 0 },
+      { "label": "Keep it to myself", "value": "keep", "score": 50 },
+      { "label": "Feel very upset", "value": "upset", "score": 100 }
+    ]
+  },
+  {
+    "id": "q031",
+    "question": "How do you get along with your classmates?",
+    "category": "social",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "mcq",
+    "core": false,
+    "followup": false,
+    "guidance": "Conflict with classmates affects daily wellbeing; address class group dynamics where needed.",
+    "options": [
+      { "label": "Very well", "value": "very-well", "score": 0 },
+      { "label": "Okay", "value": "okay", "score": 25 },
+      { "label": "Sometimes difficult", "value": "sometimes", "score": 50 },
+      { "label": "Often difficult", "value": "often", "score": 100 }
+    ]
+  },
+  {
+    "id": "q032",
+    "question": "How much time do you spend on screens and gadgets at home?",
+    "category": "general",
+    "classRange": { "min": 6, "max": 10 },
+    "type": "mcq",
+    "core": false,
+    "followup": false,
+    "guidance": "Excessive screen time displaces sleep and study; discuss family screen boundaries.",
+    "options": [
+      { "label": "Only on weekends", "value": "weekend", "score": 0 },
+      { "label": "Some days", "value": "some", "score": 25 },
+      { "label": "Every day", "value": "daily", "score": 50 },
+      { "label": "Most of the day", "value": "all-day", "score": 100 }
+    ]
+  },
+  {
+    "id": "q033",
+    "question": "Anything else you would like to tell your teachers or school?",
+    "category": "general",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "text",
+    "core": false,
+    "followup": false,
+    "guidance": "An open channel; some children disclose here what they are reluctant to say in person."
+  },
+  {
+    "id": "q034",
+    "question": "If you face any difficulty at school or home, tell us here.",
+    "category": "general",
+    "classRange": { "min": 6, "max": 10 },
+    "type": "text",
+    "core": false,
+    "followup": false,
+    "guidance": "Encourages disclosure of difficulties in a safe written format; review every response."
+  },
+  {
+    "id": "q035",
+    "question": "I have someone I can share my worries with at home.",
+    "category": "emotional",
+    "classRange": { "min": 4, "max": 5 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "reverse": true,
+    "guidance": "Never or Rarely means the child is coping alone at home; explore who they would feel safe telling.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q036",
+    "question": "Do you know which grown-up to ask for help if you feel scared at school?",
+    "category": "general",
+    "classRange": { "min": 4, "max": 5 },
+    "type": "yesno",
+    "core": false,
+    "followup": false,
+    "guidance": "Knowing a safe adult protects against helplessness; if No, agree a named person with the child.",
+    "options": [
+      { "label": "Yes", "value": "yes", "score": 0 },
+      { "label": "No", "value": "no", "score": 100 }
+    ]
+  },
+  {
+    "id": "q037",
+    "question": "Do you have a friend to play with during break?",
+    "category": "social",
+    "classRange": { "min": 4, "max": 5 },
+    "type": "yesno",
+    "core": false,
+    "followup": false,
+    "guidance": "Having a playmate at break prevents isolation; a No is worth a gentle follow-up.",
+    "options": [
+      { "label": "Yes", "value": "yes", "score": 0 },
+      { "label": "No", "value": "no", "score": 100 }
+    ]
+  },
+  {
+    "id": "q038",
+    "question": "I find it hard to sit still and wait for my turn.",
+    "category": "behavioral",
+    "classRange": { "min": 4, "max": 5 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "guidance": "Normal in bursts at this age; persistent difficulty needs support rather than punishment.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q039",
+    "question": "Do you get a headache or sore eyes after using a screen or tablet?",
+    "category": "physical",
+    "classRange": { "min": 4, "max": 5 },
+    "type": "yesno",
+    "core": false,
+    "followup": false,
+    "guidance": "Screen-related strain affects comfort; suggest a short break every 20-30 minutes.",
+    "options": [
+      { "label": "No", "value": "no", "score": 0 },
+      { "label": "Yes", "value": "yes", "score": 100 }
+    ]
+  },
+  {
+    "id": "q040",
+    "question": "Does someone at home read or talk with you in the evenings?",
+    "category": "family",
+    "classRange": { "min": 4, "max": 5 },
+    "type": "yesno",
+    "core": false,
+    "followup": false,
+    "guidance": "Shared evening time strengthens a felt sense of security; No may point to family busyness or stress.",
+    "options": [
+      { "label": "Yes", "value": "yes", "score": 0 },
+      { "label": "No", "value": "no", "score": 100 }
+    ]
+  },
+  {
+    "id": "q041",
+    "question": "When I am at school, I mostly feel...",
+    "category": "emotional",
+    "classRange": { "min": 4, "max": 5 },
+    "type": "mcq",
+    "core": false,
+    "followup": false,
+    "guidance": "A simple mood pick; Sad or Scared warrants an individual conversation.",
+    "options": [
+      { "label": "Happy", "value": "happy", "score": 0 },
+      { "label": "Okay", "value": "okay", "score": 25 },
+      { "label": "Tired", "value": "tired", "score": 50 },
+      { "label": "Sad", "value": "sad", "score": 75 },
+      { "label": "Scared", "value": "scared", "score": 100 }
+    ]
+  },
+  {
+    "id": "q042",
+    "question": "Do you like coming to school most days?",
+    "category": "general",
+    "classRange": { "min": 4, "max": 5 },
+    "type": "yesno",
+    "core": false,
+    "followup": false,
+    "guidance": "Not liking school at this age can signal a stressful or frightening experience; explore gently.",
+    "options": [
+      { "label": "Yes", "value": "yes", "score": 0 },
+      { "label": "No", "value": "no", "score": 100 }
+    ]
+  },
+  {
+    "id": "q043",
+    "question": "What is your favourite thing about school?",
+    "category": "general",
+    "classRange": { "min": 4, "max": 5 },
+    "type": "text",
+    "core": false,
+    "followup": false,
+    "guidance": "A warm opener that builds rapport and reveals what engages the child."
+  },
+  {
+    "id": "q044",
+    "question": "Other children tease me or do not want to play with me.",
+    "category": "social",
+    "classRange": { "min": 4, "max": 5 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "guidance": "Early exclusion shapes later confidence; do not dismiss it as normal childishness.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q045",
+    "question": "Do you feel scared of anything at school?",
+    "category": "emotional",
+    "classRange": { "min": 4, "max": 5 },
+    "type": "yesno",
+    "core": false,
+    "followup": true,
+    "guidance": "Gentle phrasing; a Yes should be followed up personally to identify the cause.",
+    "options": [
+      { "label": "No", "value": "no", "score": 0 },
+      { "label": "Yes", "value": "yes", "score": 100 }
+    ]
+  },
+  {
+    "id": "q046",
+    "question": "I can ask my teacher for help when I am stuck.",
+    "category": "academic",
+    "classRange": { "min": 4, "max": 5 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "reverse": true,
+    "guidance": "A low 'can ask' indicates fear of teachers; build approachability and invite questions.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q047",
+    "question": "Is there someone you can sit with at lunch?",
+    "category": "social",
+    "classRange": { "min": 4, "max": 5 },
+    "type": "yesno",
+    "core": false,
+    "followup": false,
+    "guidance": "Sitting alone at lunch is a practical, visible sign of isolation.",
+    "options": [
+      { "label": "Yes", "value": "yes", "score": 0 },
+      { "label": "No", "value": "no", "score": 100 }
+    ]
+  },
+  {
+    "id": "q048",
+    "question": "At home after school, I mostly do...",
+    "category": "family",
+    "classRange": { "min": 4, "max": 5 },
+    "type": "mcq",
+    "core": false,
+    "followup": false,
+    "guidance": "Reveals home routines; 'stay by myself' or 'no one to play with' suggests a possible lack of connection.",
+    "options": [
+      { "label": "Play with my family", "value": "family", "score": 0 },
+      { "label": "Play outside", "value": "outside", "score": 15 },
+      { "label": "Watch cartoons or use a tablet", "value": "screen", "score": 35 },
+      { "label": "Stay by myself", "value": "alone", "score": 70 },
+      { "label": "There is no one to play with", "value": "no-one", "score": 100 }
+    ]
+  },
+  {
+    "id": "q049",
+    "question": "I worry about my marks and homework.",
+    "category": "academic",
+    "classRange": { "min": 6, "max": 8 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "guidance": "Academic pressure starts before class 9-10; separate healthy effort from fear of failure.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q050",
+    "question": "Do you find it difficult to concentrate in class?",
+    "category": "academic",
+    "classRange": { "min": 6, "max": 8 },
+    "type": "yesno",
+    "core": false,
+    "followup": false,
+    "guidance": "Concentration problems may reflect worry, sleep loss or attention difficulties; check the context.",
+    "options": [
+      { "label": "No", "value": "no", "score": 0 },
+      { "label": "Yes", "value": "yes", "score": 100 }
+    ]
+  },
+  {
+    "id": "q051",
+    "question": "I have a best friend I trust.",
+    "category": "social",
+    "classRange": { "min": 6, "max": 8 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "reverse": true,
+    "guidance": "A trusted friendship protects against peer stress; the absence of one is a concern.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q052",
+    "question": "At school, other students mostly treat me...",
+    "category": "social",
+    "classRange": { "min": 6, "max": 8 },
+    "type": "mcq",
+    "core": false,
+    "followup": false,
+    "guidance": "Unkind treatment links to bullying; escalate repeated patterns to the anti-bullying team.",
+    "options": [
+      { "label": "Very kindly", "value": "kindly", "score": 0 },
+      { "label": "Fairly", "value": "fairly", "score": 15 },
+      { "label": "Sometimes unkindly", "value": "sometimes", "score": 50 },
+      { "label": "Often unkindly", "value": "often", "score": 100 }
+    ]
+  },
+  {
+    "id": "q053",
+    "question": "Do you eat breakfast before coming to school?",
+    "category": "physical",
+    "classRange": { "min": 6, "max": 8 },
+    "type": "yesno",
+    "core": false,
+    "followup": false,
+    "guidance": "Skipping breakfast affects attention and mood by mid-morning.",
+    "options": [
+      { "label": "Yes", "value": "yes", "score": 0 },
+      { "label": "No", "value": "no", "score": 100 }
+    ]
+  },
+  {
+    "id": "q054",
+    "question": "I feel nervous before tests or speaking in class.",
+    "category": "emotional",
+    "classRange": { "min": 6, "max": 8 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "guidance": "Mild nerves are normal; marked distress suggests anxiety-management support is worthwhile.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q055",
+    "question": "At home, I can talk to my family about my problems...",
+    "category": "family",
+    "classRange": { "min": 6, "max": 8 },
+    "type": "mcq",
+    "core": false,
+    "followup": false,
+    "guidance": "Little home communication can push children to peers or silence for support.",
+    "options": [
+      { "label": "Easily", "value": "easily", "score": 0 },
+      { "label": "Sometimes", "value": "sometimes", "score": 25 },
+      { "label": "Not really", "value": "not-really", "score": 50 },
+      { "label": "Never", "value": "never", "score": 100 }
+    ]
+  },
+  {
+    "id": "q056",
+    "question": "I get into fights or arguments with my friends.",
+    "category": "behavioral",
+    "classRange": { "min": 6, "max": 8 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "guidance": "Repeated conflicts reveal frustration or anger-regulation issues worth addressing.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q057",
+    "question": "Is there a teacher or staff member at school you trust?",
+    "category": "general",
+    "classRange": { "min": 6, "max": 8 },
+    "type": "yesno",
+    "core": false,
+    "followup": false,
+    "guidance": "A trusted adult at school is protective; a No should be followed up.",
+    "options": [
+      { "label": "Yes", "value": "yes", "score": 0 },
+      { "label": "No", "value": "no", "score": 100 }
+    ]
+  },
+  {
+    "id": "q058",
+    "question": "I feel tired when I wake up in the morning.",
+    "category": "physical",
+    "classRange": { "min": 6, "max": 8 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "guidance": "Morning tiredness beyond the normal suggests a sleep deficit or hidden worry.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q059",
+    "question": "Do people in your class include you in games and groups?",
+    "category": "social",
+    "classRange": { "min": 6, "max": 8 },
+    "type": "yesno",
+    "core": false,
+    "followup": false,
+    "guidance": "Exclusion at ages 6-8 predicts withdrawal; observe group dynamics around this student.",
+    "options": [
+      { "label": "Yes", "value": "yes", "score": 0 },
+      { "label": "No", "value": "no", "score": 100 }
+    ]
+  },
+  {
+    "id": "q060",
+    "question": "After school I usually spend my time...",
+    "category": "general",
+    "classRange": { "min": 6, "max": 8 },
+    "type": "mcq",
+    "core": false,
+    "followup": false,
+    "guidance": "A routine snapshot; heavy isolation or stress after school warrants follow-up.",
+    "options": [
+      { "label": "Homework then playing", "value": "balanced", "score": 0 },
+      { "label": "Playing outside", "value": "outside", "score": 15 },
+      { "label": "Mostly on phone or TV", "value": "screen", "score": 40 },
+      { "label": "Mostly alone in my room", "value": "alone", "score": 75 },
+      { "label": "Very stressed about studies", "value": "stressed", "score": 100 }
+    ]
+  },
+  {
+    "id": "q061",
+    "question": "I can manage my homework without too much stress.",
+    "category": "academic",
+    "classRange": { "min": 6, "max": 8 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "reverse": true,
+    "guidance": "Homework overwhelm at this stage needs practical scheduling and study-skills support.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q062",
+    "question": "Have you ever felt that nobody cares about you?",
+    "category": "emotional",
+    "classRange": { "min": 6, "max": 8 },
+    "type": "yesno",
+    "core": false,
+    "followup": true,
+    "safeguard": true,
+    "guidance": "A perceived absence of care is an early risk marker; explore relationships gently without alarming the child.",
+    "options": [
+      { "label": "No", "value": "no", "score": 0 },
+      { "label": "Yes", "value": "yes", "score": 100 }
+    ]
+  },
+  {
+    "id": "q063",
+    "question": "I feel pressure from expectations about my marks.",
+    "category": "academic",
+    "classRange": { "min": 9, "max": 10 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "guidance": "Expectation pressure from self, parents or teachers is a major senior stressor; explore its source.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q064",
+    "question": "Do you worry about what you will do after school?",
+    "category": "academic",
+    "classRange": { "min": 9, "max": 10 },
+    "type": "yesno",
+    "core": false,
+    "followup": true,
+    "guidance": "Uncertainty about the future causes anxiety; reassure that structured career guidance is available.",
+    "options": [
+      { "label": "No", "value": "no", "score": 0 },
+      { "label": "Yes", "value": "yes", "score": 100 }
+    ]
+  },
+  {
+    "id": "q065",
+    "question": "Compared to last year, my studies are...",
+    "category": "academic",
+    "classRange": { "min": 9, "max": 10 },
+    "type": "mcq",
+    "core": false,
+    "followup": false,
+    "guidance": "A worsening trajectory can flag early disengagement or pressure overload; respond early.",
+    "options": [
+      { "label": "Going well", "value": "well", "score": 0 },
+      { "label": "About the same", "value": "same", "score": 25 },
+      { "label": "Harder", "value": "harder", "score": 50 },
+      { "label": "Much harder and stressful", "value": "much-harder", "score": 75 },
+      { "label": "I am struggling a lot", "value": "struggling", "score": 100 }
+    ]
+  },
+  {
+    "id": "q066",
+    "question": "I compare myself to others and feel I am not good enough.",
+    "category": "emotional",
+    "classRange": { "min": 9, "max": 10 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "guidance": "Harmful comparison erodes self-esteem at exam age; counter it with concrete achievements.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q067",
+    "question": "I feel exhausted by the end of the school week.",
+    "category": "physical",
+    "classRange": { "min": 9, "max": 10 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "guidance": "Weekend exhaustion may signal academic overload or poor sleep recovery.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q068",
+    "question": "Have you felt very low or hopeless in the last two weeks?",
+    "category": "emotional",
+    "classRange": { "min": 9, "max": 10 },
+    "type": "yesno",
+    "core": true,
+    "followup": true,
+    "safeguard": true,
+    "guidance": "Two weeks of low mood is a strong clinical-pathway signal; any Yes should reach the counsellor immediately.",
+    "options": [
+      { "label": "No", "value": "no", "score": 0 },
+      { "label": "Yes", "value": "yes", "score": 100 }
+    ]
+  },
+  {
+    "id": "q069",
+    "question": "Has anyone offered you cigarettes, alcohol or any intoxicating substance?",
+    "category": "behavioral",
+    "classRange": { "min": 9, "max": 10 },
+    "type": "yesno",
+    "core": false,
+    "followup": true,
+    "guidance": "A non-judgemental awareness question; a Yes opens a conversation about pressure, not a lecture.",
+    "options": [
+      { "label": "No", "value": "no", "score": 0 },
+      { "label": "Yes", "value": "yes", "score": 100 }
+    ]
+  },
+  {
+    "id": "q070",
+    "question": "I worry about my appearance or how I look.",
+    "category": "emotional",
+    "classRange": { "min": 9, "max": 10 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "guidance": "Body-image worry peaks in adolescence; link it to confidence and self-esteem work.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q071",
+    "question": "Do you feel pressured by friends to do things you do not want to do?",
+    "category": "social",
+    "classRange": { "min": 9, "max": 10 },
+    "type": "yesno",
+    "core": false,
+    "followup": true,
+    "guidance": "Peer pressure is heightened at this stage; a Yes can be explored safely without judgement.",
+    "options": [
+      { "label": "No", "value": "no", "score": 0 },
+      { "label": "Yes", "value": "yes", "score": 100 }
+    ]
+  },
+  {
+    "id": "q072",
+    "question": "I worry about arguments or problems with my friends.",
+    "category": "social",
+    "classRange": { "min": 9, "max": 10 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "guidance": "Friend conflicts at this age can trigger serious distress; keep communication channels open.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q073",
+    "question": "Have you felt like staying away from school this term?",
+    "category": "behavioral",
+    "classRange": { "min": 9, "max": 10 },
+    "type": "yesno",
+    "core": false,
+    "followup": true,
+    "guidance": "Early refusal signals overwhelm; respond before attendance begins to drop.",
+    "options": [
+      { "label": "No", "value": "no", "score": 0 },
+      { "label": "Yes", "value": "yes", "score": 100 }
+    ]
+  },
+  {
+    "id": "q074",
+    "question": "I feel I have people I can talk to when I am stressed.",
+    "category": "social",
+    "classRange": { "min": 9, "max": 10 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "reverse": true,
+    "guidance": "Perceived support is protective; its absence raises risk and should prompt connection to help.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q075",
+    "question": "Do you feel you have enough time to study and rest?",
+    "category": "academic",
+    "classRange": { "min": 9, "max": 10 },
+    "type": "yesno",
+    "core": false,
+    "followup": false,
+    "guidance": "Imbalance between study and rest drives burnout at senior levels.",
+    "options": [
+      { "label": "Yes", "value": "yes", "score": 0 },
+      { "label": "No", "value": "no", "score": 100 }
+    ]
+  },
+  {
+    "id": "q076",
+    "question": "When I feel stressed, I usually...",
+    "category": "general",
+    "classRange": { "min": 9, "max": 10 },
+    "type": "mcq",
+    "core": false,
+    "followup": false,
+    "guidance": "Coping style predicts outcomes; 'cannot cope' signals a need for practical skills support.",
+    "options": [
+      { "label": "Talk to someone", "value": "talk", "score": 0 },
+      { "label": "Take a break", "value": "break", "score": 25 },
+      { "label": "Keep it to myself", "value": "keep", "score": 50 },
+      { "label": "I cannot find a way to cope", "value": "no-cope", "score": 100 }
+    ]
+  },
+  {
+    "id": "q077",
+    "question": "I have trouble falling asleep because my mind is full of thoughts.",
+    "category": "physical",
+    "classRange": { "min": 9, "max": 10 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "guidance": "Racing thoughts at bedtime indicate anxiety-linked insomnia; discuss wind-down routines.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q078",
+    "question": "Is there anything you would like help with or someone to talk to about? (optional)",
+    "category": "general",
+    "classRange": { "min": 9, "max": 10 },
+    "type": "text",
+    "core": false,
+    "followup": false,
+    "guidance": "An open disclosure channel; many students share here rather than face to face."
+  },
+  {
+    "id": "q079",
+    "question": "I feel calm and relaxed even during busy school days.",
+    "category": "emotional",
+    "classRange": { "min": 6, "max": 10 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "reverse": true,
+    "guidance": "Distress on busy days reveals load capacity; a low calm score flags strain.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q080",
+    "question": "Do you feel you can manage your schoolwork?",
+    "category": "general",
+    "classRange": { "min": 6, "max": 10 },
+    "type": "yesno",
+    "core": false,
+    "followup": false,
+    "guidance": "Feeling unable to manage is an early academic-distress flag worth acting on.",
+    "options": [
+      { "label": "Yes", "value": "yes", "score": 0 },
+      { "label": "No", "value": "no", "score": 100 }
+    ]
+  },
+  {
+    "id": "q081",
+    "question": "I feel afraid of making mistakes in front of the class.",
+    "category": "emotional",
+    "classRange": { "min": 8, "max": 10 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "guidance": "Fear of mistakes restricts participation and may indicate perfectionism; address gently.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q082",
+    "question": "Most days, I feel...",
+    "category": "general",
+    "classRange": { "min": 8, "max": 10 },
+    "type": "mcq",
+    "core": false,
+    "followup": false,
+    "guidance": "A day-to-day mood gauge; low scores connect to the two-week hopelessness risk item.",
+    "options": [
+      { "label": "Energetic", "value": "energetic", "score": 0 },
+      { "label": "Okay", "value": "okay", "score": 25 },
+      { "label": "Low", "value": "low", "score": 50 },
+      { "label": "Very low", "value": "very-low", "score": 75 },
+      { "label": "As if I do not want to be at school", "value": "refuse", "score": 100 }
+    ]
+  },
+  {
+    "id": "q083",
+    "question": "Do you feel your family understands your problems?",
+    "category": "family",
+    "classRange": { "min": 8, "max": 10 },
+    "type": "yesno",
+    "core": false,
+    "followup": false,
+    "guidance": "Perceived family understanding buffers stress; a No signals a need for family awareness.",
+    "options": [
+      { "label": "Yes", "value": "yes", "score": 0 },
+      { "label": "No", "value": "no", "score": 100 }
+    ]
+  },
+  {
+    "id": "q084",
+    "question": "I get headaches or feel unwell on school mornings.",
+    "category": "physical",
+    "classRange": { "min": 8, "max": 10 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "guidance": "School-morning sickness is a classic body signal of avoidance or stress.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q085",
+    "question": "Do you have friends you can talk to after school?",
+    "category": "social",
+    "classRange": { "min": 8, "max": 10 },
+    "type": "yesno",
+    "core": false,
+    "followup": false,
+    "guidance": "Post-school connection keeps students anchored; a No warrants follow-up.",
+    "options": [
+      { "label": "Yes", "value": "yes", "score": 0 },
+      { "label": "No", "value": "no", "score": 100 }
+    ]
+  },
+  {
+    "id": "q086",
+    "question": "When I get angry or upset, I...",
+    "category": "behavioral",
+    "classRange": { "min": 8, "max": 10 },
+    "type": "mcq",
+    "core": false,
+    "followup": false,
+    "guidance": "Anger-management style matters; destructive outlets need skill-building support.",
+    "options": [
+      { "label": "Talk about it calmly", "value": "talk", "score": 0 },
+      { "label": "Need some time alone to calm down", "value": "alone", "score": 25 },
+      { "label": "Keep it all inside", "value": "inside", "score": 50 },
+      { "label": "Shout or get into fights", "value": "fight", "score": 100 }
+    ]
+  },
+  {
+    "id": "q087",
+    "question": "If you could change one thing about school or your daily routine to feel better, what would it be?",
+    "category": "general",
+    "classRange": { "min": 6, "max": 10 },
+    "type": "text",
+    "core": false,
+    "followup": false,
+    "guidance": "Solution-oriented and safe; responses often reveal the root cause indirectly."
+  },
+  {
+    "id": "q088",
+    "question": "The food in the hostel mess is enough for me.",
+    "category": "physical",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "reverse": true,
+    "residence": "hostel",
+    "guidance": "Food sufficiency affects energy and mood; a low answer should be raised with hostel staff.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q089",
+    "question": "Are the washrooms and bathing areas in the hostel clean for you to use?",
+    "category": "physical",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "yesno",
+    "core": false,
+    "followup": false,
+    "residence": "hostel",
+    "guidance": "Hygiene directly affects health and dignity; a No should be reported to hostel management.",
+    "options": [
+      { "label": "Yes", "value": "yes", "score": 0 },
+      { "label": "No", "value": "no", "score": 100 }
+    ]
+  },
+  {
+    "id": "q090",
+    "question": "I get time to play or relax in the hostel besides studying.",
+    "category": "general",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "reverse": true,
+    "residence": "hostel",
+    "guidance": "Unstructured play supports wellbeing; little or no relaxed time may mean an over-tight daily routine.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q091",
+    "question": "Do you get enough sleep at night in the hostel?",
+    "category": "physical",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "yesno",
+    "core": false,
+    "followup": false,
+    "residence": "hostel",
+    "guidance": "Snoring neighbours, noise or lights can disrupt hostel sleep; a No should be explored with staff.",
+    "options": [
+      { "label": "Yes", "value": "yes", "score": 0 },
+      { "label": "No", "value": "no", "score": 100 }
+    ]
+  },
+  {
+    "id": "q092",
+    "question": "I miss my home or my family and it makes me sad.",
+    "category": "emotional",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "residence": "hostel",
+    "guidance": "Some homesickness is normal; frequent sadness over it needs extra staff attention and reassurance.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q093",
+    "question": "I get along with my roommates and other hostel students.",
+    "category": "social",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "reverse": true,
+    "residence": "hostel",
+    "guidance": "Roommate conflict disturbs the whole day; a low score should be discussed before it escalates.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q094",
+    "question": "Is there a hostel staff member or warden you can talk to when you have a problem?",
+    "category": "general",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "yesno",
+    "core": false,
+    "followup": false,
+    "residence": "hostel",
+    "guidance": "A trusted adult in the hostel is protective; a No must be followed up so one is clearly identified.",
+    "options": [
+      { "label": "Yes", "value": "yes", "score": 0 },
+      { "label": "No", "value": "no", "score": 100 }
+    ]
+  },
+  {
+    "id": "q095",
+    "question": "The rules in the hostel feel fair to me.",
+    "category": "behavioral",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "reverse": true,
+    "residence": "hostel",
+    "guidance": "Perceived unfairness breeds resentment and acting out; explore which rule feels unfair.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q096",
+    "question": "Do you feel safe in the hostel at night?",
+    "category": "general",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "yesno",
+    "core": false,
+    "followup": true,
+    "residence": "hostel",
+    "guidance": "Night-time fear is serious; any No should be escalated to the designated safeguarding lead.",
+    "options": [
+      { "label": "Yes", "value": "yes", "score": 0 },
+      { "label": "No", "value": "no", "score": 100 }
+    ]
+  },
+  {
+    "id": "q097",
+    "question": "I have enough space and light in the hostel to study properly.",
+    "category": "academic",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "reverse": true,
+    "residence": "hostel",
+    "guidance": "Poor study conditions quietly drag down academic confidence; a low answer should reach hostel staff.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q098",
+    "question": "When I have a problem in the hostel, I usually...",
+    "category": "general",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "mcq",
+    "core": false,
+    "followup": false,
+    "residence": "hostel",
+    "guidance": "Reveals the practical help-seeking route available; 'no one to ask' needs an immediate response.",
+    "options": [
+      { "label": "Talk to a staff member", "value": "staff", "score": 0 },
+      { "label": "Tell a friend", "value": "friend", "score": 25 },
+      { "label": "Keep it to myself", "value": "keep", "score": 50 },
+      { "label": "There is no one I can ask", "value": "no-one", "score": 100 }
+    ]
+  },
+  {
+    "id": "q099",
+    "question": "The hostel caregivers treat me kindly.",
+    "category": "general",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "rating",
+    "core": false,
+    "followup": false,
+    "reverse": true,
+    "residence": "hostel",
+    "guidance": "Kind care is a foundation of hostel wellbeing; repeated low scores should be investigated.",
+    "options": [
+      { "label": "Never", "value": 1, "score": 0 },
+      { "label": "Rarely", "value": 2, "score": 25 },
+      { "label": "Sometimes", "value": 3, "score": 50 },
+      { "label": "Often", "value": 4, "score": 75 },
+      { "label": "Always", "value": 5, "score": 100 }
+    ]
+  },
+  {
+    "id": "q100",
+    "question": "If there is anything about hostel life you would like to tell us, write it here.",
+    "category": "general",
+    "classRange": { "min": 4, "max": 10 },
+    "type": "text",
+    "core": false,
+    "followup": false,
+    "residence": "hostel",
+    "guidance": "A safe written channel for hostel-specific concerns; review every response."
+  }
+]
