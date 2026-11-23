@@ -143,6 +143,9 @@ const TimedAssessmentCardsScreen = ({ classNum, subject, assessments, isLoading,
 
               <div className="flex items-center gap-3 flex-wrap mb-4">
                 <AssessmentTypeBadge type={asm.assessmentFormat} />
+                {asm.weakOnly && (
+                  <span className="px-2 py-1 rounded-full text-xs font-medium bg-amber-500/20 text-amber-400 border border-amber-500/30">Weak Students</span>
+                )}
                 <CountdownTimer startDateTime={asm.startDateTime} endDateTime={asm.endDateTime} />
                 {asm.assessmentFormat === 'mcq' && asm.totalQuestions && (
                   <span className="text-xs text-gray-500 dark:text-gray-400">{asm.totalQuestions} questions</span>
@@ -161,7 +164,13 @@ const TimedAssessmentCardsScreen = ({ classNum, subject, assessments, isLoading,
                     <motion.button
                       whileHover={{ scale: 1.03 }}
                       whileTap={{ scale: 0.97 }}
-                      onClick={() => onSelect(asm.id)}
+                      onClick={() => {
+                        try {
+                          if (document.fullscreenElement) return;
+                          document.documentElement.requestFullscreen?.().catch(() => {});
+                        } catch (_) {}
+                        onSelect(asm.id);
+                      }}
                       className="w-full px-4 py-2.5 rounded-xl font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 transition-all text-sm"
                     >
                       Start Assessment →

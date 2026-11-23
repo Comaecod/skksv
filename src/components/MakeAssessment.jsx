@@ -87,6 +87,9 @@ const MakeAssessment = ({ skipInitialAuth, readOnly } = {}) => {
   const [staffNames, setStaffNames] = useState([]);
   const [enabled, setEnabled] = useState(true);
   const [allowGuest, setAllowGuest] = useState(false);
+  const [weakOnly, setWeakOnly] = useState(false);
+  const [weakTargetMode, setWeakTargetMode] = useState('all');
+  const [weakTargetClasses, setWeakTargetClasses] = useState([]);
 
   const [isTimed, setIsTimed] = useState(true);
   const [startDateTime, setStartDateTime] = useState('');
@@ -153,6 +156,9 @@ const MakeAssessment = ({ skipInitialAuth, readOnly } = {}) => {
         setCreatedBy(data.createdBy || userProfile?.id || null);
         setEnabled(data.enabled !== false);
         setAllowGuest(data.allowGuest === true);
+        setWeakOnly(data.weakOnly === true);
+        setWeakTargetMode(data.weakTargetMode === 'classes' ? 'classes' : 'all');
+        setWeakTargetClasses(Array.isArray(data.weakTargetClasses) ? data.weakTargetClasses.map(String) : []);
         setIsTimed(!!data.startDateTime || !!data.endDateTime);
         setStartDateTime(formatTimestamp(data.startDateTime));
         setEndDateTime(formatTimestamp(data.endDateTime));
@@ -238,6 +244,9 @@ const MakeAssessment = ({ skipInitialAuth, readOnly } = {}) => {
     const questions = questionMode === 'simple' ? parseQuestions(questionsMd) : tryParseJson(questionsJson, []);
     const sections = questionMode === 'simple' ? parseSections(sectionsMd) : tryParseJson(sectionsJson, []);
     const hasValidSections = sections.length > 0 && sections.every(s => s.range && s.count && s.marks != null);
+    const finalWeakOnly = !!weakOnly;
+    const finalAllowGuest = finalWeakOnly ? false : !!allowGuest;
+    const finalWeakTargetClasses = finalWeakOnly && weakTargetMode === 'classes' ? weakTargetClasses.map(String).filter(Boolean) : [];
     return {
       subject,
       classNum,
@@ -245,7 +254,10 @@ const MakeAssessment = ({ skipInitialAuth, readOnly } = {}) => {
       teacher,
       invigilator: invigilator || teacher,
       enabled,
-      allowGuest: !!allowGuest,
+      allowGuest: finalAllowGuest,
+      weakOnly: finalWeakOnly,
+      weakTargetMode: finalWeakOnly ? weakTargetMode : null,
+      weakTargetClasses: finalWeakTargetClasses,
       totalQuestions: isCoding ? codingTestCaseCount : hasValidSections ? sections.reduce((sum, s) => sum + Number(s.count), 0) : questions.length,
       totalMarks: isProject ? Number(projectTotalMarks) || 0 : isCoding ? Number(codingTotalMarks) || 0 : hasValidSections ? sections.reduce((sum, s) => sum + Number(s.count) * Number(s.marks), 0) : questions.reduce((sum, q) => sum + (Number(q.marks) || 1), 0),
       wrongAnswerPenaltyFraction: Number(wrongAnswerPenaltyFraction),
@@ -284,6 +296,9 @@ const MakeAssessment = ({ skipInitialAuth, readOnly } = {}) => {
     if (!title.trim()) return 'Title is required';
     if (subject == null || subject === '') return 'Subject is required';
     if (!classNum) return 'Class is required';
+
+    if (weakOnly && allowGuest) return 'Weak-only assessments cannot be available in no-login mode';
+    if (weakOnly && weakTargetMode === 'classes' && weakTargetClasses.length === 0) return 'Select at least one class for weak-only assessment targeting';
 
     if (isTimed) {
       if (!startDateTime) return 'Start date/time is required for timed assessments';
@@ -396,7 +411,8 @@ const MakeAssessment = ({ skipInitialAuth, readOnly } = {}) => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Class *</label>
-                  <CustomSelect value={classNum} onChange={setClassNum} options={CLASS_OPTIONS} className="w-full" disabled={readOnly} />
+                  <CustomSelect value={classNum} onChange={setClassNum} options={CLASS_OPTIONS} className="w-full" disabled={readOnly || weakOnly} />
+                  {weakOnly && <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Class is used as a label/reference for weak-only assessments; visibility is controlled by weak targeting.</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Teacher</label>
@@ -421,9 +437,57 @@ const MakeAssessment = ({ skipInitialAuth, readOnly } = {}) => {
                 Timed Assessment (with start/end window)
               </label>
               <label className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-300 mt-3" title="Allow students to attempt this assessment without logging in. Their results are only visible to you and super admins.">
-                <input type="checkbox" checked={allowGuest} onChange={e => setAllowGuest(e.target.checked)} className="rounded" disabled={readOnly} />
+                <input type="checkbox" checked={weakOnly ? false : allowGuest} onChange={e => setAllowGuest(e.target.checked)} className="rounded" disabled={readOnly || weakOnly} />
                 Allow no-login attempts
               </label>
+            </div>
+
+            <div className="p-5 rounded-xl bg-black/5 dark:bg-white/5 border border-gray-200 dark:border-white/10">
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">🎯 Targeting</h3>
+              <label className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-300">
+                <input type="checkbox" checked={weakOnly} onChange={e => { setWeakOnly(e.target.checked); if (e.target.checked) setAllowGuest(false); }} className="rounded" disabled={readOnly} />
+                For weak students only
+              </label>
+              {weakOnly && (
+                <div className="mt-4 space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Apply to</label>
+                    <div className="flex gap-3 flex-wrap">
+                      <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                        <input type="radio" name="weakTargetMode" value="all" checked={weakTargetMode === 'all'} onChange={() => setWeakTargetMode('all')} disabled={readOnly} />
+                        All classes
+                      </label>
+                      <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                        <input type="radio" name="weakTargetMode" value="classes" checked={weakTargetMode === 'classes'} onChange={() => setWeakTargetMode('classes')} disabled={readOnly} />
+                        Specific classes
+                      </label>
+                    </div>
+                  </div>
+                  {weakTargetMode === 'classes' && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Select classes *</label>
+                      <div className="flex flex-wrap gap-2">
+                        {CLASS_OPTIONS.map(c => {
+                          const checked = weakTargetClasses.includes(c.value);
+                          return (
+                            <label key={c.value} className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-sm ${checked ? 'border-primary/50 bg-primary/10 text-primary' : 'border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300'} ${readOnly ? 'opacity-60' : ''}`}>
+                              <input type="checkbox" checked={checked} disabled={readOnly} onChange={(e) => {
+                                if (e.target.checked) {
+                                  setWeakTargetClasses(prev => Array.from(new Set([...prev, c.value])));
+                                } else {
+                                  setWeakTargetClasses(prev => prev.filter(v => v !== c.value));
+                                }
+                              }} className="rounded" />
+                              {c.label}
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                  <p className="text-xs text-gray-500 dark:text-gray-400">This assessment will only be visible to logged-in students marked as weak. Class restriction is enforced based on weak target selection. It will not be available in no-login/guest mode. Checked against userId only.</p>
+                </div>
+              )}
             </div>
 
             {isTimed && (

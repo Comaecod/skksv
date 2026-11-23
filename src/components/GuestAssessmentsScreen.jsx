@@ -113,6 +113,12 @@ const GuestAssessmentsScreen = () => {
   const handleSelectAssessment = (id) => {
     const asm = assessments.find(a => a.id === id);
     if (!asm) return;
+    if (asm.weakOnly || asm.allowGuest === false) {
+      setAlreadyTaken(false);
+      setError && setError('This assessment is not available in no-login mode');
+      alert('This assessment is not available in no-login mode');
+      return;
+    }
     setSelectedAssessment(asm);
     if (!studentInfo) {
       setScreen('name');

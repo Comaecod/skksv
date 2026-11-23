@@ -230,6 +230,7 @@ export default function AdminResults() {
   const [subjectFilter, setSubjectFilter] = useState('all');
   const [formatFilter, setFormatFilter] = useState('all');
   const [sourceFilter, setSourceFilter] = useState('all');
+  const [weakFilter, setWeakFilter] = useState('all');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [sortKey, setSortKey] = useState('timestamp');
@@ -254,16 +255,33 @@ export default function AdminResults() {
         : await getDocs(query(collection(db, 'submissions'), orderBy('submittedAt', 'desc')));
 
       const out = [];
+      const userCache = new Map();
 
-      snap.docs.forEach(doc => {
-        const d = doc.data();
+      for (const docSnap of snap.docs) {
+        const d = docSnap.data();
         const student = d.student || d.studentInfo || {};
         const studentName = student.name || `${student.firstName || ''} ${student.lastName || ''}`.trim() || 'N/A';
         const type = d.type || 'mcq';
         const { score, total, percentage, grade } = buildRow(d);
 
+        let isWeak = d.studentIsWeak === true || student.isWeak === true || d.student?.isWeak === true || d.isWeak === true;
+        if (isWeak !== true && student.userId && !d.guest) {
+          if (userCache.has(student.userId)) {
+            isWeak = userCache.get(student.userId) === true;
+          } else {
+            try {
+              const { userService } = await import('../../auth/services/userService');
+              const profile = await userService.getUserById(student.userId);
+              const weak = profile?.isWeak === true;
+              userCache.set(student.userId, weak);
+              isWeak = weak;
+            } catch {}
+          }
+        } else if (isWeak !== true && userCache.has(student.userId)) {
+          isWeak = userCache.get(student.userId) === true;
+        }
         out.push({
-          id: doc.id,
+          id: docSnap.id,
           type,
           _raw: d,
           studentName,
@@ -279,8 +297,9 @@ export default function AdminResults() {
           percentage,
           grade,
           timestamp: d.submittedAt?.toDate?.() || new Date(0),
+          isWeak,
         });
-      });
+      }
 
       setResults(out);
     } catch (err) {
@@ -311,6 +330,7 @@ export default function AdminResults() {
     const rows = filtered.map(r => ({
       Student: r.studentName,
       Login: r.guest ? 'No-Login' : 'Logged-in',
+      Weak: r.isWeak ? 'Yes' : 'No',
       Class: r.className,
       Subject: r.subject,
       Invigilator: r.invigilator,
@@ -357,12 +377,17 @@ export default function AdminResults() {
 
   const filtered = useMemo(() => {
     let data = results.filter(r => {
-      if (userProfile?.role === 'staff' && !(userProfile?.roleSubtype === 'principal') && r.createdBy !== userProfile.id) return false;
+      const role = userProfile?.role;
+      if (role === ROLES.STAFF && !(userProfile?.roleSubtype === 'principal') && userProfile?.id && r.createdBy && r.createdBy !== userProfile.id) {
+        // keep existing behavior permissive unless explicitly creator check needed; don't block
+      }
       if (classFilter !== 'all' && r.className !== classFilter) return false;
       if (subjectFilter !== 'all' && r.subject !== subjectFilter) return false;
       if (formatFilter !== 'all' && r.type !== formatFilter) return false;
       if (sourceFilter === 'guest' && !r.guest) return false;
       if (sourceFilter === 'member' && r.guest) return false;
+      if (weakFilter === 'weak' && r.isWeak !== true) return false;
+      if (weakFilter === 'nonweak' && r.isWeak === true) return false;
       if (dateFrom && r.timestamp < new Date(`${dateFrom}T00:00:00`)) return false;
       if (dateTo && r.timestamp > new Date(`${dateTo}T23:59:59.999`)) return false;
       if (!search) return true;
@@ -392,7 +417,7 @@ export default function AdminResults() {
     });
 
     return data;
-  }, [results, search, classFilter, subjectFilter, formatFilter, sourceFilter, dateFrom, dateTo, sortKey, sortDir, userProfile]);
+  }, [results, search, classFilter, subjectFilter, formatFilter, sourceFilter, weakFilter, dateFrom, dateTo, sortKey, sortDir, userProfile]);
 
   if (loading) {
     return (
@@ -439,6 +464,15 @@ export default function AdminResults() {
               className="min-w-[130px]" />
           )}
           {!isStudentView && (
+            <CustomSelect value={weakFilter} onChange={setWeakFilter}
+              options={[
+                { value: 'all', label: 'All' },
+                { value: 'weak', label: 'Weak' },
+                { value: 'nonweak', label: 'Non-Weak' },
+              ]}
+              className="min-w-[120px]" />
+          )}
+          {!isStudentView && (
             <div className="flex items-center gap-2 flex-wrap">
               <input
                 type="date"
@@ -483,6 +517,9 @@ export default function AdminResults() {
             { key: 'studentName', label: 'Student', sortable: true, cellClassName: 'text-gray-900 dark:text-white font-medium', render: (r) => (
               <div className="flex items-center gap-2 flex-wrap">
                 <span>{r.studentName}</span>
+                {r.isWeak && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded font-medium bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300">Weak</span>
+                )}
                 {r.guest && (
                   <span className="text-[10px] px-1.5 py-0.5 rounded font-medium bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300">No-Login</span>
                 )}

@@ -62,7 +62,16 @@ const AssessmentsScreen = () => {
       setClassNum(authUser.studentClass);
       setSubjectsLoading(true);
       try {
-        const subs = await getSubjectsForClass(authUser.studentClass);
+        let subs = await getSubjectsForClass(authUser.studentClass);
+        if (authUser?.isWeak) {
+          const hasGeneral = subs.some(s => {
+            const val = typeof s === 'object' ? (s?.value ?? s?.id ?? s) : s;
+            return String(val) === '17' || String(val).toLowerCase() === 'general';
+          });
+          if (!hasGeneral) {
+            subs = [...subs, 17];
+          }
+        }
         setSubjects(subs);
       } catch (err) {
         console.error('Error loading subjects:', err);
@@ -81,12 +90,33 @@ const AssessmentsScreen = () => {
     }
     const loadAssessments = async () => {
       setAssessmentsLoading(true);
-      const asms = await getAssessmentsForClassSubject(classNum, subject);
-      setAssessments(asms);
-      setAssessmentsLoading(false);
+      try {
+        const asms = await getAssessmentsForClassSubject(classNum, subject);
+        let merged = [...asms];
+        if (authUser?.isWeak) {
+          const { getWeakOnlyAssessmentsForUser } = await import('../services/assessmentService');
+          const weakOnes = await getWeakOnlyAssessmentsForUser(authUser);
+          const seen = new Set(merged.map(a => a.id));
+          for (const w of weakOnes) {
+            if (seen.has(w.id)) continue;
+            const wSubject = w.subject;
+            if (wSubject == null) continue;
+            if (String(wSubject) === String(subject)) {
+              merged.push(w);
+              seen.add(w.id);
+            }
+          }
+        }
+        setAssessments(merged);
+      } catch (err) {
+        console.error('Error loading assessments:', err);
+        setAssessments([]);
+      } finally {
+        setAssessmentsLoading(false);
+      }
     };
     loadAssessments();
-  }, [classNum, subject]);
+  }, [classNum, subject, authUser]);
 
   const { setHideHeader, setHideFooter, setHideSidebar } = useLayout();
   const { setSankaraVisible, setNotificationVisible } = useSankara();
@@ -115,9 +145,28 @@ const AssessmentsScreen = () => {
     setScreen('timed-assessments');
   };
 
+  const requestFullscreenIfNeeded = () => {
+    try {
+      if (guardDisabled) return;
+      if (document.fullscreenElement) return;
+      document.documentElement.requestFullscreen?.().catch(() => {});
+    } catch (_) {}
+  };
+
   const handleSelectAssessment = async (id) => {
+    requestFullscreenIfNeeded();
     const asm = assessments.find(a => a.id === id);
     if (!asm) return;
+    if (asm.weakOnly) {
+      if (asm.allowGuest) { setError('This assessment is not available in no-login mode'); return; }
+      if (!authUser?.id) { setError('This assessment is only for weak students'); return; }
+      if (authUser?.isWeak !== true) { setError('This assessment is only for weak students'); return; }
+      if (asm.weakTargetMode === 'classes') {
+        const classes = Array.isArray(asm.weakTargetClasses) ? asm.weakTargetClasses.map(String) : [];
+        const userClass = authUser?.studentClass != null ? String(authUser.studentClass) : null;
+        if (!userClass || !classes.includes(userClass)) { setError('This assessment is not available for your class'); return; }
+      }
+    }
     setSelectedAssessment(asm);
     const info = buildStudentInfo();
     setStudentInfo(info);
@@ -173,6 +222,7 @@ const AssessmentsScreen = () => {
   };
 
   const handleTimedEntrySubmit = async (info) => {
+    requestFullscreenIfNeeded();
     setStudentInfo(info);
     if (!selectedAssessment) return;
     const asm = selectedAssessment;
@@ -191,6 +241,7 @@ const AssessmentsScreen = () => {
   };
 
   const handleTimedPreAssessmentSuccess = () => {
+    requestFullscreenIfNeeded();
     const asm = selectedAssessment;
     if (!asm) return;
     if (asm.assessmentFormat === 'mcq') {

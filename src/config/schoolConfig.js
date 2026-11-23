@@ -44,4 +44,5 @@ export const SUBJECTS = [
   { value: 14, label: 'Economics' },
   { value: 15, label: 'Computers' },
   { value: 16, label: 'EVS' },
+  { value: 17, label: 'General' },
 ];

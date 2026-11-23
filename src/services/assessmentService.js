@@ -84,7 +84,7 @@ export const getGuestClasses = async () => {
     const classes = new Set(
       snapshot.docs
         .map(d => d.data())
-        .filter(a => !a.endDateTime || toDate(a.endDateTime) > now)
+        .filter(a => a.weakOnly !== true && (!a.endDateTime || toDate(a.endDateTime) > now))
         .map(a => a.classNum)
         .filter(Boolean)
     );
@@ -108,7 +108,7 @@ export const getGuestSubjectsForClass = async (classNum) => {
     const seen = new Set();
     snapshot.docs
       .map(d => d.data())
-      .filter(a => !a.endDateTime || toDate(a.endDateTime) > now)
+      .filter(a => a.weakOnly !== true && (!a.endDateTime || toDate(a.endDateTime) > now))
       .forEach(a => { if (a.subject != null) seen.add(a.subject); });
     return [...seen];
   } catch (err) {
@@ -129,7 +129,7 @@ export const getGuestAssessmentsForClassSubject = async (classNum, subject) => {
     const now = new Date();
     return snapshot.docs
       .map(d => ({ id: d.id, ...d.data() }))
-      .filter(a => a.enabled !== false && (!a.endDateTime || toDate(a.endDateTime) > now));
+      .filter(a => a.enabled !== false && a.weakOnly !== true && (!a.endDateTime || toDate(a.endDateTime) > now));
   } catch (err) {
     console.error('Error fetching guest assessments:', err.message);
     return [];
@@ -177,9 +177,42 @@ export const getAssessmentsForClassSubject = async (classNum, subject) => {
     const now = new Date();
     return snapshot.docs
       .map(d => ({ id: d.id, ...d.data() }))
-      .filter(a => a.enabled !== false && (!a.endDateTime || toDate(a.endDateTime) > now));
+      .filter(a => a.enabled !== false && a.weakOnly !== true && (!a.endDateTime || toDate(a.endDateTime) > now));
   } catch (err) {
     console.error('Error fetching assessments:', err.message);
+    return [];
+  }
+};
+
+export const getWeakOnlyAssessmentsForUser = async (user) => {
+  if (!user) return [];
+  if (user.isWeak !== true) return [];
+  const userId = user.id || user.uid || user.userId;
+  if (!userId) return [];
+  try {
+    const q = query(
+      collection(db, ASSESSMENTS_COL),
+      where('weakOnly', '==', true),
+      where('enabled', '==', true)
+    );
+    const snapshot = await getDocs(q);
+    const now = new Date();
+    const userClass = user.studentClass != null ? String(user.studentClass) : null;
+    return snapshot.docs
+      .map(d => ({ id: d.id, ...d.data() }))
+      .filter(a => {
+        if (a.endDateTime && toDate(a.endDateTime) <= now) return false;
+        if (a.allowGuest) return false;
+        const mode = a.weakTargetMode || 'all';
+        if (mode === 'classes') {
+          const classes = Array.isArray(a.weakTargetClasses) ? a.weakTargetClasses.map(String) : [];
+          if (userClass && classes.includes(userClass)) return true;
+          return false;
+        }
+        return true;
+      });
+  } catch (err) {
+    console.error('Error fetching weak-only assessments:', err.message);
     return [];
   }
 };
@@ -236,6 +269,30 @@ export const submitMcqAttempt = async (assessmentId, studentInfo, answers, resul
     if (assessment.endDateTime && new Date() > toDate(assessment.endDateTime)) {
       throw new Error('Assessment has expired');
     }
+    if (assessment.weakOnly) {
+      if (assessment.allowGuest || studentInfo.guestId) throw new Error('This assessment is only for weak students');
+      if (!studentInfo.userId) throw new Error('This assessment is only for weak students');
+      try {
+        const { userService } = await import('../auth/services/userService');
+        const profile = await userService.getUserById(studentInfo.userId);
+        if (profile?.isWeak !== true) throw new Error('This assessment is only for weak students');
+        if (assessment.weakTargetMode === 'classes') {
+          const classes = Array.isArray(assessment.weakTargetClasses) ? assessment.weakTargetClasses.map(String) : [];
+          const userClass = profile.studentClass != null ? String(profile.studentClass) : null;
+          if (!userClass || !classes.includes(userClass)) throw new Error('This assessment is not available for your class');
+        }
+      } catch (e) {
+        if (e.message === 'This assessment is only for weak students' || e.message === 'This assessment is not available for your class') throw e;
+      }
+    }
+    let isWeak = false;
+    if (studentInfo.userId && !studentInfo.guestId) {
+      try {
+        const { userService } = await import('../auth/services/userService');
+        const profile = await userService.getUserById(studentInfo.userId);
+        isWeak = profile?.isWeak === true;
+      } catch {}
+    }
     const docRef = await addDoc(collection(db, SUBMISSIONS_COL), {
       type: 'mcq',
       assessmentId,
@@ -250,7 +307,9 @@ export const submitMcqAttempt = async (assessmentId, studentInfo, answers, resul
         userId: studentInfo.userId || null,
         guestId: studentInfo.guestId || null,
         name: `${studentInfo.firstName || ''} ${studentInfo.lastName || ''}`.trim(),
+        isWeak,
       },
+      studentIsWeak: isWeak,
       answers,
       results,
       timeTaken,
@@ -271,6 +330,30 @@ export const submitProject = async (assessmentId, studentInfo, projectData, file
     if (!assessment) throw new Error('Assessment not found');
     if (assessment.endDateTime && new Date() > toDate(assessment.endDateTime)) {
       throw new Error('Assessment has expired');
+    }
+    if (assessment.weakOnly) {
+      if (assessment.allowGuest || studentInfo.guestId) throw new Error('This assessment is only for weak students');
+      if (!studentInfo.userId) throw new Error('This assessment is only for weak students');
+      try {
+        const { userService } = await import('../auth/services/userService');
+        const profile = await userService.getUserById(studentInfo.userId);
+        if (profile?.isWeak !== true) throw new Error('This assessment is only for weak students');
+        if (assessment.weakTargetMode === 'classes') {
+          const classes = Array.isArray(assessment.weakTargetClasses) ? assessment.weakTargetClasses.map(String) : [];
+          const userClass = profile.studentClass != null ? String(profile.studentClass) : null;
+          if (!userClass || !classes.includes(userClass)) throw new Error('This assessment is not available for your class');
+        }
+      } catch (e) {
+        if (e.message === 'This assessment is only for weak students' || e.message === 'This assessment is not available for your class') throw e;
+      }
+    }
+    let isWeak = false;
+    if (studentInfo.userId && !studentInfo.guestId) {
+      try {
+        const { userService } = await import('../auth/services/userService');
+        const profile = await userService.getUserById(studentInfo.userId);
+        isWeak = profile?.isWeak === true;
+      } catch {}
     }
     let fileUrl = '';
     let fileName = '';
@@ -293,7 +376,9 @@ export const submitProject = async (assessmentId, studentInfo, projectData, file
         userId: studentInfo.userId || null,
         guestId: studentInfo.guestId || null,
         name: `${studentInfo.firstName || ''} ${studentInfo.lastName || ''}`.trim(),
+        isWeak,
       },
+      studentIsWeak: isWeak,
       topic: projectData.topic || '',
       description: projectData.description || '',
       fileUrl,

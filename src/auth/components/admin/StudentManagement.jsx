@@ -70,6 +70,7 @@ const initialFormState = {
   fatherContact: '',
   motherContact: '',
   schoolBusService: false,
+  isWeak: false,
 };
 
 export default function StudentManagement() {
@@ -86,6 +87,7 @@ export default function StudentManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterClass, setFilterClass] = useState('');
   const [filterResidence, setFilterResidence] = useState('');
+  const [filterWeak, setFilterWeak] = useState('all');
 
   useEffect(() => {
     loadStudents();
@@ -131,6 +133,7 @@ export default function StudentManagement() {
         fatherContact: form.fatherContact,
         motherContact: form.motherContact,
         schoolBusService: form.schoolBusService,
+        isWeak: !!form.isWeak,
         forcePasswordChange: true,
         createdBy: user?.uid,
       });
@@ -169,6 +172,7 @@ export default function StudentManagement() {
       fatherContact: student.fatherContact || '',
       motherContact: student.motherContact || '',
       schoolBusService: student.schoolBusService || false,
+      isWeak: student.isWeak === true,
     });
     setShowForm(true);
     setFormError('');
@@ -216,6 +220,8 @@ export default function StudentManagement() {
   const filteredStudents = students.filter((s) => {
     if (filterClass && s.studentClass !== filterClass) return false;
     if (filterResidence && s.dayScholarOrHostel !== filterResidence) return false;
+    if (filterWeak === 'weak' && s.isWeak !== true) return false;
+    if (filterWeak === 'nonweak' && s.isWeak === true) return false;
     if (!searchTerm) return true;
     const q = searchTerm.toLowerCase();
     return (
@@ -312,11 +318,16 @@ export default function StudentManagement() {
               </div>
             </div>
 
-            <div className="border-t border-gray-200 dark:border-white/10 pt-4">
+            <div className="border-t border-gray-200 dark:border-white/10 pt-4 space-y-2">
               <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
                 <input type="checkbox" checked={form.schoolBusService} onChange={(e) => setForm({ ...form, schoolBusService: e.target.checked })} className="rounded border-gray-300 dark:border-white/10" />
                 Avails School Bus Service
               </label>
+              <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                <input type="checkbox" checked={form.isWeak} onChange={(e) => setForm({ ...form, isWeak: e.target.checked })} className="rounded border-gray-300 dark:border-white/10" />
+                Mark as weak student (for combined exams across classes)
+              </label>
+              <p className="text-xs text-gray-500 dark:text-gray-400 pl-5">Only visible to admins/staff. Not shown to the student.</p>
             </div>
 
             <button type="submit" disabled={isSubmitting} className="px-6 py-2.5 rounded-xl text-sm font-medium bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 transition-all disabled:opacity-50">
@@ -330,12 +341,20 @@ export default function StudentManagement() {
         <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search by name, email, admission no, or father's name..." className="flex-1 px-4 py-2.5 rounded-xl bg-white dark:bg-[#282843] border border-gray-300 dark:border-white/10 text-gray-900 dark:text-white text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all" />
         <CustomSelect value={filterClass} onChange={setFilterClass} options={[{ value: '', label: 'All Classes' }, ...CLASS_OPTIONS]} className="min-w-[140px]" />
         <CustomSelect value={filterResidence} onChange={setFilterResidence} options={[{ value: '', label: 'All Residences' }, ...RESIDENCE_OPTIONS]} className="min-w-[160px]" />
+        <CustomSelect value={filterWeak} onChange={setFilterWeak} options={[{ value: 'all', label: 'All' }, { value: 'weak', label: 'Weak' }, { value: 'nonweak', label: 'Non-Weak' }]} className="min-w-[120px]" />
         <span className="text-sm text-gray-500 dark:text-gray-400 self-center whitespace-nowrap">{filteredStudents.length} result{filteredStudents.length !== 1 ? 's' : ''}</span>
       </div>
 
       <DataTable
         columns={[
-          { key: 'name', label: 'Name', render: (s) => <span className="font-medium text-gray-900 dark:text-white">{s.displayName || '—'}</span> },
+          { key: 'name', label: 'Name', render: (s) => (
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-medium text-gray-900 dark:text-white">{s.displayName || '—'}</span>
+              {s.isWeak === true && (
+                <span className="text-[10px] px-1.5 py-0.5 rounded font-medium bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300">Weak</span>
+              )}
+            </div>
+          ) },
           { key: 'class', label: 'Class', render: (s) => <span className="text-gray-500 dark:text-gray-400">{s.studentClass || '—'}{s.section ? ` - ${s.section}` : ''}</span> },
           { key: 'email', label: 'Email', render: (s) => <span className="text-gray-500 dark:text-gray-400">{s.email}</span> },
           { key: 'admissionNo', label: 'Admission No', render: (s) => <span className="text-gray-500 dark:text-gray-400">{s.admissionNo || '—'}</span> },
